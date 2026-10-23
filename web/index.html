@@ -124,6 +124,7 @@ td code { color: var(--muted); font-size: 12px; }
     <span class="pill" id="st-models"><i class="dot" id="st-nemotron"></i>Nemotron</span>
   </div>
 </header>
+<div id="static-banner" style="display:none;margin:12px 24px 0;padding:10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--muted);font-size:14px">Replay mode: these are <b style="color:var(--fg)">recorded live runs</b> (real Zetaris queries and Nemotron calls through Nightshift, replayed in your browser). Run it locally for live mode: see the <a style="color:var(--lime)" href="https://github.com/CopyNinja07-07/zerobleed#4-run-locally">README</a>.</div>
 <main>
   <aside class="stack">
     <div class="panel">
@@ -167,6 +168,8 @@ td code { color: var(--muted); font-size: 12px; }
 <script>
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+// Static replay mode (GitHub Pages or ?static): no backend, plays recorded runs from data/.
+const STATIC = window.ZB_STATIC === true || new URLSearchParams(location.search).has("static");
 let selected = "SHP-1017";
 let domain = "procurement";
 let zbTotal = null, baseTotal = null, t0 = 0, timer = null;
@@ -174,6 +177,11 @@ const counts = { data: 0, broker: 0, model: 0, cells: 0, gates: 0, tokens: 0 };
 
 // Header pills: live sponsor status from the server.
 async function loadStatus() {
+  if (STATIC) {
+    for (const id of ["st-zetaris", "st-nightshift", "st-nemotron"]) $(id).className = "dot sample";
+    $("static-banner").style.display = "block";
+    return;
+  }
   try {
     const s = await (await fetch("/api/status")).json();
     const set = (id, v) => { $(id).className = "dot " + (v === "online" ? "online" : v === "sample_mode" ? "sample" : "offline"); };
@@ -186,7 +194,7 @@ async function loadStatus() {
 async function loadShips() {
   try {
     $("listTitle").textContent = domain === "incident" ? "Open alerts" : "Late shipments";
-    const rows = await (await fetch(`/api/targets?domain=${domain}`)).json();
+    const rows = await (await fetch(STATIC ? `data/targets-${domain}.json` : `/api/targets?domain=${domain}`)).json();
     $("ships").innerHTML = rows.slice(0, 8).map((r) =>
       `<button class="ship${r.id === selected ? " on" : ""}" data-id="${esc(r.id)}">${esc(r.title)}<small>${esc(r.detail)}</small></button>`).join("");
     document.querySelectorAll(".ship").forEach((b) => b.onclick = () => { selected = b.dataset.id; loadShips(); });
@@ -246,7 +254,21 @@ function addStep(e) {
   animateEvent(e);
 }
 
+// In static mode, replay a recorded run: its steps at a readable pace, then the result.
+const recorded = {};
+async function replay(id, kind, onStep) {
+  recorded[id] ??= fetch(`data/run-${id}.json`).then((r) => r.json());
+  const rec = await recorded[id];
+  if (kind === "baseline") { await new Promise((r) => setTimeout(r, rec.events.length * 650 + 900)); return rec.baseline; }
+  for (const e of rec.events) { await new Promise((r) => setTimeout(r, 650)); onStep(e); }
+  return rec.result;
+}
+
 function stream(path, onStep) {
+  if (STATIC) {
+    const id = decodeURIComponent(path.split("id=")[1]);
+    return replay(id, path.includes("baseline") ? "baseline" : "audit", onStep);
+  }
   return new Promise((resolve, reject) => {
     const es = new EventSource(path);
     es.addEventListener("step", (m) => onStep(JSON.parse(m.data)));
@@ -257,7 +279,7 @@ function stream(path, onStep) {
 
 function countUp(el, to, ms = 1200) {
   const start = performance.now();
-  const step = (t) => { const k = Math.min(1, (t - start) / ms); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))).toLocaleString(); if (k < 1) requestAnimationFrame(step); };
+  const step = (t) => { const k = Math.max(0, Math.min(1, (t - start) / ms)); el.textContent = Math.round(to * (1 - Math.pow(1 - k, 3))).toLocaleString(); if (k < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
 
@@ -334,6 +356,7 @@ const setTabs = () => { $("tab-procurement").classList.toggle("on", domain === "
 for (const d of ["procurement", "incident"]) $(`tab-${d}`).onclick = () => { domain = d; selected = d === "incident" ? "ALR-2001" : "SHP-1017"; setTabs(); loadShips(); };
 setTabs();
 if (params.get("compare") === "0") $("compare").checked = false;
+if (STATIC) document.title = "ZeroBleed Auditor (replay)";
 loadStatus();
 loadShips().then(() => { if (params.get("run")) $("run").click(); });
 </script>

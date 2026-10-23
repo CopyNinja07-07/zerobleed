@@ -17,7 +17,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-Node%2022-3178c6?style=flat-square&labelColor=08070d)](#13-project-layout)
 [![Docker](https://img.shields.io/badge/Docker-ready-2496ed?style=flat-square&labelColor=08070d)](#5-run-with-docker)
 
-[**Results**](RESULTS.md) · [**Whitepaper**](docs/WHITEPAPER.md) · [**Sponsor tech**](docs/SPONSOR_TECH.md) · [**Quick start**](#4-run-locally) · [**API**](#6-api-contract)
+[**▶ Try the Auditor**](#try-the-zerobleed-auditor) · [**Results**](RESULTS.md) · [**Whitepaper**](docs/WHITEPAPER.md) · [**Sponsor tech**](docs/SPONSOR_TECH.md) · [**Quick start**](#4-run-locally) · [**API**](#6-api-contract)
 
 </div>
 
@@ -46,6 +46,24 @@
 | Prompt injection planted in the data | not fooled | fooled |
 
 <sub>Measured 23 Oct 2026 on a MacBook Air (M5, 16 GB). Every run's Nightshift receipts and step traces are in [`RESULTS.md`](RESULTS.md).</sub>
+
+---
+
+## Try the ZeroBleed Auditor
+
+The **ZeroBleed Auditor** is the dashboard an auditor or incident responder uses. Pick a case and press **Run**, and you'll see:
+- **Live pipeline:** each step flows from Zetaris through the broker to Nemotron.
+- **Decision:** the result with its rationale and an independent check, plus **Approve / Send back** buttons.
+- **Tokens read:** a race against a normal shared-history agent on the same case.
+- **Scratchpad, evidence and calls:** the scratchpad passed between steps, the Zetaris query behind every fact, and every Nemotron call with its Nightshift receipt.
+
+| Way to run | What you need | What you see |
+|---|---|---|
+| **Online replay:** [copyninja07-07.github.io/zerobleed](https://copyninja07-07.github.io/zerobleed/) | a browser | All 8 cases replayed from **recorded live runs**, with no setup |
+| **Local, offline:** `SAMPLE_MODE=true npm start` → http://localhost:3030 | Node.js | The same recorded runs, served by the real app |
+| **Local, live:** `npm start` → http://localhost:3030 | Zetaris + Nightshift | Real Zetaris queries and real Nemotron calls, as in the demo video |
+
+The online replay is the static build in [`site/`](site/) (`npm run build:site`), published to the `gh-pages` branch with `npm run publish:site`.
 
 ---
 

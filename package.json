@@ -15,7 +15,9 @@
     "start": "tsx src/server.ts",
     "test": "SAMPLE_MODE=true DATA_PORT=8798 node --import tsx --test tests/*.test.ts && npm run -s conformance",
     "report": "tsx scripts/report.ts",
-    "pdf": "tsx scripts/pdf.ts"
+    "pdf": "tsx scripts/pdf.ts",
+    "build:site": "SAMPLE_MODE=true DATA_PORT=8791 tsx scripts/buildSite.ts",
+    "publish:site": "git subtree split --prefix site -b gh-pages-tmp && git push -f origin gh-pages-tmp:gh-pages && git branch -D gh-pages-tmp"
   },
   "devDependencies": {
     "@types/node": "22.10.1",
