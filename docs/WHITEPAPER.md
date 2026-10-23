@@ -146,6 +146,10 @@ The worker then retries with one more fact. Each step allows a bounded number of
 **Results.** See [`RESULTS.md`](../RESULTS.md) for every run, with links to each run's model calls (including Nightshift receipt IDs) and step trace.
 
 <!-- RESULTS-TABLE:START -->
+| Domain | Runs | Correct: ZeroBleed | Correct: shared-history agent | Input tokens: ZeroBleed | Input tokens: shared-history | Fewer tokens | Largest prompt: ZeroBleed vs shared |
+|---|---|---|---|---|---|---|---|
+| Supplier penalty audit | 4 | **4 / 4** | 3 / 4 | 17,133 | 197,152 | **91.3%** | 880 vs 10,073 |
+| Incident triage | 4 | **4 / 4** | 1 / 4 | 28,860 | 726,511 | **96.0%** | 1,995 vs 63,860 |
 <!-- RESULTS-TABLE:END -->
 
 **What the numbers show.** The token reduction follows directly from the design: no ZeroBleed call carries raw rows, so prompt size is set by the micro-contract rather than by the data volume. The accuracy gap is widest where the baseline must find a few facts inside a large prompt (incident triage, about 60,000 tokens of logs per turn) or must ignore an instruction embedded in the data (SHP-1044, ALR-2004).

@@ -15,6 +15,10 @@ ZeroBleed was tested on **two domains with the same broker**: supplier penalty a
 **Check it yourself:** [`RESULTS.md`](RESULTS.md) lists every run with links to its model calls (including each Nightshift receipt ID) and its step trace, and explains how to verify them. It is generated from the raw files in [`evidence/`](evidence/) by `npm run report`. PDFs for sharing: [`docs/pdf/`](docs/pdf/).
 
 <!-- BENCHMARK-SUMMARY:START -->
+| Domain | Runs | Correct: ZeroBleed | Correct: shared-history agent | Input tokens: ZeroBleed | Input tokens: shared-history | Fewer tokens | Largest prompt: ZeroBleed vs shared |
+|---|---|---|---|---|---|---|---|
+| Supplier penalty audit | 4 | **4 / 4** | 3 / 4 | 17,133 | 197,152 | **91.3%** | 880 vs 10,073 |
+| Incident triage | 4 | **4 / 4** | 1 / 4 | 28,860 | 726,511 | **96.0%** | 1,995 vs 63,860 |
 <!-- BENCHMARK-SUMMARY:END -->
 
 - **An order of magnitude fewer tokens.** In incident triage, the shared-history agent read about 180,000 tokens of raw logs per case; ZeroBleed's largest single prompt stayed under about 2,000.

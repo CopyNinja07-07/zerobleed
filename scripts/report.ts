@@ -88,7 +88,6 @@ out.push(
   "```",
   ""
 );
-writeFileSync("RESULTS.md", out.join("\n"));
 
 // The same headline numbers go into the README and the whitepaper, between markers.
 const headline: string[] = [
@@ -112,6 +111,10 @@ const inject = (file: string, start: string, end: string) => {
   writeFileSync(file, text.slice(0, a + start.length) + "\n" + headline.join("\n") + "\n" + text.slice(b));
   console.log(`updated ${file}`);
 };
+// Headline first, then the per-domain detail.
+const intro = out.findIndex((l) => l.startsWith("Failures stay in the denominator"));
+out.splice(intro + 2, 0, "## Headline (current runs)", "", ...headline, "");
+writeFileSync("RESULTS.md", out.join("\n"));
 inject("README.md", "<!-- BENCHMARK-SUMMARY:START -->", "<!-- BENCHMARK-SUMMARY:END -->");
 inject("docs/WHITEPAPER.md", "<!-- RESULTS-TABLE:START -->", "<!-- RESULTS-TABLE:END -->");
 console.log("wrote RESULTS.md");
