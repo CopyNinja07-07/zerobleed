@@ -39,6 +39,7 @@ test("scratchpad: the Markovian state block round-trips", () => {
 });
 
 import { procurement } from "../src/domains/procurement.ts";
+import { incident } from "../src/domains/incident.ts";
 
 for (const c of procurement.cases) {
   test(`audit ${c.id} -> ${c.expect} $${c.value} (SAMPLE_MODE)`, async () => {
@@ -48,5 +49,15 @@ for (const c of procurement.cases) {
     assert.equal(Math.round(Number(r.decision?.penalty_usd)), Number(c.value));
     assert.equal(r.run.status, "completed");
     assert.ok(Math.max(...r.ledger.map((e) => e.inputTokens)) < 1500, "no single model call reads more than 1,500 tokens");
+  });
+}
+
+for (const c of incident.cases) {
+  test(`triage ${c.id} -> ${c.expect} ${c.value} (SAMPLE_MODE)`, async () => {
+    const { runAudit } = await import("../src/broker/broker.ts");
+    const r = await runAudit({ id: c.id, domain: "incident" }, { quiet: true, runId: `test-${c.id}` });
+    assert.equal(r.decision?.decision, c.expect);
+    assert.equal(r.decision?.recommended_action, c.value);
+    assert.ok(Math.max(...r.ledger.map((e) => e.inputTokens)) < 3000, "no single model call reads more than 3,000 tokens");
   });
 }

@@ -1,8 +1,57 @@
-# ZeroBleed
+<div align="center">
 
-**A need-to-know context broker for agentic audits.** Open Agent Hackathon 2026 · Track 03: Reasoning Architecture.
+# ⬢ ZeroBleed
 
-A procurement auditor asks: *"Supplier VEND-88 delivered 21 days late. Can we enforce the $48,000 penalty?"* The answer depends on three systems: delivery logs, a contract clause, and a weather waiver log. A typical multi-agent pipeline pastes all of that raw data into one shared conversation that every agent re-reads at every step. That is slow and expensive. Facts in the middle get missed, and any instruction hidden in the data reaches every model.
+### A need-to-know context broker for agentic decisions
+
+**Every AI step sees only the facts it needs. Nothing else.**
+
+[![Track](https://img.shields.io/badge/Open%20Agent%20Hackathon%202026-Track%2003%20·%20Reasoning%20Architecture-d6f588?style=for-the-badge&labelColor=08070d)](#)
+
+[![Zetaris](https://img.shields.io/badge/data-Zetaris-b57edc?style=flat-square&labelColor=08070d)](#11-sponsor-technology)
+[![Meterless](https://img.shields.io/badge/engine-Meterless%20Markovian-d6f588?style=flat-square&labelColor=08070d)](#11-sponsor-technology)
+[![Nightshift](https://img.shields.io/badge/provider-Meterless%20Nightshift-f0edf7?style=flat-square&labelColor=08070d)](#11-sponsor-technology)
+[![NVIDIA](https://img.shields.io/badge/models-NVIDIA%20Nemotron-76b900?style=flat-square&labelColor=08070d)](#14-ai-and-model-usage-per-the-ai-usage-policy)
+[![Conformance](https://img.shields.io/badge/Markovian%20conformance-8%2F8-d6f588?style=flat-square&labelColor=08070d)](evidence/markovian-conformance.txt)
+[![Tests](https://img.shields.io/badge/npm%20test-passing-d6f588?style=flat-square&labelColor=08070d)](#10-validation)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Node%2022-3178c6?style=flat-square&labelColor=08070d)](#13-project-layout)
+[![Docker](https://img.shields.io/badge/Docker-ready-2496ed?style=flat-square&labelColor=08070d)](#5-run-with-docker)
+
+[**Results**](RESULTS.md) · [**Whitepaper**](docs/WHITEPAPER.md) · [**Sponsor tech**](docs/SPONSOR_TECH.md) · [**Quick start**](#4-run-locally) · [**API**](#6-api-contract)
+
+</div>
+
+<p align="center"><img src="docs/screenshots/dashboard-ALR-2004.png" alt="ZeroBleed dashboard triaging alert ALR-2004: live pipeline, steps, ACTIVE_ADVERSARY decision, scratchpad and evidence trail" width="100%"></p>
+
+```text
+              ┌───────────────────────────────────────────────────────────────┐
+  raw rows    │  ZETARIS        catalog (names only) · SQL signals · 1 cell    │  never leaves
+              └───────────────────────────────┬───────────────────────────────┘
+                                              │ scoped single-cell SQL
+              ┌───────────────────────────────▼───────────────────────────────┐
+  < 500 chars │  BROKER on the MARKOVIAN ENGINE                                │  plain code
+              │  micro-contracts · least privilege · interrupt gate · guard    │
+              └──────────┬──────────────────────────────────────▲─────────────┘
+                         │ K = (instruction, inputs, outputs, may_request)
+              ┌──────────▼──────────────────────────────────────┴─────────────┐
+  stateless   │  NEMOTRON via NIGHTSHIFT   Lightning 30B · Ultra 550B           │  "I need table.column"
+              └───────────────────────────────────────────────────────────────┘
+```
+
+| | ZeroBleed | Shared-history agent |
+|---|---|---|
+| Supplier penalty audits | **4 / 4** correct · **91.3%** fewer tokens | 3 / 4 |
+| Incident triage (≈20k raw log rows) | **4 / 4** correct · **96.0%** fewer tokens | 1 / 4 |
+| Largest single prompt | **≤ 2,000 tokens** | ≈ 64,000 tokens |
+| Prompt injection planted in the data | not fooled | fooled |
+
+<sub>Measured 23 Oct 2026 on a MacBook Air (M5, 16 GB). Every run's Nightshift receipts and step traces are in [`RESULTS.md`](RESULTS.md).</sub>
+
+---
+
+## The problem, in one paragraph
+
+A procurement auditor asks: *"Supplier VEND-88 delivered 21 days late. Can we enforce the $48,000 penalty?"* An incident responder asks: *"Is this outage a config mistake, a dead node, or an attacker?"* Each answer depends on several systems. A typical multi-agent pipeline pastes all that raw data into one shared conversation that every agent re-reads at every step. That is slow and expensive. Facts in the middle get missed, and any instruction hidden in the data reaches the model that decides.
 
 ZeroBleed keeps the raw data in **Zetaris** and never puts it in a prompt. A broker written in plain code gives each **NVIDIA Nemotron** worker, served through **Meterless Nightshift**, a tiny micro-contract holding only the facts that one step needs. A worker that needs a fact it was not given can only ask for a real column name from the Zetaris catalog. The broker checks the name and fetches that one cell. The **Meterless Markovian engine** carries a scratchpad of under 500 characters between steps instead of a growing history.
 
@@ -12,7 +61,7 @@ ZeroBleed keeps the raw data in **Zetaris** and never puts it in a prompt. A bro
 
 ZeroBleed was tested on **two domains with the same broker**: supplier penalty audits and production incident triage (CloudTrail, VPC flow and Kubernetes logs). Every case ran through ZeroBleed and through a conventional shared-history pipeline, with the same models and the same Zetaris data. Token counts are the usage Nightshift reported for every call.
 
-**Check it yourself:** [`RESULTS.md`](RESULTS.md) lists every run with links to its model calls (including each Nightshift receipt ID) and its step trace, and explains how to verify them. It is generated from the raw files in [`evidence/`](evidence/) by `npm run report`. PDFs for sharing: [`docs/pdf/`](docs/pdf/).
+**Check it yourself:** [`RESULTS.md`](RESULTS.md) lists every run with links to its model calls (including each Nightshift receipt ID) and its step trace, and explains how to verify them. It is generated from the raw files in [`evidence/`](evidence/) by `npm run report` (`npm run pdf` renders shareable PDFs locally).
 
 <!-- BENCHMARK-SUMMARY:START -->
 | Domain | Runs | Correct: ZeroBleed | Correct: shared-history agent | Input tokens: ZeroBleed | Input tokens: shared-history | Fewer tokens | Largest prompt: ZeroBleed vs shared |
@@ -200,11 +249,11 @@ Incident triage takes `{"input": {"alert_id": "ALR-2001"}}` (cases ALR-2001 to A
 ## 10. Validation
 
 ```bash
-npm test     # 8 checks (gate, schema, scratchpad, all 4 audits in SAMPLE_MODE) + the Markovian conformance suite
+npm test     # 12 checks (gates, schema, scratchpad, all 8 cases in SAMPLE_MODE, offline) + the Markovian conformance suite
 ```
 
 - **Meterless Engine test:** the official Markovian conformance suite passes **8/8** ([`evidence/markovian-conformance.txt`](evidence/markovian-conformance.txt)).
-- **Setup check:** `.venv/bin/python smoke_test.py` confirms Zetaris answers SQL over REST and both Nemotron lanes answer through Nightshift.
+- **Setup check:** `python3 scripts/smoke_test.py` (needs `pip install python-dotenv requests openai`) confirms Zetaris answers SQL over REST and both Nemotron lanes answer through Nightshift.
 
 ---
 
@@ -236,17 +285,23 @@ All data is **synthetic** and deterministic. There are no real companies, people
 ```
 src/
   api.ts                 POST /run and GET /health (programmatic entry point)
-  server.ts              starts the API, dashboard and data silos
-  zetaris.ts, llm.ts     adapters for Zetaris and Nightshift (timeouts, retries)
+  server.ts              starts the API (:8000), dashboard (:3030) and data silos (:8787)
+  zetaris.ts, llm.ts     adapters for Zetaris and Nightshift (timeouts, retries, provider contract)
   replay.ts              SAMPLE_MODE and service fallback
   trace.ts               stdout + logs/trace-<run_id>.jsonl
-  broker/                catalog, planner, micro-contracts, scratchpad, broker
-  engines/markovian/     vendored Meterless Markovian engine (Apache 2.0)
+  broker/                catalog, planner, micro-contracts, scratchpad, broker (domain-agnostic)
+  domains/               procurement.ts, incident.ts: tables, row keys, step specs, guards, cases
+  engines/markovian/     vendored Meterless Markovian engine (Apache 2.0), extensions marked
   baseline.ts            the shared-history pipeline used for comparison
-web/                     auditor dashboard
-scripts/                 data generation, Zetaris setup, benchmark, conformance
-tests/                   npm test
-input_examples/, output_examples/, logs/, evidence/, fixtures/
+  dataServer.ts          serves the synthetic silos as JSON APIs for Zetaris
+web/                     animated auditor dashboard
+scripts/                 data generation, Zetaris setup, benchmark, report, PDFs, conformance, smoke test
+tests/                   npm test (offline, SAMPLE_MODE)
+video/                   demo recorder (Playwright), title cards, voiceover script
+input_examples/, output_examples/   sample /run requests and live responses
+evidence/                benchmark summaries, per-run calls (with receipts) and traces, conformance
+fixtures/                recorded responses for SAMPLE_MODE
+docs/                    whitepaper, sponsor tech explanation, screenshots
 ```
 
 ## 14. AI and model usage (per the AI Usage Policy)
