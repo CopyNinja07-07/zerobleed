@@ -1,0 +1,1 @@
+{"text":"{\n  \"status\": \"INSUFFICIENT_CONTEXT\",\n  \"missing_variable\": \"alert_signals.non_admin_iam_escalations_60m\"\n}","model":"nvidia/nemotron-3-ultra-550b-a55b","usage":{"input_tokens":1806,"output_tokens":39},"ms":1333,"receiptId":"rcpt_req_92olw8sw"}

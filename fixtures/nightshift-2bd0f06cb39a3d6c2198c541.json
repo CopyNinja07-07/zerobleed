@@ -1,0 +1,1 @@
+{"text":"Understood. I will analyze the data and apply the triage policy TR-7 in order: ACTIVE_ADVERSARY, CONFIG_ERROR, HARDWARE_FAILURE, else UNKNOWN.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":58869,"output_tokens":39},"ms":3598,"receiptId":"rcpt_req_ovzvp7si"}

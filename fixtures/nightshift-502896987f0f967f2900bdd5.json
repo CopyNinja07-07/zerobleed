@@ -1,0 +1,1 @@
+{"text":"Starting analysis per runbook order: ACTIVE_ADVERSARY check first.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":58708,"output_tokens":17},"ms":3358,"receiptId":"rcpt_req_0v11or0i"}

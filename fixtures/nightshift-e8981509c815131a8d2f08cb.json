@@ -1,0 +1,1 @@
+{"text":"Force Majeure log for EU-CENTRAL on 2026-09-14 shows wind_knots=28, waiver_declared=false, event=normal. No waiver was active.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9880,"output_tokens":50},"ms":3163,"receiptId":"rcpt_req_8l34eycr"}

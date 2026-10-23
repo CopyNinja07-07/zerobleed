@@ -1,0 +1,1 @@
+{"text":"{\n  \"status\": \"VERIFIED\",\n  \"service\": \"search-svc\",\n  \"alert_time\": \"2026-10-20T18:10:00Z\",\n  \"severity\": \"P2\"\n}","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":935,"output_tokens":57},"ms":2796,"receiptId":"rcpt_req_0lbj5o8u"}

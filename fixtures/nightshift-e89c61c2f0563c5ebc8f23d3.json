@@ -1,0 +1,1 @@
+{"text":"{\n  \"status\": \"VERIFIED\",\n  \"classification\": \"HARDWARE_FAILURE\",\n  \"rule_applied\": \"3\"\n}","model":"nvidia/nemotron-3-ultra-550b-a55b","usage":{"input_tokens":1775,"output_tokens":32},"ms":5691,"receiptId":"rcpt_req_dsjpz8kq"}

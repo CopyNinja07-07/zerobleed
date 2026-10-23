@@ -148,6 +148,10 @@ The worker then retries with one more fact. Each step allows a bounded number of
 <!-- RESULTS-TABLE:START -->
 <!-- RESULTS-TABLE:END -->
 
+**What the numbers show.** The token reduction follows directly from the design: no ZeroBleed call carries raw rows, so prompt size is set by the micro-contract rather than by the data volume. The accuracy gap is widest where the baseline must find a few facts inside a large prompt (incident triage, about 60,000 tokens of logs per turn) or must ignore an instruction embedded in the data (SHP-1044, ALR-2004).
+
+**A design fix, reported openly.** In the first incident run, the critic had to request each of four Zetaris signals one at a time. The small model sometimes guessed instead of asking, and one run timed out, giving 2 of 4 correct (the baseline also scored 2 of 4). We changed one setting: the incident critic may be pre-loaded from the `alert_signals` view as well as the runbook, because those signals are Zetaris aggregates, never raw rows. The second run scored 4 of 4. Both runs are in `RESULTS.md`. Baseline accuracy also varied between runs (2 of 4, then 1 of 4), so these four-case numbers should be read as indicative.
+
 ## 8. Limitations
 
 - **Wall time.** Steps run sequentially and each interrupt adds a Zetaris query, so ZeroBleed is slower than the baseline per case. Independent steps and interrupt fetches could run in parallel.

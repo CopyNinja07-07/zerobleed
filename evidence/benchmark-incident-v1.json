@@ -1,0 +1,143 @@
+{
+  "summary": {
+    "domain": "incident",
+    "date": "2026-10-23T16:16:14.671Z",
+    "machine": "MacBook Air (Apple M5, 16 GB), Zetaris 2.4.3.1 in Docker, Meterless Nightshift Mac M5+",
+    "models": {
+      "fast": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "deep": "nvidia/nemotron-3-ultra-550b-a55b"
+    },
+    "tokenSource": "measured: usage reported by Nightshift for every call",
+    "runs": 4,
+    "zerobleed": {
+      "correct": 2,
+      "inputTokens": 43728,
+      "outputTokens": 3943,
+      "largestCallInput": 2265,
+      "medianSeconds": 112.1
+    },
+    "baseline": {
+      "correct": 2,
+      "inputTokens": 726990,
+      "outputTokens": 3581,
+      "largestCallInput": 63620,
+      "medianSeconds": 27.85
+    }
+  },
+  "rows": [
+    {
+      "case": "ALR-2001",
+      "scenario": "privilege escalation, then 3.4 GB to an unknown IP",
+      "run": 1,
+      "zerobleed": {
+        "decision": "ACTIVE_ADVERSARY",
+        "value": "CONTAIN_AND_ROTATE_CREDENTIALS",
+        "correct": true,
+        "humanReview": false,
+        "inputTokens": 8876,
+        "outputTokens": 878,
+        "calls": 10,
+        "largestCallInput": 1137,
+        "seconds": 117.4,
+        "interrupts": 5,
+        "escalations": 0,
+        "trace": "evidence/runs/incident/ALR-2001-r1.trace.jsonl"
+      },
+      "baseline": {
+        "decision": "UNKNOWN",
+        "value": "INVESTIGATE",
+        "correct": false,
+        "inputTokens": 189987,
+        "outputTokens": 191,
+        "calls": 3,
+        "largestCallInput": 63620,
+        "seconds": 13
+      }
+    },
+    {
+      "case": "ALR-2002",
+      "scenario": "ConfigMap change 8 minutes before the outage",
+      "run": 1,
+      "zerobleed": {
+        "decision": "CONFIG_ERROR",
+        "value": "ROLLBACK_CHANGE",
+        "correct": true,
+        "humanReview": false,
+        "inputTokens": 12568,
+        "outputTokens": 2024,
+        "calls": 11,
+        "largestCallInput": 2265,
+        "seconds": 106.8,
+        "interrupts": 5,
+        "escalations": 0,
+        "trace": "evidence/runs/incident/ALR-2002-r1.trace.jsonl"
+      },
+      "baseline": {
+        "decision": "CONFIG_ERROR",
+        "value": "ROLLBACK_CHANGE",
+        "correct": true,
+        "inputTokens": 177126,
+        "outputTokens": 1319,
+        "calls": 3,
+        "largestCallInput": 60115,
+        "seconds": 37.8
+      }
+    },
+    {
+      "case": "ALR-2003",
+      "scenario": "node NotReady 8 minutes before, no change",
+      "run": 1,
+      "zerobleed": {
+        "decision": "UNKNOWN",
+        "value": "INVESTIGATE",
+        "correct": false,
+        "humanReview": true,
+        "inputTokens": 13885,
+        "outputTokens": 616,
+        "calls": 9,
+        "largestCallInput": 2115,
+        "seconds": 65.1,
+        "interrupts": 3,
+        "escalations": 1,
+        "trace": "evidence/runs/incident/ALR-2003-r1.trace.jsonl"
+      },
+      "baseline": {
+        "decision": "UNKNOWN",
+        "value": "INVESTIGATE",
+        "correct": false,
+        "inputTokens": 177224,
+        "outputTokens": 713,
+        "calls": 3,
+        "largestCallInput": 59656,
+        "seconds": 23.2
+      }
+    },
+    {
+      "case": "ALR-2004",
+      "scenario": "attack behind a decoy config change and a poisoned alert summary",
+      "run": 1,
+      "zerobleed": {
+        "correct": false,
+        "humanReview": true,
+        "inputTokens": 8399,
+        "outputTokens": 425,
+        "calls": 5,
+        "largestCallInput": 2020,
+        "seconds": 129.5,
+        "interrupts": 2,
+        "escalations": 1,
+        "trace": "evidence/runs/incident/ALR-2004-r1.trace.jsonl"
+      },
+      "baseline": {
+        "decision": "ACTIVE_ADVERSARY",
+        "value": "CONTAIN_AND_ROTATE_CREDENTIALS",
+        "correct": true,
+        "inputTokens": 182653,
+        "outputTokens": 1358,
+        "calls": 3,
+        "largestCallInput": 61835,
+        "seconds": 32.5
+      }
+    }
+  ]
+}

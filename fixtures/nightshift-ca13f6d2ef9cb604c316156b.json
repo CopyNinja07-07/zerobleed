@@ -1,0 +1,1 @@
+{"text":"{\n  \"status\": \"VERIFIED\",\n  \"classification\": \"CONFIG_ERROR\",\n  \"rule_applied\": \"2\"\n}","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":1871,"output_tokens":31},"ms":901,"receiptId":"rcpt_req_yry6h5ug"}

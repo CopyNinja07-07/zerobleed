@@ -1,0 +1,1 @@
+{"text":"{\"decision\": \"NO_BREACH\", \"penalty_usd\": 0, \"rationale\": \"Delay of 9 days is below the 14-day threshold, so no penalty applies regardless of Force Majeure status.\"}","model":"nvidia/nemotron-3-ultra-550b-a55b","usage":{"input_tokens":9991,"output_tokens":53},"ms":2900,"receiptId":"rcpt_req_cbhfpfnq"}

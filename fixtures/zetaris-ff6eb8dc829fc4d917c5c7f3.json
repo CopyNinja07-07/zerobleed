@@ -1,0 +1,1 @@
+{"columns":["alert_id","non_admin_iam_escalations_60m","escalating_principal_60m","egress_gb_outside_allowlist_60m","egress_destination_outside_allowlist_60m","config_changes_30m","nodes_not_ready_30m"],"rows":[["ALR-2001","2","ci-deploy-bot","3.4","185.220.101.44","0","0"]]}

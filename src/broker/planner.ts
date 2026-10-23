@@ -41,9 +41,10 @@ export async function plan(goal: string, catalog: Catalog): Promise<{ plan: Plan
     // cross-silo read is individually authorised and logged.
     const dropped: string[] = [];
     for (const t of tasks) {
-      const home = domain.homeTable[t.type];
-      dropped.push(...t.columns.filter((c) => !c.startsWith(`${home}.`)));
-      t.columns = t.columns.filter((c) => c.startsWith(`${home}.`));
+      const homes = ([] as string[]).concat(domain.homeTable[t.type]).filter(Boolean);
+      const atHome = (c: string) => homes.some((h) => c.startsWith(`${h}.`));
+      dropped.push(...t.columns.filter((c) => !atHome(c)));
+      t.columns = t.columns.filter(atHome);
     }
     if (problems.length) return { plan: fallback(problems.join("; ")), call, prompt };
     const note = dropped.length ? `least privilege removed ${dropped.join(", ")}` : undefined;

@@ -47,7 +47,7 @@ export interface Domain {
   goal(id: string): string;
   plannerSystem: string;
   fallbackPlan: PlannedTask[];
-  homeTable: Record<TaskType, string>;
+  homeTable: Record<TaskType, string | string[]>; // tables a step may be pre-loaded from; anything else must be requested
   requiredColumns: Partial<Record<TaskType, string>>;
   taskSpecs: Record<TaskType, TaskSpec>;
   critiqueFacts: string[]; // verified facts every critic receives

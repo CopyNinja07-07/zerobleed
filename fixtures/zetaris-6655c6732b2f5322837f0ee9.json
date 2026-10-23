@@ -1,0 +1,1 @@
+{"columns":["alert_id","ts","alert_time","service","severity","metric","value","summary"],"rows":[["ALR-2002","1792513800","2026-10-20T16:30:00Z","payments-api","P1","http_5xx_rate","0.52","payments-api 5xx rate 52%, upstream timeouts"]]}

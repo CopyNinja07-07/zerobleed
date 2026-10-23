@@ -1,0 +1,1 @@
+{"text":"{\n  \"status\": \"VERIFIED\",\n  \"service\": \"ledger-svc\",\n  \"alert_time\": \"2026-10-20T21:40:00Z\",\n  \"severity\": \"P1\"\n}","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":979,"output_tokens":58},"ms":1026,"receiptId":"rcpt_req_8939z9jc"}

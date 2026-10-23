@@ -1,0 +1,1 @@
+{"text":"I have reviewed all data sources and will apply the triage policy TR-7 in order.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":63488,"output_tokens":20},"ms":6901,"receiptId":"rcpt_req_qph4w0jd"}

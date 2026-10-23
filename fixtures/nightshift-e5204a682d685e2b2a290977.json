@@ -1,0 +1,1 @@
+{"text":"{\"decision\": \"ENFORCE\", \"penalty_usd\": 48000, \"rationale\": \"Delay of 21 days exceeds the 14-day threshold with no Force Majeure waiver active on the breach date 2026-09-14 in US-EAST.\"}","model":"nvidia/nemotron-3-ultra-550b-a55b","usage":{"input_tokens":9941,"output_tokens":72},"ms":11362,"receiptId":"rcpt_req_9y2y3q7d"}

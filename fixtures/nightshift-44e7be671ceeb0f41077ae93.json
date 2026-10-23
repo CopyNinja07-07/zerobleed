@@ -1,1 +1,1 @@
-{"text":"VEND-31's contract (CTR-31) has a 14-day threshold. The delay is 9 days, which does not exceed 14, so no penalty applies.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9736,"output_tokens":43},"ms":989,"receiptId":"rcpt_req_12r5h4ro"}
+{"text":"VEND-31's contract (CTR-31) has a 14-day threshold and 12% penalty ($21,600). The delay is 9 days, which is under the threshold, so the penalty does not apply.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9795,"output_tokens":56},"ms":1837,"receiptId":"rcpt_req_ldgd4azk"}

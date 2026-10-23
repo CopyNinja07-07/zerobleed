@@ -1,1 +1,1 @@
-{"text":"{\"status\":\"VERIFIED\",\"delay_days\":9,\"breach_date\":\"2026-09-14\",\"hub_region\":\"EU-CENTRAL\",\"vendor_id\":\"VEND-31\"}","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":713,"output_tokens":46},"ms":719,"receiptId":"rcpt_req_6j4t4wwp"}
+{"text":"{\"status\":\"VERIFIED\",\"delay_days\":9,\"breach_date\":\"2026-09-14\",\"hub_region\":\"EU-CENTRAL\",\"vendor_id\":\"VEND-31\"}","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":713,"output_tokens":46},"ms":1020,"receiptId":"rcpt_req_hasqbr6k"}

@@ -14,11 +14,13 @@
     "benchmark": "tsx scripts/benchmark.ts",
     "start": "tsx src/server.ts",
     "test": "SAMPLE_MODE=true DATA_PORT=8798 node --import tsx --test tests/*.test.ts && npm run -s conformance",
-    "report": "tsx scripts/report.ts"
+    "report": "tsx scripts/report.ts",
+    "pdf": "tsx scripts/pdf.ts"
   },
   "devDependencies": {
+    "@types/node": "22.10.1",
+    "marked": "^14.1.3",
     "tsx": "4.19.2",
-    "typescript": "5.6.3",
-    "@types/node": "22.10.1"
+    "typescript": "5.6.3"
   }
 }

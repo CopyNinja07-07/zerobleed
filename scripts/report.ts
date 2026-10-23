@@ -21,22 +21,34 @@ const out: string[] = [
   "",
 ];
 
-for (const d of Object.values(DOMAINS)) {
-  const file = `evidence/benchmark-${d.id}.json`;
-  if (!existsSync(file)) continue;
-  const { summary, rows } = JSON.parse(readFileSync(file, "utf8"));
+// One section per benchmark file. "-v1" files are earlier runs kept for transparency.
+const files = readdirSync("evidence").filter((f) => /^benchmark-.+\.json$/.test(f)).sort((a, b) => {
+  const rank = (f: string) => Object.keys(DOMAINS).indexOf(f.replace(/^benchmark-|\.json$/g, "").split("-")[0]) * 10 + (f.includes("-v") ? 1 : 0);
+  return rank(a) - rank(b);
+});
+for (const f of files) {
+  const tag = f.replace(/^benchmark-|\.json$/g, "");
+  const d = DOMAINS[tag.split("-")[0]];
+  if (!d) continue;
+  const version = tag.includes("-") ? tag.split("-").slice(1).join("-") : "";
+  const { summary, rows } = JSON.parse(readFileSync(`evidence/${f}`, "utf8"));
   const saved = 100 * (1 - summary.zerobleed.inputTokens / Math.max(1, summary.baseline.inputTokens));
   out.push(
-    `## ${d.title}`,
+    `## ${d.title}${version ? ` (${version}: earlier run, kept for transparency)` : ""}`,
     "",
+    ...(version === "v1" && d.id === "incident"
+      ? ["This first incident run used the original design, in which the critic had to request each Zetaris signal one at a time. The small model sometimes guessed instead of asking. The fix pre-loads the critic with the Zetaris-computed signals (aggregates, never raw rows). The current run is in the section above.", ""]
+      : version === "v1" && d.id === "procurement"
+        ? ["An earlier run with 3 runs per case, made before the benchmark saved per-run call and trace files. Only its summary file survives, so it cannot be checked call by call; the current run above can.", ""]
+        : []),
     `Measured ${summary.date.slice(0, 10)} on ${summary.machine}. Fast lane \`${summary.models.fast}\`, deep lane \`${summary.models.deep}\`. ${rows.length} runs.`,
     "",
     "| | ZeroBleed | Shared-history agent |",
     "|---|---|---|",
     `| Correct decisions | **${summary.zerobleed.correct} / ${rows.length}** | ${summary.baseline.correct} / ${rows.length} |`,
     `| Input tokens, total | **${fmt(summary.zerobleed.inputTokens)}** | ${fmt(summary.baseline.inputTokens)} |`,
-    `| Largest single prompt | **${fmt(summary.zerobleed.largestCallInput ?? 0)}** | ${fmt(summary.baseline.largestCallInput ?? 0)} |`,
-    `| Median wall time per case | ${summary.zerobleed.medianSeconds ?? "-"}s | ${summary.baseline.medianSeconds ?? "-"}s |`,
+    `| Largest single prompt | **${fmt(summary.zerobleed.largestCallInput ?? Math.max(...rows.map((r: any) => r.zerobleed.largestCallInput)))}** | ${fmt(summary.baseline.largestCallInput ?? Math.max(...rows.map((r: any) => r.baseline.largestCallInput)))} |`,
+    ...(summary.zerobleed.medianSeconds !== undefined ? [`| Median wall time per case | ${summary.zerobleed.medianSeconds}s | ${summary.baseline.medianSeconds}s |`] : []),
     "",
     `ZeroBleed read **${saved.toFixed(1)}% fewer input tokens**.`,
     "",
@@ -46,7 +58,7 @@ for (const d of Object.values(DOMAINS)) {
   for (const r of rows) {
     const c = d.cases.find((x) => x.id === r.case)!;
     const runId = `${r.case}-r${r.run}`;
-    const dir = `evidence/runs/${d.id}`;
+    const dir = `evidence/runs/${tag}`;
     const ev = existsSync(`${dir}/${runId}.calls.json`) ? `[calls](${dir}/${runId}.calls.json) · [trace](${dir}/${runId}.trace.jsonl)` : "summary only";
     const mark = (ok: boolean) => (ok ? "✅" : "❌");
     out.push(
@@ -55,8 +67,8 @@ for (const d of Object.values(DOMAINS)) {
   }
   out.push("");
   // A sample of receipts so a reader can spot-check without opening files.
-  const dir = `evidence/runs/${d.id}`;
-  if (existsSync(dir)) {
+  const dir = `evidence/runs/${tag}`;
+  if (existsSync(dir) && !version) {
     const first = readdirSync(dir).find((f) => f.endsWith(".calls.json"));
     if (first) {
       const calls = JSON.parse(readFileSync(`${dir}/${first}`, "utf8"));
@@ -77,4 +89,29 @@ out.push(
   ""
 );
 writeFileSync("RESULTS.md", out.join("\n"));
+
+// The same headline numbers go into the README and the whitepaper, between markers.
+const headline: string[] = [
+  "| Domain | Runs | Correct: ZeroBleed | Correct: shared-history agent | Input tokens: ZeroBleed | Input tokens: shared-history | Fewer tokens | Largest prompt: ZeroBleed vs shared |",
+  "|---|---|---|---|---|---|---|---|",
+];
+for (const d of Object.values(DOMAINS)) {
+  const f = `evidence/benchmark-${d.id}.json`;
+  if (!existsSync(f)) continue;
+  const { summary, rows } = JSON.parse(readFileSync(f, "utf8"));
+  const saved = 100 * (1 - summary.zerobleed.inputTokens / Math.max(1, summary.baseline.inputTokens));
+  headline.push(
+    `| ${d.title} | ${rows.length} | **${summary.zerobleed.correct} / ${rows.length}** | ${summary.baseline.correct} / ${rows.length} | ${fmt(summary.zerobleed.inputTokens)} | ${fmt(summary.baseline.inputTokens)} | **${saved.toFixed(1)}%** | ${fmt(summary.zerobleed.largestCallInput)} vs ${fmt(summary.baseline.largestCallInput)} |`
+  );
+}
+const inject = (file: string, start: string, end: string) => {
+  const text = readFileSync(file, "utf8");
+  const a = text.indexOf(start);
+  const b = text.indexOf(end);
+  if (a < 0 || b < a) return;
+  writeFileSync(file, text.slice(0, a + start.length) + "\n" + headline.join("\n") + "\n" + text.slice(b));
+  console.log(`updated ${file}`);
+};
+inject("README.md", "<!-- BENCHMARK-SUMMARY:START -->", "<!-- BENCHMARK-SUMMARY:END -->");
+inject("docs/WHITEPAPER.md", "<!-- RESULTS-TABLE:START -->", "<!-- RESULTS-TABLE:END -->");
 console.log("wrote RESULTS.md");

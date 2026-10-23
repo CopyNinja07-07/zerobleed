@@ -1,0 +1,1 @@
+{"text":"VEND-12's contract (CTR-12) has a 14-day threshold and 12% penalty ($30,000). The delay is 18 days, exceeding the threshold. No Force Majeure waiver was declared for US-WEST on 2026-09-20, so the penalty applies.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9934,"output_tokens":79},"ms":1953,"receiptId":"rcpt_req_j99am3d5"}

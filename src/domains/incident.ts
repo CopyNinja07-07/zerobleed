@@ -32,7 +32,9 @@ export const incident: Domain = {
     { id: "T2_CRITIQUE", type: "CRITIQUE", columns: ["runbooks.triage_policy"] },
     { id: "T3_DECIDE", type: "DECIDE", columns: [] },
   ],
-  homeTable: { EXTRACT: "alerts", CRITIQUE: "runbooks", DECIDE: "" },
+  // The critic may be pre-loaded with the Zetaris-computed signals: they are
+  // aggregates, never raw rows. Raw log tables are not in the catalog at all.
+  homeTable: { EXTRACT: "alerts", CRITIQUE: ["runbooks", "alert_signals"], DECIDE: "" },
   requiredColumns: { EXTRACT: "alerts.service", CRITIQUE: "runbooks.triage_policy" },
   taskSpecs: {
     EXTRACT: {
