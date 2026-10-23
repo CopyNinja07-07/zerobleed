@@ -12,6 +12,7 @@ import { runBaseline } from "./baseline.ts";
 import { startDataServer } from "./dataServer.ts";
 import { isSampleMode } from "./replay.ts";
 import { query } from "./zetaris.ts";
+import { modelFor, providerStatus } from "./llm.ts";
 
 const API_PORT = Number(process.env.PORT ?? 8000);
 const UI_PORT = Number(process.env.DASHBOARD_PORT ?? 3030);
@@ -21,7 +22,8 @@ createServer(async (req, res) => {
   const path = (req.url ?? "/").split("?")[0];
   if (req.method === "POST" && path === "/run") return handleRun(req, res);
   if (path === "/health") {
-    return res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ status: "ok", sample_mode: isSampleMode(), agents: AGENTS.map((a) => a.name) }));
+    const nightshift = isSampleMode() ? { status: "sample_mode" } : await providerStatus();
+    return res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ status: "ok", sample_mode: isSampleMode(), nightshift: { status: nightshift.status, missing_models: (nightshift as any).missing ?? [] }, agents: AGENTS.map((a) => a.name) }));
   }
   res.writeHead(404, { "content-type": "application/json" }).end(JSON.stringify({ status: "error", error: { type: "NotFound", message: "POST /run or GET /health", recoverable: true } }));
 }).listen(API_PORT, "0.0.0.0", () => console.log(`[INFO] ZeroBleed API: http://localhost:${API_PORT}/run`));
@@ -36,6 +38,18 @@ createServer(async (req, res) => {
   try {
     if (url.pathname === "/") {
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" }).end(readFileSync("web/index.html"));
+    } else if (url.pathname === "/api/status") {
+      // Live sponsor status for the dashboard header.
+      const ns = isSampleMode() ? { status: "sample_mode", missing: [] as string[] } : await providerStatus();
+      let zetaris = "offline";
+      try { await query("SELECT 1"); zetaris = "online"; } catch {}
+      res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({
+        zetaris: isSampleMode() ? "sample_mode" : zetaris,
+        nightshift: ns.status,
+        models: { fast: modelFor("fast"), deep: modelFor("deep") },
+        missing: ns.missing,
+        engine: "Markovian",
+      }));
     } else if (url.pathname === "/api/targets") {
       // What the user can pick: late shipments, or open alerts.
       const domain = getDomain(url.searchParams.get("domain") ?? "procurement");

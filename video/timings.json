@@ -1,15 +1,15 @@
 [
   {
     "scene": "title",
-    "seconds": 6.6
+    "seconds": 6.5
   },
   {
     "scene": "problem",
-    "seconds": 9.6
+    "seconds": 9.5
   },
   {
     "scene": "how",
-    "seconds": 10
+    "seconds": 10.9
   },
   {
     "scene": "live1-intro",
@@ -17,15 +17,15 @@
   },
   {
     "scene": "live1-run",
-    "seconds": 56.1
+    "seconds": 41.5
   },
   {
     "scene": "live2-intro",
-    "seconds": 6.5
+    "seconds": 6.6
   },
   {
     "scene": "live2-run",
-    "seconds": 66.6
+    "seconds": 57
   },
   {
     "scene": "results",

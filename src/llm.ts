@@ -24,6 +24,15 @@ const headers = () => ({
   "Content-Type": "application/json",
 });
 
+// Contract (Meterless Runtime 0.90.0): accept any pasted URL and normalise it
+// to <host>/v1, never /v1/v1.
+export function baseUrl(): string {
+  let u = env("METERLESS_BASE_URL").trim();
+  if (!/^https?:\/\//.test(u)) u = "http://" + u;
+  u = u.replace(/\/(v1\/)?(chat\/completions|models)\/?$/, "").replace(/\/healthz\/?$/, "").replace(/\/v1\/?$/, "").replace(/\/+$/, "");
+  return `${u}/v1`;
+}
+
 export function modelFor(lane: Lane): string {
   return lane === "deep" ? env("METERLESS_DEEP_MODEL") : env("METERLESS_MODEL");
 }
@@ -70,7 +79,7 @@ async function chatLive(lane: Lane, messages: Message[], maxTokens: number, thin
 async function chatOnce(lane: Lane, messages: Message[], maxTokens: number, think: boolean): Promise<ChatResult> {
   const model = modelFor(lane);
   const started = Date.now();
-  const res = await fetch(env("METERLESS_BASE_URL").replace(/\/$/, "") + "/chat/completions", {
+  const res = await fetch(baseUrl() + "/chat/completions", {
     method: "POST",
     headers: headers(),
     body: JSON.stringify({
@@ -80,7 +89,7 @@ async function chatOnce(lane: Lane, messages: Message[], maxTokens: number, thin
       chat_template_kwargs: { enable_thinking: think },
       messages,
     }),
-    signal: AbortSignal.timeout(90_000), // bounded: a model call never hangs a run
+    signal: AbortSignal.timeout(180_000), // contract: 180 s, a cold model load can take minutes
   });
   const body = await res.text();
   if (!res.ok) throw new Error(`Nightshift ${res.status} (${model}): ${body.slice(0, 300)}`);
@@ -98,8 +107,18 @@ async function chatOnce(lane: Lane, messages: Message[], maxTokens: number, thin
   };
 }
 
-export async function listModels(): Promise<string[]> {
-  const res = await fetch(env("METERLESS_BASE_URL").replace(/\/$/, "") + "/models", { headers: headers(), signal: AbortSignal.timeout(15_000) });
-  if (!res.ok) throw new Error(`Nightshift ${res.status} on /models`);
-  return ((await res.json()).data ?? []).map((m: { id: string }) => m.id);
+// Contract: GET /v1/models decides status. 401/403 = unauthorized, 200 with
+// meterless ids = online, anything else = offline. /healthz alone proves nothing.
+export async function providerStatus(): Promise<{ status: "online" | "unauthorized" | "offline"; models: string[]; missing: string[] }> {
+  try {
+    const res = await fetch(baseUrl() + "/models", { headers: headers(), signal: AbortSignal.timeout(15_000) });
+    if (res.status === 401 || res.status === 403) return { status: "unauthorized", models: [], missing: [] };
+    if (!res.ok) return { status: "offline", models: [], missing: [] };
+    const models: string[] = ((await res.json()).data ?? []).map((m: { id: string }) => m.id);
+    const online = models.some((m) => m.startsWith("meterless/"));
+    const missing = [modelFor("fast"), modelFor("deep")].filter((m) => !models.includes(m));
+    return { status: online ? "online" : "offline", models, missing };
+  } catch {
+    return { status: "offline", models: [], missing: [] };
+  }
 }
