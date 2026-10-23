@@ -97,7 +97,7 @@ td code { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); }
       <div class="panel"><h2>Scratchpad carried between steps</h2><div class="chunks" id="chunks"><p class="empty">Each step receives only this block, never the history.</p></div></div>
       <div class="panel"><h2>Evidence trail</h2><div id="evidence"><p class="empty">Every fact links to the one Zetaris query that produced it.</p></div></div>
     </div>
-    <div class="panel"><h2>Model calls</h2><div id="ledger"><p class="empty">One row per Nemotron call through Nightshift.</p></div></div>
+    <div class="panel" id="calls"><h2>Model calls</h2><div id="ledger"><p class="empty">One row per Nemotron call through Nightshift.</p></div></div>
   </section>
 </main>
 <script>
@@ -175,9 +175,9 @@ function renderResult(r) {
   }
   $("evidence").innerHTML = [...byQuery].map(([sql, facts]) =>
     `<div style="margin-bottom:10px"><pre>${esc(sql)}</pre><p style="margin:4px 0 0;font-size:13px">${[...facts].map(([k, v]) => `<b>${esc(k)}</b> = ${esc(String(v).slice(0, 60))}${String(v).length > 60 ? "..." : ""}`).join(" &middot; ")}</p></div>`).join("");
-  $("ledger").innerHTML = `<table><tr><th>Step</th><th>Model</th><th>Tokens in</th><th>Tokens out</th><th>Time</th><th>Result</th></tr>${r.ledger.map((e) =>
-    `<tr><td>${esc(e.task)}</td><td>${esc(e.model.replace("nvidia/", ""))}</td><td>${e.inputTokens}</td><td>${e.outputTokens}</td><td>${(e.ms / 1000).toFixed(1)}s</td><td>${esc(e.outcome)}</td></tr>`).join("")}
-    <tr><td><b>Total</b></td><td></td><td><b>${r.totals.inputTokens}</b></td><td><b>${r.totals.outputTokens}</b></td><td><b>${(r.totals.ms / 1000).toFixed(1)}s</b></td><td></td></tr></table>`;
+  $("ledger").innerHTML = `<table><tr><th>Step</th><th>Model (via Nightshift)</th><th>Tokens in</th><th>Tokens out</th><th>Time</th><th>Result</th><th>Nightshift receipt</th></tr>${r.ledger.map((e) =>
+    `<tr><td>${esc(e.task)}</td><td>${esc(e.model)}</td><td>${e.inputTokens}</td><td>${e.outputTokens}</td><td>${(e.ms / 1000).toFixed(1)}s</td><td>${esc(e.outcome)}</td><td><code>${esc(e.receiptId ?? "-")}</code></td></tr>`).join("")}
+    <tr><td><b>Total</b></td><td></td><td><b>${r.totals.inputTokens}</b></td><td><b>${r.totals.outputTokens}</b></td><td><b>${(r.totals.ms / 1000).toFixed(1)}s</b></td><td></td><td></td></tr></table>`;
   zbTotal = r.totals.inputTokens;
   renderBars();
 }

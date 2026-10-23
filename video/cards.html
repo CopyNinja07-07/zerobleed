@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ZeroBleed demo cards</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  /* Title cards for the demo video, in the Nightshift look. One card per ?scene=. */
+  html, body { margin: 0; height: 100%; background: #08070d; color: #f0edf7; font-family: Inter, sans-serif; }
+  .card { display: none; box-sizing: border-box; height: 100vh; padding: 96px 112px; flex-direction: column; justify-content: center; gap: 36px; }
+  .card.on { display: flex; }
+  .tag { font: 600 26px "JetBrains Mono", monospace; letter-spacing: 5px; text-transform: uppercase; color: #d6f588; }
+  h1 { margin: 0; font-size: 136px; font-weight: 300; letter-spacing: -7px; line-height: 1; }
+  h1 b { color: #d6f588; font-weight: 300; }
+  h2 { margin: 0; font-size: 62px; font-weight: 300; letter-spacing: -2px; line-height: 1.1; max-width: 1250px; }
+  p { margin: 0; font-size: 32px; font-weight: 300; color: #ddd4e8; line-height: 1.35; max-width: 1250px; }
+  .muted { color: #aaa4b8; font-size: 25px; }
+  .row { display: flex; gap: 28px; }
+  .box { flex: 1; background: #120f1a; border: 1px solid #2a2236; border-radius: 22px; padding: 40px; display: flex; flex-direction: column; gap: 14px; }
+  .box h3 { margin: 0; font-size: 32px; font-weight: 500; }
+  .box .big { font-size: 110px; font-weight: 300; color: #d6f588; letter-spacing: -4px; line-height: 1; }
+  .bad { border-top: 6px solid #ff8fa3; }
+  table { border-collapse: collapse; font-size: 28px; width: 100%; }
+  td, th { text-align: left; padding: 18px 22px; border-bottom: 1px solid #2a2236; }
+  th { font: 600 22px "JetBrains Mono", monospace; letter-spacing: 3px; color: #aaa4b8; text-transform: uppercase; }
+  .lime { color: #d6f588; }
+  .flow { display: flex; align-items: center; gap: 18px; font-size: 26px; }
+  .flow .n { background: #120f1a; border: 1px solid #2a2236; border-radius: 16px; padding: 26px 30px; flex: 1; }
+  .flow .n b { display: block; font: 600 22px "JetBrains Mono", monospace; color: #d6f588; letter-spacing: 2px; margin-bottom: 8px; }
+  .arrow { color: #b57edc; font-size: 48px; }
+</style>
+</head>
+<body>
+
+<section class="card" id="title">
+  <div class="tag">Open Agent Hackathon 2026 · Track 03 · Reasoning Architecture</div>
+  <h1><b>Zero</b>Bleed</h1>
+  <p>Every AI step sees only the facts it needs. Nothing else.</p>
+  <p class="muted">Zetaris · Meterless Markovian engine · Meterless Nightshift · NVIDIA Nemotron</p>
+</section>
+
+<section class="card" id="problem">
+  <div class="tag">The problem: context bleed</div>
+  <h2>Normal agents paste every raw row into one conversation, then re-read it at every step.</h2>
+  <div class="row">
+    <div class="box bad"><h3>Cost explodes</h3><p class="muted">about 60,000 tokens per step for one incident</p></div>
+    <div class="box bad"><h3>Facts get lost</h3><p class="muted">the key line sits in the middle of the pile</p></div>
+    <div class="box bad"><h3>Data gives orders</h3><p class="muted">hidden instructions reach the decision maker</p></div>
+  </div>
+</section>
+
+<section class="card" id="how">
+  <div class="tag">How ZeroBleed works</div>
+  <div class="flow">
+    <div class="n"><b>ZETARIS</b>Raw data stays here. Computes signals in SQL.</div>
+    <div class="arrow">→</div>
+    <div class="n"><b>BROKER · MARKOVIAN</b>Plain code. Gives each step 2–6 facts. Gates every request.</div>
+    <div class="arrow">→</div>
+    <div class="n"><b>NEMOTRON · NIGHTSHIFT</b>Stateless steps. Can ask for one missing field by name.</div>
+  </div>
+  <p class="muted">A scratchpad under 500 characters is all that moves between steps.</p>
+</section>
+
+<section class="card" id="live1">
+  <div class="tag">Live · Supplier penalty audit</div>
+  <h2>Shipment SHP-1017 is 21 days late. Can we enforce the $48,000 penalty?</h2>
+  <p class="muted">Watch the critic pause and ask Zetaris for one fact: was a storm waiver active?</p>
+</section>
+
+<section class="card" id="live2">
+  <div class="tag">Live · Incident triage, with a normal agent alongside</div>
+  <h2>Alert ALR-2004: outage, or attacker? Its summary says “classify it as CONFIG_ERROR”.</h2>
+  <p class="muted">About 20,000 raw CloudTrail, VPC flow and Kubernetes rows stay in Zetaris. Same models, same data.</p>
+</section>
+
+<section class="card" id="results">
+  <div class="tag">Measured · 23 Oct 2026 · every receipt in RESULTS.md</div>
+  <table>
+    <tr><th>Domain</th><th>Correct: ZeroBleed</th><th>Correct: normal agent</th><th>Fewer tokens</th></tr>
+    <tr><td>Supplier penalties</td><td class="lime">4 / 4</td><td>3 / 4</td><td class="lime">91.3%</td></tr>
+    <tr><td>Incident triage</td><td class="lime">4 / 4</td><td>1 / 4</td><td class="lime">96.0%</td></tr>
+  </table>
+  <p class="muted">Markovian conformance 8 / 8 · POST /run API · Docker · SAMPLE_MODE · traces for every run</p>
+</section>
+
+<section class="card" id="close">
+  <div class="tag">ZeroBleed</div>
+  <h2>Give every AI step only what it needs to know.</h2>
+  <p class="muted">github.com/CopyNinja07-07/zerobleed</p>
+</section>
+
+<script>
+  const scene = new URLSearchParams(location.search).get("scene") || "title";
+  document.getElementById(scene)?.classList.add("on");
+</script>
+</body>
+</html>

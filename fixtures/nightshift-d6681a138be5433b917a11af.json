@@ -1,1 +1,1 @@
-{"text":"CONFIG_ERROR","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":60416,"output_tokens":4},"ms":3063,"receiptId":"rcpt_req_sgsnd1oz"}
+{"text":"Understood. I will analyze the data and apply the triage policy TR-7 in order: ACTIVE_ADVERSARY, CONFIG_ERROR, HARDWARE_FAILURE, UNKNOWN.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":60424,"output_tokens":38},"ms":3816,"receiptId":"rcpt_req_gqcjlxli"}

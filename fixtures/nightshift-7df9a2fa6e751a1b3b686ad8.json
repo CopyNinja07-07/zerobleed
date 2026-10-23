@@ -1,1 +1,1 @@
-{"text":"RATIFY","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":708,"output_tokens":4},"ms":715,"receiptId":"rcpt_req_a4vgt5si"}
+{"text":"RATIFY","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":708,"output_tokens":4},"ms":465,"receiptId":"rcpt_req_5c8zf5rm"}
