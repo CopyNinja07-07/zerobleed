@@ -37,6 +37,13 @@ const KEYS: Record<Table, (facts: Record<string, string>) => Record<string, stri
   force_majeure: (f) => (f.breach_date && f.hub_region ? { log_date: f.breach_date, hub_region: f.hub_region } : undefined),
 };
 
+// Plain-words description of which row a fetched cell came from, so a worker
+// knows the cell already answers "on the breach_date in this region".
+export function rowScope(table: Table, facts: Record<string, string>): string | undefined {
+  const key = KEYS[table](facts);
+  return key ? Object.entries(key).map(([k, v]) => `${k} ${v}`).join(", ") : undefined;
+}
+
 const quote = (v: string) => `'${v.replace(/'/g, "''")}'`;
 
 export interface Projection {

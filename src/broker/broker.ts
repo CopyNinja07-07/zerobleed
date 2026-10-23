@@ -9,7 +9,7 @@
 import { Markovian, type MarkovianRun } from "../engines/markovian/index.ts";
 import type { ChatResult, Lane } from "../llm.ts";
 import { chat } from "../llm.ts";
-import { loadCatalog, project, type Catalog, type Table } from "./catalog.ts";
+import { loadCatalog, project, rowScope, type Catalog, type Table } from "./catalog.ts";
 import { dispatch, TASK_SPECS, type MicroContract } from "./contracts.ts";
 import { plan as makePlan, type Plan, type PlannedTask } from "./planner.ts";
 import { carryoverFromPrompt, readScratchpad, toolResultFromPrompt, writeScratchpad, type Scratchpad } from "./scratchpad.ts";
@@ -93,10 +93,16 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
       log(`Zetaris: fetched ${cols.length} cell(s) from ${t} for ${task.id}`);
     }
     for (const extra of (pad.context.extra ?? "").split(",").filter(Boolean)) {
-      const c = extra.split(".")[1];
-      if (pad.facts[c] !== undefined) inputs[c] = pad.facts[c];
+      const [t, c] = extra.split(".") as [Table, string];
+      if (pad.facts[c] === undefined) continue;
+      inputs[c] = pad.facts[c];
+      const scope = rowScope(t, { ...pad.facts, ...pad.context });
+      if (scope) inputs[`${c}_row`] = `${t} row for ${scope}`;
     }
-    if (task.type === "CRITIQUE" && pad.facts.delay_days !== undefined) inputs.delay_days = pad.facts.delay_days;
+    // The critic checks the clause against the verified delivery facts.
+    if (task.type === "CRITIQUE") {
+      for (const f of ["delay_days", "breach_date", "hub_region"]) if (pad.facts[f] !== undefined) inputs[f] = pad.facts[f];
+    }
     if (task.type === "DECIDE") Object.assign(inputs, pad.facts);
     return inputs;
   }
@@ -162,6 +168,16 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
     }
     const task = thePlan!.tasks.find((t) => t.id === pad.remaining[0]);
     if (!task) return { text: `Nothing left to do.\n[TASK_COMPLETE]`, metadata: usage() };
+
+    // Branch on confidence: never let the strategist decide on an unverified step.
+    const unresolved = pad.completed.filter((c) => c.includes("("));
+    if (task.type === "DECIDE" && unresolved.length) {
+      decision = { decision: "HUMAN_REVIEW", penalty_usd: "pending", rationale: `Not decided automatically: ${unresolved.join(", ")} could not be verified.` };
+      pad.remaining.shift();
+      pad.completed.push(`${task.id}(skipped)`);
+      log(`Decision withheld: ${unresolved.join(", ")} unverified, routed to a human reviewer`);
+      return { text: `${decision.rationale}\n[TASK_COMPLETE]\n\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
+    }
 
     const spec = TASK_SPECS[task.type];
     const inputs = await buildInputs(task, pad);
