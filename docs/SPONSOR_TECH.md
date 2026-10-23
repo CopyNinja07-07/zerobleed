@@ -31,7 +31,7 @@ Each response's usage and compute receipt ID is recorded, so every model call in
 
 Models are called by exact name, never `meterless/auto`, and every trace line records which Nemotron model handled the request.
 
-**Cursor (with Space XAI).** Code was edited in Cursor alongside an AI coding agent (Claude Code). The coding tools never received the Nightshift or NVIDIA keys.
+**Cursor (with Space XAI).** Code was edited in Cursor, with AI-assisted coding. The coding tools never received the Nightshift or NVIDIA keys.
 
 **What is unique.** We used the sponsor stack to build a *context firewall*, not just a pipeline:
 - **Zetaris** is both the data platform and the gatekeeper. Its catalog defines what an AI is allowed to ask for, and its SQL turns raw telemetry into signals so no model reads a raw log line.

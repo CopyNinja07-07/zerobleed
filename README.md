@@ -353,7 +353,7 @@ docs/                    whitepaper, sponsor tech explanation, screenshots
 
 ## 16. How we built it
 
-- **Coding tools:** an AI coding agent (Claude Code), with Cursor for editing. The coding models never saw the Nightshift or NVIDIA keys.
+- **Coding tools:** Cursor for editing, with AI-assisted coding (see section 14). The coding models never saw the Nightshift or NVIDIA keys.
 - **Runtime models:** NVIDIA Nemotron 3.5 Lightning 30B and Nemotron 3 Ultra 550B, through Meterless Nightshift.
 - **Meterless Engine:** Markovian, extended where marked "ZeroBleed extension" (see [`NOTICE.md`](src/engines/markovian/NOTICE.md)).
 
