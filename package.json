@@ -10,7 +10,8 @@
     "setup:zetaris": "tsx scripts/setupZetaris.ts",
     "audit": "tsx src/cli.ts",
     "conformance": "tsx scripts/conformance.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "benchmark": "tsx scripts/benchmark.ts"
   },
   "devDependencies": {
     "tsx": "4.19.2",

@@ -38,18 +38,25 @@ export interface ChatOptions {
 
 // Hidden reasoning counts against max_tokens, so the budget is generous.
 // An empty answer (reasoning ran out of budget) is retried once with double the budget.
+export type Message = { role: "system" | "user" | "assistant"; content: string };
+
 export async function chat(lane: Lane, system: string, user: string, opts: ChatOptions = {}): Promise<ChatResult> {
+  return chatMessages(lane, [{ role: "system", content: system }, { role: "user", content: user }], opts);
+}
+
+// Multi-turn form. ZeroBleed itself never uses history; the baseline does.
+export async function chatMessages(lane: Lane, messages: Message[], opts: ChatOptions = {}): Promise<ChatResult> {
   const think = opts.think ?? false;
   const maxTokens = opts.maxTokens ?? (think ? 4000 : 800);
   try {
-    return await chatOnce(lane, system, user, maxTokens, think);
+    return await chatOnce(lane, messages, maxTokens, think);
   } catch (err) {
     if (!/empty_response/.test((err as Error).message)) throw err;
-    return chatOnce(lane, system, user, maxTokens * 2, think);
+    return chatOnce(lane, messages, maxTokens * 2, think);
   }
 }
 
-async function chatOnce(lane: Lane, system: string, user: string, maxTokens: number, think: boolean): Promise<ChatResult> {
+async function chatOnce(lane: Lane, messages: Message[], maxTokens: number, think: boolean): Promise<ChatResult> {
   const model = modelFor(lane);
   const started = Date.now();
   const res = await fetch(env("METERLESS_BASE_URL").replace(/\/$/, "") + "/chat/completions", {
@@ -60,10 +67,7 @@ async function chatOnce(lane: Lane, system: string, user: string, maxTokens: num
       temperature: 0,
       max_tokens: maxTokens,
       chat_template_kwargs: { enable_thinking: think },
-      messages: [
-        { role: "system", content: system },
-        { role: "user", content: user },
-      ],
+      messages,
     }),
   });
   const body = await res.text();
