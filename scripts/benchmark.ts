@@ -2,7 +2,8 @@
 // baseline, checks each decision against the known answer, and writes the
 // measured results to evidence/benchmark-<domain>.{md,json}.
 // Usage: npm run benchmark -- [domain] [runs-per-case]     e.g. npm run benchmark -- incident 3
-import { mkdirSync, writeFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { mkdirSync, renameSync, writeFileSync } from "node:fs";
 import { runAudit } from "../src/broker/broker.ts";
 import { runBaseline } from "../src/baseline.ts";
 import { startDataServer } from "../src/dataServer.ts";
@@ -24,11 +25,37 @@ const median = (xs: number[]) => {
   return s.length ? (s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2) : 0;
 };
 
+// Nightshift held 50 GB once on this 16 GB Mac. Stop before that happens again.
+function nightshiftGb(): number {
+  try {
+    const out = execFileSync("ps", ["-axo", "rss,command"], { encoding: "utf8" });
+    return out.split("\n").filter((l) => /Nightshift\.app/.test(l)).reduce((s, l) => s + Number(l.trim().split(/\s+/)[0] || 0), 0) / 1048576;
+  } catch {
+    return 0;
+  }
+}
+const MAX_NIGHTSHIFT_GB = Number(process.env.MAX_NIGHTSHIFT_GB ?? 6);
+
+const evidenceDir = `evidence/runs/${domain.id}`;
+mkdirSync(evidenceDir, { recursive: true });
 const rows: any[] = [];
 for (const c of domain.cases) {
   for (let r = 1; r <= RUNS; r++) {
-    const zb = await runAudit({ id: c.id, domain: domain.id }, { quiet: true });
+    const gb = nightshiftGb();
+    if (gb > MAX_NIGHTSHIFT_GB) {
+      console.error(`Stopping: Nightshift is using ${gb.toFixed(1)} GB (limit ${MAX_NIGHTSHIFT_GB} GB). Restart Nightshift and re-run.`);
+      process.exit(3);
+    }
+    const runId = `${c.id}-r${r}`;
+    const zb = await runAudit({ id: c.id, domain: domain.id }, { quiet: true, runId });
+    renameSync(zb.traceFile, `${evidenceDir}/${runId}.trace.jsonl`);
     const base = await runBaseline(c.id, domain.id);
+    // Every model call, with the Nightshift receipt that proves it happened.
+    writeFileSync(`${evidenceDir}/${runId}.calls.json`, JSON.stringify({
+      case: c.id, run: r,
+      zerobleed: { decision: zb.decision, calls: zb.ledger, evidence: zb.citations, markovian: { chunks: zb.run.chunks.length, status: zb.run.status, reflection: zb.run.reflection } },
+      baseline: { decision: base.decision, calls: base.turns, error: base.error },
+    }, null, 2));
     const row = {
       case: c.id,
       scenario: c.what,
@@ -45,6 +72,7 @@ for (const c of domain.cases) {
         seconds: +(zb.totals.ms / 1000).toFixed(1),
         interrupts: zb.events.filter((e) => e.startsWith("Gate:")).length,
         escalations: zb.events.filter((e) => e.includes("Escalating")).length,
+        trace: `${evidenceDir}/${runId}.trace.jsonl`,
       },
       baseline: {
         decision: base.decision?.decision,
@@ -59,7 +87,7 @@ for (const c of domain.cases) {
       },
     };
     rows.push(row);
-    console.log(JSON.stringify(row));
+    console.log(JSON.stringify(row), `nightshift ${nightshiftGb().toFixed(1)} GB`);
   }
 }
 

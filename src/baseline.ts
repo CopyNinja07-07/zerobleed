@@ -7,7 +7,7 @@ import { query } from "./zetaris.ts";
 
 export interface BaselineResult {
   decision?: { decision: string; rationale: string; [key: string]: string };
-  turns: { turn: string; lane: Lane; inputTokens: number; outputTokens: number; ms: number }[];
+  turns: { turn: string; lane: Lane; model: string; inputTokens: number; outputTokens: number; ms: number; receiptId?: string }[];
   totals: { inputTokens: number; outputTokens: number; llmCalls: number; ms: number };
   error?: string;
 }
@@ -52,10 +52,9 @@ const SETUPS: Record<string, BaselineSetup> = {
         `VPC_FLOWS_LAST_HOUR: ${JSON.stringify(flows)}\nK8S_EVENTS_LAST_HOUR: ${JSON.stringify(k8s)}`
       );
     },
+    // Three turns, not five: each turn re-reads about 60,000 tokens of logs.
     steps: (id) => [
-      ["EXTRACT", "fast", `Summarise alert ${id}: service, time and severity.`],
-      ["SIGNALS", "fast", "From the logs, list any IAM privilege escalation by a non-admin principal, the total GB sent to destinations outside the allowlist, any ConfigMap or Deployment change, and any node NotReady, with times."],
-      ["CRITIQUE", "fast", "Apply the runbook's triage policy in its stated order to those signals."],
+      ["SIGNALS", "fast", `For alert ${id}, list from the logs: any IAM privilege escalation by a non-admin principal, the total GB sent to destinations outside the allowlist, any ConfigMap or Deployment change, and any node NotReady, with times. Then apply the runbook's triage policy in its stated order.`],
       [
         "DECIDE",
         "deep",
@@ -80,7 +79,7 @@ export async function runBaseline(id: string, domainId = "procurement"): Promise
       if (ask) history.push({ role: "user", content: ask });
       last = await chatMessages(lane, history, { maxTokens: 1200 });
       history.push({ role: "assistant", content: last.text });
-      turns.push({ turn, lane, inputTokens: last.usage.input_tokens, outputTokens: last.usage.output_tokens, ms: last.ms });
+      turns.push({ turn, lane, model: last.model, inputTokens: last.usage.input_tokens, outputTokens: last.usage.output_tokens, ms: last.ms, receiptId: last.receiptId });
     }
   } catch (err) {
     return { turns, totals: totalsOf(turns, started), error: (err as Error).message.slice(0, 300) };
