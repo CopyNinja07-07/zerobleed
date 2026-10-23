@@ -5,3 +5,6 @@ __pycache__/
 node_modules/
 .zerobleed/
 runs/
+logs/trace-test-*
+logs/trace-SHP-*
+logs/trace-ALR-*

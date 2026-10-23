@@ -1,0 +1,1 @@
+{"columns":["col_name","data_type","comment"],"rows":[["alert_id","string",null],["iam_escalations_60m","bigint",null],["escalation_principal_60m","string",null],["unknown_egress_gb_60m","double",null],["unknown_egress_destination_60m","string",null],["config_changes_30m","bigint",null],["nodes_not_ready_30m","bigint",null]]}

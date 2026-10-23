@@ -9,6 +9,12 @@ const silos: Record<string, string> = {
   "/erp/shipments": "data/shipments.json",
   "/legal/contracts": "data/contracts.json",
   "/weather/force_majeure": "data/force_majeure.json",
+  // Domain 2: incident response
+  "/aws/cloudtrail": "data/incident/cloudtrail.json",
+  "/aws/vpc_flows": "data/incident/vpc_flows.json",
+  "/k8s/events": "data/incident/k8s_events.json",
+  "/datadog/alerts": "data/incident/alerts.json",
+  "/sre/runbooks": "data/incident/runbooks.json",
 };
 
 export function startDataServer(port = PORT) {
@@ -19,8 +25,7 @@ export function startDataServer(port = PORT) {
       return;
     }
     // Wrapped in {"records": [...]}: Zetaris flattens an array-of-structs field with explode().
-    const records = JSON.parse(readFileSync(file, "utf8"));
-    res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ records }));
+    res.writeHead(200, { "content-type": "application/json" }).end(`{"records":${readFileSync(file, "utf8")}}`);
   });
   // Rejects if the port is taken (another ZeroBleed process already serves the silos).
   return new Promise<typeof server>((resolve, reject) => {

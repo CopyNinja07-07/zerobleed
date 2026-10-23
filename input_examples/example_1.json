@@ -1,0 +1,5 @@
+{
+  "run_id": "example-1",
+  "input": { "shipment_id": "SHP-1017" },
+  "options": { "sample_mode": false, "compare_baseline": false }
+}

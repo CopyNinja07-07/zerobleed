@@ -1,0 +1,1 @@
+{"text":"delay_days=9, breach_date=2026-09-14, hub_region=EU-CENTRAL, vendor_id=VEND-31","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9718,"output_tokens":37},"ms":2265,"receiptId":"rcpt_req_jpmrxap9"}

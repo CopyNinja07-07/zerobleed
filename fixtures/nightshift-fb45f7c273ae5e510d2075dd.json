@@ -1,0 +1,1 @@
+{"text":"{\"decision\": \"NO_BREACH\", \"penalty_usd\": 0, \"rationale\": \"Delay of 9 days does not exceed the 14-day threshold, so no penalty applies regardless of waiver status.\"}","model":"nvidia/nemotron-3-ultra-550b-a55b","usage":{"input_tokens":9890,"output_tokens":52},"ms":12146,"receiptId":"rcpt_req_so9jtyqw"}

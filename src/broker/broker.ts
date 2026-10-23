@@ -9,13 +9,14 @@
 import { Markovian, type MarkovianRun } from "../engines/markovian/index.ts";
 import type { ChatResult, Lane } from "../llm.ts";
 import { chat } from "../llm.ts";
+import { getDomain, type Domain } from "../domains/index.ts";
 import { loadCatalog, project, rowScope, type Catalog, type Table } from "./catalog.ts";
-import { dispatch, TASK_SPECS, type MicroContract } from "./contracts.ts";
+import { dispatch, type MicroContract } from "./contracts.ts";
 import { plan as makePlan, type Plan, type PlannedTask } from "./planner.ts";
-import { onFallback } from "../replay.ts";
+import { isSampleMode, onFallback } from "../replay.ts";
+import { createTracer, type TraceEvent } from "../trace.ts";
 import { carryoverFromPrompt, readScratchpad, toolResultFromPrompt, writeScratchpad, type Scratchpad } from "./scratchpad.ts";
 
-export const MAX_RETRIES = 2; // Rmax: interrupts allowed per task
 
 export interface LedgerEntry {
   step: number;
@@ -37,13 +38,16 @@ export interface Citation {
 }
 
 export interface AuditTarget {
-  shipment_id: string;
+  id: string; // e.g. SHP-1017 or ALR-2001
+  domain?: string; // defaults to procurement
 }
 
 export interface AuditResult {
   target: AuditTarget;
   goal: string;
-  decision?: { decision: string; penalty_usd: string; rationale: string };
+  domain: string;
+  decision?: { decision: string; rationale: string; [key: string]: string };
+  valueKey: string;
   needsHumanReview: boolean;
   reviewReasons: string[];
   plan: Plan;
@@ -52,15 +56,40 @@ export interface AuditResult {
   ledger: LedgerEntry[];
   events: string[];
   run: MarkovianRun;
+  runId: string;
+  traceFile: string;
   totals: { inputTokens: number; outputTokens: number; llmCalls: number; ms: number };
 }
 
-const contractText = (k: MicroContract) => JSON.stringify(k);
+// Money is shown as $N, anything else as is.
+export const showValue = (d: Domain, v: string | undefined) => (d.valueKey.endsWith("_usd") ? `$${v ?? "-"}` : (v ?? "-"));
 
-export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string) => void; historyDir?: string } = {}): Promise<AuditResult> {
+const AGENT: Record<string, string> = { PLAN: "Planner", EXTRACT: "Extractor", CRITIQUE: "Critic", DECIDE: "Strategist", REFLECT: "Reviewer" };
+const agentFor = (task: string) => AGENT[task] ?? AGENT[task.split("_")[1] ?? ""] ?? task;
+
+// Non-model events, classified for the trace.
+function traceOf(e: string): TraceEvent {
+  const [head, ...rest] = e.split(": ");
+  const body = rest.join(": ");
+  if (head === "Zetaris") return { agent_name: "Zetaris", action: "scoped_query", output_summary: body, status: "success" };
+  if (head === "Gate") return { agent_name: "Broker", action: "interrupt_gate", output_summary: body, status: body.startsWith("DENIED") ? "denied" : "success" };
+  if (head === "Guard") return { agent_name: "Broker", action: "consistency_guard", output_summary: body, status: "escalated" };
+  if (head === "Fallback") return { agent_name: "Broker", action: "service_fallback", output_summary: body, status: "fallback" };
+  if (head === "Broker") return { agent_name: "Broker", action: "least_privilege", output_summary: body, status: "success" };
+  return { agent_name: "Broker", action: "note", output_summary: e, status: "success" };
+}
+
+export async function runAudit(
+  target: AuditTarget,
+  opts: { onEvent?: (e: string) => void; historyDir?: string; runId?: string; quiet?: boolean } = {}
+): Promise<AuditResult> {
   const started = Date.now();
-  const catalog: Catalog = await loadCatalog();
-  const goal = `Audit shipment ${target.shipment_id} for an SLA delivery breach and decide if the contract penalty is enforceable.`;
+  const domain: Domain = getDomain(target.domain);
+  const MAX_RETRIES = domain.maxRetries; // Rmax: interrupts allowed per task
+  const tracer = createTracer(opts.runId ?? `${target.id}-${started}`, { quiet: opts.quiet });
+  tracer.event({ agent_name: "Broker", action: "start_run", input_summary: `${domain.id} ${target.id}${isSampleMode() ? " (SAMPLE_MODE)" : ""}`, status: "success" });
+  const catalog: Catalog = await loadCatalog(domain);
+  const goal = domain.goal(target.id);
   const ledger: LedgerEntry[] = [];
   const citations: Citation[] = [];
   const events: string[] = [];
@@ -69,13 +98,25 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
   let thePlan: Plan | undefined;
   let step = 0;
 
-  const log = (e: string) => {
+  const log = (e: string, traced = false) => {
     events.push(e);
     opts.onEvent?.(e);
+    if (!traced) tracer.event(traceOf(e));
   };
   const stopFallbackLog = onFallback((m) => log(`Fallback: ${m}`));
-  const book = (task: string, lane: Lane, call: ChatResult, promptChars: number, outcome: string) =>
+  const book = (task: string, lane: Lane, call: ChatResult, promptChars: number, outcome: string) => {
     ledger.push({ step, task, lane, model: call.model, inputTokens: call.usage.input_tokens, outputTokens: call.usage.output_tokens, promptChars, ms: call.ms, receiptId: call.receiptId, outcome });
+    tracer.event({
+      agent_name: agentFor(task),
+      action: task === "PLAN" ? "plan_from_schema" : task === "REFLECT" ? "reflection_pass" : `micro_contract ${task}`,
+      input_summary: `${promptChars} chars via Nightshift`,
+      output_summary: outcome,
+      model: call.model,
+      input_tokens: call.usage.input_tokens,
+      output_tokens: call.usage.output_tokens,
+      status: outcome === "INSUFFICIENT_CONTEXT" ? "paused" : outcome === "REJECTED" ? "error" : "success",
+    });
+  };
   const cite = (fact: string, value: string, sql: string) => citations.push({ fact, value, sql });
 
   // Builds X for a task: planned columns fetched from Zetaris, plus any facts
@@ -97,13 +138,14 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
     for (const extra of (pad.context.extra ?? "").split(",").filter(Boolean)) {
       const [t, c] = extra.split(".") as [Table, string];
       if (pad.facts[c] === undefined) continue;
-      inputs[c] = pad.facts[c];
-      const scope = rowScope(t, { ...pad.facts, ...pad.context });
-      if (scope) inputs[`${c}_row`] = `${t} row for ${scope}`;
+      const name = domain.qualifiedExtras ? extra : c;
+      inputs[name] = pad.facts[c];
+      const scope = rowScope(catalog, t, { ...pad.facts, ...pad.context });
+      if (scope) inputs[`${name}_row`] = `${t} row for ${scope}`;
     }
-    // The critic checks the clause against the verified delivery facts.
+    // The critic checks the rule against the verified facts from earlier steps.
     if (task.type === "CRITIQUE") {
-      for (const f of ["delay_days", "breach_date", "hub_region"]) if (pad.facts[f] !== undefined) inputs[f] = pad.facts[f];
+      for (const f of domain.critiqueFacts) if (pad.facts[f] !== undefined) inputs[f] = pad.facts[f];
     }
     if (task.type === "DECIDE") Object.assign(inputs, pad.facts);
     return inputs;
@@ -111,21 +153,11 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
 
   // Deterministic cross-check of the critic, using structured columns the
   // broker reads itself. A mismatch lowers confidence: escalate, then flag.
-  async function guardCritique(pad: Scratchpad, outputs: Record<string, string>): Promise<string | undefined> {
-    const p = await project("contracts", ["threshold_days", "penalty_usd"], { ...pad.facts, ...pad.context }, catalog);
-    for (const [c, v] of Object.entries(p.values)) cite(`contracts.${c}`, v, p.sql);
-    let waiver = pad.facts.waiver_declared;
-    if (waiver === undefined) {
-      const w = await project("force_majeure", ["waiver_declared"], { ...pad.facts, ...pad.context }, catalog);
-      waiver = w.values.waiver_declared;
-      cite("force_majeure.waiver_declared", waiver, w.sql);
-    }
-    const shouldApply = Number(pad.facts.delay_days) > Number(p.values.threshold_days) && waiver !== "true";
-    const said = /^true$/i.test(outputs.penalty_applicable);
-    if (said !== shouldApply) return `critic said penalty_applicable=${said}, structured data implies ${shouldApply}`;
-    if (said && Number(outputs.penalty_usd) !== Number(p.values.penalty_usd)) return `critic said penalty_usd=${outputs.penalty_usd}, contract says ${p.values.penalty_usd}`;
-    return undefined;
-  }
+  const guardCritique = (pad: Scratchpad, outputs: Record<string, string>) =>
+    domain.guard({ ...pad.facts, ...pad.context }, outputs, {
+      project: (table, columns, facts) => project(table, columns, facts, catalog),
+      cite,
+    });
 
   // One Markovian chunk = one broker step. Returns text in the engine's marker protocol.
   async function generator(prompt: string): Promise<{ text: string; metadata?: unknown }> {
@@ -141,7 +173,7 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
       const state = prompt.match(/Final state: ([\s\S]*?)\nOutput \(truncated\)/)?.[1] ?? "";
       const call = await chat("fast", "You are an audit reviewer. Reply in one short line starting with RATIFY or REFINE.", `Check this decision against the verified facts.\n${state}`);
       book("REFLECT", "fast", call, state.length, call.text.slice(0, 80));
-      log(`Reflection: ${call.text.slice(0, 120)}`);
+      log(`Reflection: ${call.text.slice(0, 120)}`, true);
       if (/^REFINE/i.test(call.text.trim())) reviewReasons.push(`reflection: ${call.text.slice(0, 160)}`);
       return { text: call.text, metadata: usage() };
     }
@@ -152,9 +184,9 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
       const { plan: p, call, prompt: planPrompt } = await makePlan(goal, catalog);
       thePlan = p;
       if (call) book("PLAN", "deep", call, planPrompt.length, p.source);
-      log(p.source === "planner" ? `Planner (Nemotron Ultra, schema only): ${p.tasks.map((t) => `${t.id}[${t.columns.length} cols]`).join(" -> ")}` : `Planner output unusable (${p.note}); using the fallback plan`);
+      log(p.source === "planner" ? `Planner (Nemotron Ultra, schema only): ${p.tasks.map((t) => `${t.id}[${t.columns.length} cols]`).join(" -> ")}` : `Planner output unusable (${p.note}); using the fallback plan`, p.source === "planner");
       if (p.source === "planner" && p.note) log(`Broker: ${p.note}`);
-      const pad: Scratchpad = { completed: ["PLAN"], remaining: p.tasks.map((t) => t.id), facts: {}, context: { shipment_id: target.shipment_id } };
+      const pad: Scratchpad = { completed: ["PLAN"], remaining: p.tasks.map((t) => t.id), facts: {}, context: { [domain.targetKey]: target.id } };
       return { text: `Planned ${p.tasks.length} micro-contracts from a ${catalog.enum.length}-column catalog.\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
     }
 
@@ -174,33 +206,34 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
     // Branch on confidence: never let the strategist decide on an unverified step.
     const unresolved = pad.completed.filter((c) => c.includes("("));
     if (task.type === "DECIDE" && unresolved.length) {
-      decision = { decision: "HUMAN_REVIEW", penalty_usd: "pending", rationale: `Not decided automatically: ${unresolved.join(", ")} could not be verified.` };
+      decision = { decision: "HUMAN_REVIEW", [domain.valueKey]: "pending", rationale: `Not decided automatically: ${unresolved.join(", ")} could not be verified.` };
       pad.remaining.shift();
       pad.completed.push(`${task.id}(skipped)`);
       log(`Decision withheld: ${unresolved.join(", ")} unverified, routed to a human reviewer`);
       return { text: `${decision.rationale}\n[TASK_COMPLETE]\n\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
     }
 
-    const spec = TASK_SPECS[task.type];
+    const spec = domain.taskSpecs[task.type];
     const inputs = await buildInputs(task, pad);
     const k: MicroContract = {
       task: task.id,
       instruction: spec.instruction,
       inputs,
       allowed_outputs: spec.outputs,
-      may_request: catalog.enum.filter((n) => inputs[n.split(".")[1]] === undefined),
+      may_request: catalog.enum.filter((n) => inputs[n.split(".")[1]] === undefined && inputs[n] === undefined),
     };
     let lane: Lane = pad.context[`escalate_${task.id}`] ? "deep" : spec.lane;
     let { reply, call, payload } = await dispatch(k, lane, spec.think);
     book(task.id, lane, call, payload.length, reply.status);
-    log(`${task.id} on ${lane === "fast" ? "Nemotron Lightning" : "Nemotron Ultra"} (${call.usage.input_tokens} tokens in): ${reply.status}${reply.status === "INSUFFICIENT_CONTEXT" ? ` -> needs ${reply.missing}` : ""}${reply.status === "REJECTED" ? ` (${reply.reason})` : ""}`);
+    log(`${task.id} on ${lane === "fast" ? "Nemotron Lightning" : "Nemotron Ultra"} (${call.usage.input_tokens} tokens in): ${reply.status}${reply.status === "INSUFFICIENT_CONTEXT" ? ` -> needs ${reply.missing}` : ""}${reply.status === "REJECTED" ? ` (${reply.reason})` : ""}`, true);
 
     // A rejected reply (bad JSON, keys outside Y, name outside C) gets one retry on the deep lane.
-    if (reply.status === "REJECTED" && lane === "fast") {
+    if (reply.status === "REJECTED") {
+      const thinkAgain = lane === "fast";
       lane = "deep";
-      ({ reply, call, payload } = await dispatch(k, lane, true));
+      ({ reply, call, payload } = await dispatch(k, lane, thinkAgain));
       book(task.id, lane, call, payload.length, reply.status);
-      log(`${task.id} retried on Nemotron Ultra: ${reply.status}`);
+      log(`${task.id} retried on Nemotron Ultra: ${reply.status}`, true);
     }
 
     if (reply.status === "INSUFFICIENT_CONTEXT") {
@@ -241,16 +274,16 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
       }
     }
     if (task.type === "DECIDE") {
-      decision = { decision: reply.outputs.decision, penalty_usd: reply.outputs.penalty_usd, rationale: reply.outputs.rationale };
+      decision = { ...reply.outputs, decision: reply.outputs.decision, rationale: reply.outputs.rationale };
       pad.remaining.shift();
       pad.completed.push(task.id);
       pad.facts.decision = reply.outputs.decision;
-      pad.facts.final_penalty_usd = reply.outputs.penalty_usd;
-      log(`Decision: ${decision.decision} ($${decision.penalty_usd})`);
+      pad.facts[`final_${domain.valueKey}`] = reply.outputs[domain.valueKey];
+      log(`Decision: ${decision.decision} (${showValue(domain, decision[domain.valueKey])})`, true);
       return { text: `Decision: ${decision.decision}. ${decision.rationale}\n[TASK_COMPLETE]\n\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
     }
     Object.assign(pad.facts, reply.outputs);
-    if (task.type === "EXTRACT") pad.context.vendor_id = reply.outputs.vendor_id;
+    if (task.type === "EXTRACT") for (const k of domain.extractContext) pad.context[k] = reply.outputs[k];
     pad.remaining.shift();
     pad.completed.push(task.id);
     return { text: `${task.id} verified: ${Object.entries(reply.outputs).map(([a, b]) => `${a}=${b}`).join(", ")}\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
@@ -280,6 +313,16 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
     generator: async (prompt) => {
       const out = await generator(prompt);
       lastCarry = out.text.split("[STATE_CHECKPOINT]").pop() ?? "";
+      if (!prompt.startsWith("Reflect on this completed run.")) {
+        const pauses = /\[NEEDS_TOOL /.test(out.text);
+        tracer.event({
+          agent_name: "Markovian engine",
+          action: `chunk ${step}`,
+          input_summary: `carryover in: ${carryoverFromPrompt(prompt).length} chars`,
+          output_summary: pauses ? "NEEDS_TOOL pause" : /\[TASK_COMPLETE\]/.test(out.text) ? "TASK_COMPLETE" : `state out: ${lastCarry.trim().length} chars`,
+          status: pauses ? "paused" : "success",
+        });
+      }
       return out;
     },
     onTool,
@@ -287,12 +330,21 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
 
   stopFallbackLog();
   const finalPad = readScratchpad(lastCarry);
+  tracer.event({
+    agent_name: "Strategist",
+    action: "final_synthesis",
+    output_summary: decision ? `${decision.decision} ${showValue(domain, decision[domain.valueKey])}${reviewReasons.length ? " (needs human review)" : ""}` : "no decision",
+    status: decision ? "success" : "error",
+  });
+  tracer.event({ agent_name: "Broker", action: "end_run", output_summary: `completed in ${((Date.now() - started) / 1000).toFixed(1)} seconds`, status: "success" });
   if (run.status !== "completed") reviewReasons.push(`Markovian run ended as ${run.status}${run.error ? `: ${run.error}` : ""}`);
   if (!decision) reviewReasons.push("no decision was produced");
   return {
     target,
+    domain: domain.id,
     goal,
     decision,
+    valueKey: domain.valueKey,
     needsHumanReview: reviewReasons.length > 0,
     reviewReasons,
     plan: thePlan!,
@@ -301,6 +353,8 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
     ledger,
     events,
     run,
+    traceFile: tracer.file,
+    runId: tracer.runId,
     totals: {
       inputTokens: ledger.reduce((s, e) => s + e.inputTokens, 0),
       outputTokens: ledger.reduce((s, e) => s + e.outputTokens, 0),

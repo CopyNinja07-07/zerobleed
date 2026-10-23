@@ -1,0 +1,1 @@
+{"columns":["alert_id","ts","alert_time","service","severity","metric","value","summary"],"rows":[["ALR-2001","1792504800","2026-10-20T14:00:00Z","checkout-api","P1","http_5xx_rate","0.37","checkout-api 5xx rate 37% and p99 latency 9.8s"]]}

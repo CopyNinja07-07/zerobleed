@@ -24,6 +24,7 @@ async function runSqlLive(statement: string): Promise<SqlResult> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ queryId: randomUUID(), sql: statement, source: "SqlEditor", limit: 1000 }),
+    signal: AbortSignal.timeout(60_000), // bounded: a Zetaris query never hangs a run
   });
   const text = await res.text();
   if (!res.ok) throw new Error(`Zetaris ${res.status}: ${text.slice(0, 300)}`);

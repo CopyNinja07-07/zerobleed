@@ -1,0 +1,172 @@
+{
+  "run_id": "example-2",
+  "status": "success",
+  "output": {
+    "decision": "WAIVE",
+    "penalty_usd": "0",
+    "rationale": "The 18-day delay on 2026-09-20 exceeds the 14-day threshold, but a Force Majeure waiver was declared active for hub_region US-WEST on the breach date, so the penalty is waived per Section 4.2.",
+    "needs_human_review": false,
+    "review_reasons": [],
+    "independent_check": "RATIFY",
+    "evidence": [
+      {
+        "fact": "shipments.shipment_id",
+        "value": "SHP-1029",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.vendor_id",
+        "value": "VEND-12",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.hub_region",
+        "value": "US-WEST",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.promised_date",
+        "value": "2026-09-02",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.breach_date",
+        "value": "2026-09-20",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.delay_days",
+        "value": "18",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.penalty_pct",
+        "value": "12",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "30000",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.clause_text",
+        "value": "Section 4.2: Delivery delays exceeding 14 days incur a 12% penalty ($30,000), UNLESS an official regional Force Majeure weather waiver was declared active on the breach_date.",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_usd FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "30000",
+        "sql": "SELECT threshold_days, penalty_usd FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "force_majeure.waiver_declared",
+        "value": "true",
+        "sql": "SELECT waiver_declared FROM zerobleed.force_majeure WHERE log_date = '2026-09-20' AND hub_region = 'US-WEST'"
+      }
+    ],
+    "steps": [
+      "Planner (Nemotron Ultra, schema only): T1_EXTRACT[6 cols] -> T2_CRITIQUE[5 cols] -> T3_DECIDE[0 cols]",
+      "Broker: least privilege removed force_majeure.hub_region, force_majeure.log_date, force_majeure.waiver_declared",
+      "Zetaris: fetched 6 cell(s) from shipments for T1_EXTRACT",
+      "T1_EXTRACT on Nemotron Lightning (586 tokens in): VERIFIED",
+      "Zetaris: fetched 4 cell(s) from contracts for T2_CRITIQUE",
+      "T2_CRITIQUE on Nemotron Lightning (709 tokens in): VERIFIED",
+      "T3_DECIDE on Nemotron Ultra (826 tokens in): VERIFIED",
+      "Decision: WAIVE ($0)",
+      "Reflection: RATIFY"
+    ]
+  },
+  "agents": [
+    {
+      "name": "Planner",
+      "model": "Nemotron 3 Ultra",
+      "role": "Plans the audit from Zetaris column names only (no rows)"
+    },
+    {
+      "name": "Broker",
+      "model": "plain code",
+      "role": "Writes need-to-know micro-contracts, gates every request for a missing fact, cross-checks the critic"
+    },
+    {
+      "name": "Extractor",
+      "model": "Nemotron 3.5 Lightning",
+      "role": "Normalises the delivery facts for one shipment"
+    },
+    {
+      "name": "Critic",
+      "model": "Nemotron 3.5 Lightning, escalates to Ultra",
+      "role": "Applies the contract clause; asks for a missing fact instead of guessing"
+    },
+    {
+      "name": "Strategist",
+      "model": "Nemotron 3 Ultra",
+      "role": "Decides ENFORCE, WAIVE or NO_BREACH from verified facts only"
+    },
+    {
+      "name": "Reviewer",
+      "model": "Nemotron 3.5 Lightning",
+      "role": "Markovian reflection pass: ratifies or questions the decision"
+    }
+  ],
+  "models": [
+    {
+      "step": "PLAN",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "input_tokens": 692,
+      "output_tokens": 197,
+      "nightshift_receipt": "rcpt_req_ta05l1jc"
+    },
+    {
+      "step": "T1_EXTRACT",
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "input_tokens": 586,
+      "output_tokens": 61,
+      "nightshift_receipt": "rcpt_req_62ll99by"
+    },
+    {
+      "step": "T2_CRITIQUE",
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "input_tokens": 709,
+      "output_tokens": 134,
+      "nightshift_receipt": "rcpt_req_c9dhbwei"
+    },
+    {
+      "step": "T3_DECIDE",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "input_tokens": 826,
+      "output_tokens": 87,
+      "nightshift_receipt": "rcpt_req_wusuh4sx"
+    },
+    {
+      "step": "REFLECT",
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "input_tokens": 556,
+      "output_tokens": 4,
+      "nightshift_receipt": "rcpt_req_56fule68"
+    }
+  ],
+  "markovian": {
+    "chunks": 4,
+    "status": "completed",
+    "largest_carryover_chars": 554
+  },
+  "tokens": {
+    "input": 3369,
+    "output": 483,
+    "calls": 5
+  },
+  "trace_id": "trace-example-2",
+  "log_file": "logs/trace-example-2.jsonl",
+  "execution_time_seconds": 18.4
+}

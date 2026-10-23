@@ -19,6 +19,8 @@ const headers = () => ({
   Authorization: "Bearer " + env("METERLESS_RUNTIME_TOKEN"),
   "meterless-app": "zerobleed",
   "meterless-scope": "user",
+  // Large cloud models can be slow to start; give the first token up to 60s.
+  "meterless-ttfb-ms": "60000",
   "Content-Type": "application/json",
 });
 
@@ -52,12 +54,16 @@ export async function chatMessages(lane: Lane, messages: Message[], opts: ChatOp
   return withReplay("nightshift", { lane, messages, think }, () => chatLive(lane, messages, maxTokens, think));
 }
 
+// One bounded retry: an empty answer gets double the budget, a transient
+// gateway error (502/503/504) is simply tried again.
 async function chatLive(lane: Lane, messages: Message[], maxTokens: number, think: boolean): Promise<ChatResult> {
   try {
     return await chatOnce(lane, messages, maxTokens, think);
   } catch (err) {
-    if (!/empty_response/.test((err as Error).message)) throw err;
-    return chatOnce(lane, messages, maxTokens * 2, think);
+    const msg = (err as Error).message;
+    if (/empty_response/.test(msg)) return chatOnce(lane, messages, maxTokens * 2, think);
+    if (/Nightshift 50[234]/.test(msg)) return chatOnce(lane, messages, maxTokens, think);
+    throw err;
   }
 }
 
@@ -74,6 +80,7 @@ async function chatOnce(lane: Lane, messages: Message[], maxTokens: number, thin
       chat_template_kwargs: { enable_thinking: think },
       messages,
     }),
+    signal: AbortSignal.timeout(90_000), // bounded: a model call never hangs a run
   });
   const body = await res.text();
   if (!res.ok) throw new Error(`Nightshift ${res.status} (${model}): ${body.slice(0, 300)}`);
@@ -92,7 +99,7 @@ async function chatOnce(lane: Lane, messages: Message[], maxTokens: number, thin
 }
 
 export async function listModels(): Promise<string[]> {
-  const res = await fetch(env("METERLESS_BASE_URL").replace(/\/$/, "") + "/models", { headers: headers() });
+  const res = await fetch(env("METERLESS_BASE_URL").replace(/\/$/, "") + "/models", { headers: headers(), signal: AbortSignal.timeout(15_000) });
   if (!res.ok) throw new Error(`Nightshift ${res.status} on /models`);
   return ((await res.json()).data ?? []).map((m: { id: string }) => m.id);
 }

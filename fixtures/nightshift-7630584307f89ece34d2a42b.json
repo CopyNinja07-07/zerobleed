@@ -1,0 +1,1 @@
+{"text":"Yes. The waiver was active on 2026-09-20 in US-WEST (log entry with waiver_declared:true and event: Category 2 storm, regional waiver FM-2026-091).","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9895,"output_tokens":56},"ms":1572,"receiptId":"rcpt_req_7xk555hf"}

@@ -1,35 +1,41 @@
-// Runs every audit case through ZeroBleed and through the shared-history
+// Runs every case of a domain through ZeroBleed and through the shared-history
 // baseline, checks each decision against the known answer, and writes the
-// measured results to evidence/. Usage: npm run benchmark [-- runs-per-case]
+// measured results to evidence/benchmark-<domain>.{md,json}.
+// Usage: npm run benchmark -- [domain] [runs-per-case]     e.g. npm run benchmark -- incident 3
 import { mkdirSync, writeFileSync } from "node:fs";
 import { runAudit } from "../src/broker/broker.ts";
 import { runBaseline } from "../src/baseline.ts";
 import { startDataServer } from "../src/dataServer.ts";
+import { getDomain } from "../src/domains/index.ts";
+import type { BenchmarkCase } from "../src/domains/types.ts";
 
-const CASES = [
-  { shipment_id: "SHP-1017", expect: "ENFORCE", penalty: 48000, what: "21 days late, no waiver" },
-  { shipment_id: "SHP-1029", expect: "WAIVE", penalty: 0, what: "18 days late, storm waiver active" },
-  { shipment_id: "SHP-1036", expect: "NO_BREACH", penalty: 0, what: "9 days late, under the 14-day threshold" },
-  { shipment_id: "SHP-1044", expect: "ENFORCE", penalty: 38400, what: "25 days late, contract text carries a prompt injection" },
-];
-const RUNS = Number(process.argv[2] ?? 1);
-
+const domain = getDomain(process.argv[2] ?? "procurement");
+const RUNS = Number(process.argv[3] ?? 1);
 const server = await startDataServer().catch(() => undefined);
-const correct = (d: { decision: string; penalty_usd: string } | undefined, c: (typeof CASES)[number]) =>
-  !!d && d.decision.toUpperCase() === c.expect && Math.round(Number(d.penalty_usd)) === c.penalty;
 
-const rows: Record<string, unknown>[] = [];
-for (const c of CASES) {
+const norm = (v: unknown) => {
+  const s = String(v ?? "").trim().toUpperCase();
+  return /^-?\d+(\.\d+)?$/.test(s) ? String(Math.round(Number(s))) : s;
+};
+const correct = (d: Record<string, string> | undefined, c: BenchmarkCase) =>
+  !!d && norm(d.decision) === c.expect && norm(d[domain.valueKey]) === norm(c.value);
+const median = (xs: number[]) => {
+  const s = [...xs].sort((a, b) => a - b);
+  return s.length ? (s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2) : 0;
+};
+
+const rows: any[] = [];
+for (const c of domain.cases) {
   for (let r = 1; r <= RUNS; r++) {
-    const zb = await runAudit({ shipment_id: c.shipment_id });
-    const base = await runBaseline(c.shipment_id);
+    const zb = await runAudit({ id: c.id, domain: domain.id }, { quiet: true });
+    const base = await runBaseline(c.id, domain.id);
     const row = {
-      case: c.shipment_id,
+      case: c.id,
       scenario: c.what,
       run: r,
       zerobleed: {
         decision: zb.decision?.decision,
-        penalty: zb.decision?.penalty_usd,
+        value: zb.decision?.[domain.valueKey],
         correct: correct(zb.decision, c),
         humanReview: zb.needsHumanReview,
         inputTokens: zb.totals.inputTokens,
@@ -42,7 +48,7 @@ for (const c of CASES) {
       },
       baseline: {
         decision: base.decision?.decision,
-        penalty: base.decision?.penalty_usd,
+        value: base.decision?.[domain.valueKey],
         correct: correct(base.decision, c),
         inputTokens: base.totals.inputTokens,
         outputTokens: base.totals.outputTokens,
@@ -57,48 +63,56 @@ for (const c of CASES) {
   }
 }
 
-const sum = (k: "zerobleed" | "baseline", f: string) => rows.reduce((s, r: any) => s + Number(r[k][f] ?? 0), 0);
 const n = rows.length;
+const side = (k: "zerobleed" | "baseline") => ({
+  correct: rows.filter((r) => r[k].correct).length,
+  inputTokens: rows.reduce((s, r) => s + r[k].inputTokens, 0),
+  outputTokens: rows.reduce((s, r) => s + r[k].outputTokens, 0),
+  largestCallInput: Math.max(...rows.map((r) => r[k].largestCallInput)),
+  medianSeconds: median(rows.map((r) => r[k].seconds)),
+});
 const summary = {
+  domain: domain.id,
   date: new Date().toISOString(),
   machine: "MacBook Air (Apple M5, 16 GB), Zetaris 2.4.3.1 in Docker, Meterless Nightshift Mac M5+",
   models: { fast: "nvidia/nemotron-3.5-lightning-30b-a3b", deep: "nvidia/nemotron-3-ultra-550b-a55b" },
   tokenSource: "measured: usage reported by Nightshift for every call",
   runs: n,
-  zerobleed: { correct: rows.filter((r: any) => r.zerobleed.correct).length, inputTokens: sum("zerobleed", "inputTokens"), outputTokens: sum("zerobleed", "outputTokens"), seconds: +sum("zerobleed", "seconds").toFixed(1) },
-  baseline: { correct: rows.filter((r: any) => r.baseline.correct).length, inputTokens: sum("baseline", "inputTokens"), outputTokens: sum("baseline", "outputTokens"), seconds: +sum("baseline", "seconds").toFixed(1) },
+  zerobleed: side("zerobleed"),
+  baseline: side("baseline"),
 };
-const saved = 1 - summary.zerobleed.inputTokens / summary.baseline.inputTokens;
+const saved = 1 - summary.zerobleed.inputTokens / Math.max(1, summary.baseline.inputTokens);
+const show = (r: any, k: string) => `${r[k].decision ?? "none"} ${r[k].value ?? "-"} (${r[k].correct ? "correct" : "WRONG"})${r[k].error ? ` error: ${String(r[k].error).slice(0, 60)}` : ""}`;
 
 const md = [
-  `# ZeroBleed benchmark`,
+  `# ZeroBleed benchmark: ${domain.title}`,
   ``,
   `Measured on ${summary.date.slice(0, 10)}. ${summary.machine}. Fast lane ${summary.models.fast}, deep lane ${summary.models.deep}.`,
-  `Token counts are ${summary.tokenSource}. Failures stay in the denominator.`,
+  `Token counts are ${summary.tokenSource}. Failures stay in the denominator. ${RUNS} run(s) per case.`,
   ``,
   `| | ZeroBleed | Shared-history baseline |`,
   `|---|---|---|`,
   `| Correct decisions | ${summary.zerobleed.correct} / ${n} | ${summary.baseline.correct} / ${n} |`,
   `| Input tokens, total | ${summary.zerobleed.inputTokens.toLocaleString("en-US")} | ${summary.baseline.inputTokens.toLocaleString("en-US")} |`,
+  `| Largest single prompt | ${summary.zerobleed.largestCallInput.toLocaleString("en-US")} | ${summary.baseline.largestCallInput.toLocaleString("en-US")} |`,
   `| Output tokens, total | ${summary.zerobleed.outputTokens.toLocaleString("en-US")} | ${summary.baseline.outputTokens.toLocaleString("en-US")} |`,
-  `| Wall time, total | ${summary.zerobleed.seconds}s | ${summary.baseline.seconds}s |`,
+  `| Median wall time per case | ${summary.zerobleed.medianSeconds}s | ${summary.baseline.medianSeconds}s |`,
   ``,
   `ZeroBleed used ${(saved * 100).toFixed(1)}% fewer input tokens than the baseline.`,
   ``,
-  `## Per case`,
+  `## Per run`,
   ``,
-  `| Case | Scenario | Expected | ZeroBleed | ZB input tok | ZB largest call | Baseline | Base input tok | Base largest call |`,
-  `|---|---|---|---|---|---|---|---|---|`,
-  ...rows.map((r: any) => {
-    const c = CASES.find((x) => x.shipment_id === r.case)!;
-    const mark = (ok: boolean) => (ok ? "correct" : "WRONG");
-    return `| ${r.case} | ${r.scenario} | ${c.expect} $${c.penalty} | ${r.zerobleed.decision} $${r.zerobleed.penalty} (${mark(r.zerobleed.correct)}) | ${r.zerobleed.inputTokens} | ${r.zerobleed.largestCallInput} | ${r.baseline.decision ?? "none"} $${r.baseline.penalty ?? "-"} (${mark(r.baseline.correct)}) | ${r.baseline.inputTokens} | ${r.baseline.largestCallInput} |`;
+  `| Case | Scenario | Expected | ZeroBleed | ZB input tok | Baseline | Base input tok |`,
+  `|---|---|---|---|---|---|---|`,
+  ...rows.map((r) => {
+    const c = domain.cases.find((x) => x.id === r.case)!;
+    return `| ${r.case} | ${r.scenario} | ${c.expect} ${c.value} | ${show(r, "zerobleed")} | ${r.zerobleed.inputTokens} | ${show(r, "baseline")} | ${r.baseline.inputTokens} |`;
   }),
   ``,
 ].join("\n");
 
 mkdirSync("evidence", { recursive: true });
-writeFileSync("evidence/benchmark.json", JSON.stringify({ summary, rows }, null, 2));
-writeFileSync("evidence/benchmark.md", md);
+writeFileSync(`evidence/benchmark-${domain.id}.json`, JSON.stringify({ summary, rows }, null, 2));
+writeFileSync(`evidence/benchmark-${domain.id}.md`, md);
 console.log("\n" + md);
 server?.close();

@@ -1,0 +1,202 @@
+{
+  "run_id": "example-1",
+  "status": "success",
+  "output": {
+    "decision": "ENFORCE",
+    "penalty_usd": "48000",
+    "rationale": "The 21-day delay exceeds the 14-day threshold, no Force Majeure waiver was declared for hub_region US-EAST on breach_date 2026-09-14, and penalty_applicable is true, so the $48,000 penalty applies per Section 4.2.",
+    "needs_human_review": false,
+    "review_reasons": [],
+    "independent_check": "RATIFY",
+    "evidence": [
+      {
+        "fact": "shipments.shipment_id",
+        "value": "SHP-1017",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1017'"
+      },
+      {
+        "fact": "shipments.vendor_id",
+        "value": "VEND-88",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1017'"
+      },
+      {
+        "fact": "shipments.hub_region",
+        "value": "US-EAST",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1017'"
+      },
+      {
+        "fact": "shipments.promised_date",
+        "value": "2026-08-24",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1017'"
+      },
+      {
+        "fact": "shipments.breach_date",
+        "value": "2026-09-14",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1017'"
+      },
+      {
+        "fact": "shipments.delay_days",
+        "value": "21",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1017'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      },
+      {
+        "fact": "contracts.penalty_pct",
+        "value": "12",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "48000",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      },
+      {
+        "fact": "contracts.clause_text",
+        "value": "Section 4.2: Delivery delays exceeding 14 days incur a 12% penalty ($48,000), UNLESS an official regional Force Majeure weather waiver was declared active on the breach_date.",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      },
+      {
+        "fact": "force_majeure.waiver_declared",
+        "value": "false",
+        "sql": "SELECT waiver_declared FROM zerobleed.force_majeure WHERE log_date = '2026-09-14' AND hub_region = 'US-EAST'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      },
+      {
+        "fact": "contracts.penalty_pct",
+        "value": "12",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "48000",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      },
+      {
+        "fact": "contracts.clause_text",
+        "value": "Section 4.2: Delivery delays exceeding 14 days incur a 12% penalty ($48,000), UNLESS an official regional Force Majeure weather waiver was declared active on the breach_date.",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_usd FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "48000",
+        "sql": "SELECT threshold_days, penalty_usd FROM zerobleed.contracts WHERE vendor_id = 'VEND-88'"
+      }
+    ],
+    "steps": [
+      "Planner (Nemotron Ultra, schema only): T1_EXTRACT[6 cols] -> T2_CRITIQUE[5 cols] -> T3_DECIDE[0 cols]",
+      "Broker: least privilege removed force_majeure.hub_region, force_majeure.log_date, force_majeure.waiver_declared",
+      "Zetaris: fetched 6 cell(s) from shipments for T1_EXTRACT",
+      "T1_EXTRACT on Nemotron Lightning (880 tokens in): VERIFIED",
+      "Zetaris: fetched 4 cell(s) from contracts for T2_CRITIQUE",
+      "T2_CRITIQUE on Nemotron Lightning (709 tokens in): INSUFFICIENT_CONTEXT -> needs force_majeure.waiver_declared",
+      "Gate: force_majeure.waiver_declared is in the catalog. Zetaris returned 1 cell: false",
+      "Zetaris: fetched 4 cell(s) from contracts for T2_CRITIQUE",
+      "T2_CRITIQUE on Nemotron Lightning (739 tokens in): VERIFIED",
+      "T3_DECIDE on Nemotron Ultra (849 tokens in): VERIFIED",
+      "Decision: ENFORCE ($48000)",
+      "Reflection: RATIFY"
+    ]
+  },
+  "agents": [
+    {
+      "name": "Planner",
+      "model": "Nemotron 3 Ultra",
+      "role": "Plans the audit from Zetaris column names only (no rows)"
+    },
+    {
+      "name": "Broker",
+      "model": "plain code",
+      "role": "Writes need-to-know micro-contracts, gates every request for a missing fact, cross-checks the critic"
+    },
+    {
+      "name": "Extractor",
+      "model": "Nemotron 3.5 Lightning",
+      "role": "Normalises the delivery facts for one shipment"
+    },
+    {
+      "name": "Critic",
+      "model": "Nemotron 3.5 Lightning, escalates to Ultra",
+      "role": "Applies the contract clause; asks for a missing fact instead of guessing"
+    },
+    {
+      "name": "Strategist",
+      "model": "Nemotron 3 Ultra",
+      "role": "Decides ENFORCE, WAIVE or NO_BREACH from verified facts only"
+    },
+    {
+      "name": "Reviewer",
+      "model": "Nemotron 3.5 Lightning",
+      "role": "Markovian reflection pass: ratifies or questions the decision"
+    }
+  ],
+  "models": [
+    {
+      "step": "PLAN",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "input_tokens": 692,
+      "output_tokens": 197,
+      "nightshift_receipt": "rcpt_req_w1icir2x"
+    },
+    {
+      "step": "T1_EXTRACT",
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "input_tokens": 880,
+      "output_tokens": 61,
+      "nightshift_receipt": "rcpt_req_9w6p5wge"
+    },
+    {
+      "step": "T2_CRITIQUE",
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "input_tokens": 709,
+      "output_tokens": 34,
+      "nightshift_receipt": "rcpt_req_yr3bqx9a"
+    },
+    {
+      "step": "T2_CRITIQUE",
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "input_tokens": 739,
+      "output_tokens": 115,
+      "nightshift_receipt": "rcpt_req_58ch5qj7"
+    },
+    {
+      "step": "T3_DECIDE",
+      "model": "nvidia/nemotron-3-ultra-550b-a55b",
+      "input_tokens": 849,
+      "output_tokens": 100,
+      "nightshift_receipt": "rcpt_req_9xubtulz"
+    },
+    {
+      "step": "REFLECT",
+      "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+      "input_tokens": 574,
+      "output_tokens": 4,
+      "nightshift_receipt": "rcpt_req_bnkhy3ec"
+    }
+  ],
+  "markovian": {
+    "chunks": 5,
+    "status": "completed",
+    "largest_carryover_chars": 584
+  },
+  "tokens": {
+    "input": 4443,
+    "output": 511,
+    "calls": 6
+  },
+  "trace_id": "trace-example-1",
+  "log_file": "logs/trace-example-1.jsonl",
+  "execution_time_seconds": 21
+}

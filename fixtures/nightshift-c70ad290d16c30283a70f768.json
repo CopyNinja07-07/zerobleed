@@ -1,0 +1,1 @@
+{"text":"{\n  \"status\": \"INSUFFICIENT_CONTEXT\",\n  \"missing_variable\": \"alert_signals.escalation_principal_60m\"\n}","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":3082,"output_tokens":35},"ms":1189,"receiptId":"rcpt_req_hh2aief7"}

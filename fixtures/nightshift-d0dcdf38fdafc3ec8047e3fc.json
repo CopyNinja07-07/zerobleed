@@ -1,0 +1,1 @@
+{"text":"Yes. The Force Majeure log for 2026-09-20 in US-WEST shows wind_knots: 61 and waiver_declared: true (event: Category 2 storm, regional waiver FM-2026-091).","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9921,"output_tokens":64},"ms":1149,"receiptId":"rcpt_req_okhtu0yz"}

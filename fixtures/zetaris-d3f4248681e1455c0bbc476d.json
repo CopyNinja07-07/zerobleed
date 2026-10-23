@@ -1,0 +1,1 @@
+{"columns":["col_name","data_type","comment"],"rows":[["alert_id","string",null],["ts","bigint",null],["alert_time","string",null],["service","string",null],["severity","string",null],["metric","string",null],["value","double",null],["summary","string",null]]}

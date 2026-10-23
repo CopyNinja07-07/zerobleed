@@ -4,33 +4,29 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ZeroBleed Auditor</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=JetBrains+Mono:wght@400;600&display=swap">
 <style>
 :root {
-  --bg: #f4f6f8; --panel: #ffffff; --fg: #15202b; --muted: #5b6878; --line: #d6dde5;
-  --accent: #2747c9; --accent-soft: #e4e9fb; --ok: #1c7a52; --ok-soft: #ddf1e7;
-  --warn: #9a6200; --warn-soft: #fbefd6; --bad: #b3263e; --bad-soft: #f8e3e7; --code: #eef2f6;
-}
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0f161d; --panel: #17212b; --fg: #e4eaf0; --muted: #97a6b7; --line: #2c3a48;
-    --accent: #8ca4ff; --accent-soft: #1f2c55; --ok: #5fd3a0; --ok-soft: #14342a;
-    --warn: #f2c14e; --warn-soft: #3a2d10; --bad: #ff8296; --bad-soft: #3d1a22; --code: #1d2833;
-  }
+  /* Nightshift-inspired: near-black violet, lilac text, lime signal. */
+  --bg: #08070d; --panel: #110e19; --fg: #f0edf7; --muted: #aaa4b8; --line: #2a2236;
+  --accent: #d6f588; --accent-soft: #232b12; --ok: #9fe0c4; --ok-soft: #12261f;
+  --warn: #eac58b; --warn-soft: #2b2112; --bad: #ff8fa3; --bad-soft: #2e1420; --code: #1a1524; --violet: #b57edc;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 Inter, -apple-system, "Segoe UI", system-ui, sans-serif; }
 header { padding: 18px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
-header h1 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+header h1 { margin: 0; font-size: 24px; font-weight: 500; letter-spacing: -0.02em; }
+header h1 b { color: var(--accent); font-weight: 600; }
 header p { margin: 0; color: var(--muted); }
 main { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 18px; padding: 18px 24px; }
 @media (max-width: 900px) { main { grid-template-columns: minmax(0, 1fr); padding: 16px; } }
 .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
-.panel h2 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.panel h2 { margin: 0 0 10px; font: 600 12px 'JetBrains Mono', ui-monospace, monospace; text-transform: uppercase; letter-spacing: 0.12em; color: var(--muted); }
 .stack { display: flex; flex-direction: column; gap: 14px; }
 .ship { width: 100%; text-align: left; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; color: var(--fg); cursor: pointer; font: inherit; }
 .ship.on { border-color: var(--accent); background: var(--accent-soft); }
 .ship small { color: var(--muted); display: block; }
-button.go { width: 100%; padding: 10px; border: none; border-radius: 8px; background: var(--accent); color: var(--panel); font: inherit; font-weight: 600; cursor: pointer; }
+button.go { width: 100%; padding: 10px; border: none; border-radius: 8px; background: var(--accent); color: #11140a; font: inherit; font-weight: 600; cursor: pointer; }
 button.go:disabled { opacity: 0.5; cursor: default; }
 label.toggle { display: flex; gap: 8px; align-items: center; margin-top: 10px; color: var(--muted); font-size: 14px; }
 .grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
@@ -38,7 +34,7 @@ label.toggle { display: flex; gap: 8px; align-items: center; margin-top: 10px; c
 ol.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 ol.log li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 14px; }
 .tag { font: 600 11px ui-monospace, Menlo, monospace; padding: 2px 6px; border-radius: 4px; text-align: center; background: var(--code); color: var(--muted); }
-.tag.plan { background: var(--accent-soft); color: var(--accent); }
+.tag.plan { background: #241a33; color: var(--violet); }
 .tag.data { background: var(--code); color: var(--fg); }
 .tag.gate { background: var(--warn-soft); color: var(--warn); }
 .tag.guard { background: var(--bad-soft); color: var(--bad); }
@@ -68,7 +64,7 @@ td code { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); }
 </head>
 <body>
 <header>
-  <h1>ZeroBleed Auditor</h1>
+  <h1><b>Zero</b>Bleed Auditor</h1>
   <p>Supplier penalty audits where every AI step sees only the facts it needs.</p>
 </header>
 <main>
@@ -106,6 +102,7 @@ let selected = "SHP-1017";
 let zbTotal = null, baseTotal = null;
 
 async function loadShips() {
+  // returns after the list renders
   try {
     const rows = await (await fetch("/api/shipments")).json();
     $("ships").innerHTML = rows.slice(0, 8).map((r) =>
@@ -163,9 +160,14 @@ function renderResult(r) {
       <div class="actions"><button onclick="this.parentNode.innerHTML='Approved by auditor'">Approve</button><button onclick="this.parentNode.innerHTML='Sent back for manual review'">Send back</button></div>
     </div>` : '<p class="empty">No decision.</p>';
   $("chunks").innerHTML = r.chunks.map((c) => `<div class="chunk"><h3>Step ${c.id} received (${c.carryover.length} characters)</h3><pre>${esc(c.carryover || "(empty: first step)")}</pre>${c.tool ? `<p class="muted" style="margin:4px 0 0">Paused for <code>${esc(c.tool.input)}</code>, Zetaris returned <b>${esc(c.tool.result)}</b></p>` : ""}</div>`).join("");
-  const seen = new Set();
-  $("evidence").innerHTML = `<table><tr><th>Fact</th><th>Value</th><th>Zetaris query</th></tr>${r.citations.filter((c) => !seen.has(c.fact) && seen.add(c.fact)).map((c) =>
-    `<tr><td>${esc(c.fact)}</td><td>${esc(String(c.value).slice(0, 80))}${String(c.value).length > 80 ? "..." : ""}</td><td><code>${esc(c.sql)}</code></td></tr>`).join("")}</table>`;
+  const byQuery = new Map();
+  for (const c of r.citations) {
+    const facts = byQuery.get(c.sql) ?? new Map();
+    facts.set(c.fact.split(".")[1], c.value);
+    byQuery.set(c.sql, facts);
+  }
+  $("evidence").innerHTML = [...byQuery].map(([sql, facts]) =>
+    `<div style="margin-bottom:10px"><pre>${esc(sql)}</pre><p style="margin:4px 0 0;font-size:13px">${[...facts].map(([k, v]) => `<b>${esc(k)}</b> = ${esc(String(v).slice(0, 60))}${String(v).length > 60 ? "..." : ""}`).join(" &middot; ")}</p></div>`).join("");
   $("ledger").innerHTML = `<table><tr><th>Step</th><th>Model</th><th>Tokens in</th><th>Tokens out</th><th>Time</th><th>Result</th></tr>${r.ledger.map((e) =>
     `<tr><td>${esc(e.task)}</td><td>${esc(e.model.replace("nvidia/", ""))}</td><td>${e.inputTokens}</td><td>${e.outputTokens}</td><td>${(e.ms / 1000).toFixed(1)}s</td><td>${esc(e.outcome)}</td></tr>`).join("")}
     <tr><td><b>Total</b></td><td></td><td><b>${r.totals.inputTokens}</b></td><td><b>${r.totals.outputTokens}</b></td><td><b>${(r.totals.ms / 1000).toFixed(1)}s</b></td><td></td></tr></table>`;
@@ -191,7 +193,11 @@ $("run").onclick = async () => {
   } catch (err) { addStep("Error: " + err.message); }
   $("run").disabled = false;
 };
-loadShips();
+// ?run=SHP-1044&compare=0 starts an audit on load (used for screenshots and demos).
+const params = new URLSearchParams(location.search);
+if (params.get("run")) selected = params.get("run");
+if (params.get("compare") === "0") $("compare").checked = false;
+loadShips().then(() => { if (params.get("run")) $("run").click(); });
 </script>
 </body>
 </html>

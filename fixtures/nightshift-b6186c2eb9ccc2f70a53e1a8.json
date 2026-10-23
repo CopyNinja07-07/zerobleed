@@ -1,0 +1,1 @@
+{"text":"CTR-31 applies. The delay of 9 days does not exceed the 14-day threshold, so no penalty applies.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9763,"output_tokens":29},"ms":1074,"receiptId":"rcpt_req_wt3w61l6"}

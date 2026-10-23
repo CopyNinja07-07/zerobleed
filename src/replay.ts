@@ -3,11 +3,19 @@
 // the app replays those recordings and runs fully offline. In live mode, if a
 // service is unreachable, the same recording is used as a fallback and the
 // event is reported, so a demo never dies on a network blip.
+import { AsyncLocalStorage } from "node:async_hooks";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const DIR = "fixtures";
 export const SAMPLE_MODE = /^(1|true|yes)$/i.test(process.env.SAMPLE_MODE ?? "");
+
+// Per-run override, so one API request can ask for sample mode on a live server.
+const sampleScope = new AsyncLocalStorage<boolean>();
+export const isSampleMode = () => sampleScope.getStore() ?? SAMPLE_MODE;
+export function withSampleMode<T>(flag: boolean | undefined, fn: () => Promise<T>): Promise<T> {
+  return flag === undefined ? fn() : sampleScope.run(flag, fn);
+}
 
 const listeners: ((msg: string) => void)[] = [];
 export function onFallback(fn: (msg: string) => void): () => void {
@@ -23,7 +31,7 @@ function load<T>(service: string, request: unknown): T | undefined {
 }
 
 export async function withReplay<T>(service: "zetaris" | "nightshift", request: unknown, live: () => Promise<T>): Promise<T> {
-  if (SAMPLE_MODE) {
+  if (isSampleMode()) {
     const hit = load<T>(service, request);
     if (hit === undefined) throw new Error(`SAMPLE_MODE: no recording for this ${service} request. Run once live to record it.`);
     return hit;
@@ -35,7 +43,7 @@ export async function withReplay<T>(service: "zetaris" | "nightshift", request: 
     return result;
   } catch (err) {
     const msg = (err as Error).message;
-    const unreachable = /fetch failed|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket|50[234]/i.test(msg);
+    const unreachable = /fetch failed|ECONNREFUSED|ENOTFOUND|ETIMEDOUT|socket|timeout|aborted|50[234]/i.test(msg);
     const hit = unreachable ? load<T>(service, request) : undefined;
     if (hit === undefined) throw err;
     for (const fn of listeners) fn(`${service} unavailable (${msg.slice(0, 80)}); used the recorded response`);

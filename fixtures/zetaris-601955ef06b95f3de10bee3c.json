@@ -1,0 +1,1 @@
+{"columns":["shipment_id","vendor_id","hub_region","delay_days","breach_date"],"rows":[["SHP-1044","VEND-47","APAC-SOUTH","25","2026-09-24"],["SHP-1017","VEND-88","US-EAST","21","2026-09-14"],["SHP-1029","VEND-12","US-WEST","18","2026-09-20"],["SHP-1036","VEND-31","EU-CENTRAL","9","2026-09-14"]]}

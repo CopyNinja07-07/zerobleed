@@ -1,0 +1,44 @@
+[
+  {
+    "service": "checkout-api",
+    "runbook_id": "RB-checkout-api",
+    "owner_team": "sre",
+    "policy_id": "TR-7",
+    "triage_policy": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN."
+  },
+  {
+    "service": "payments-api",
+    "runbook_id": "RB-payments-api",
+    "owner_team": "sre",
+    "policy_id": "TR-7",
+    "triage_policy": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN."
+  },
+  {
+    "service": "search-svc",
+    "runbook_id": "RB-search-svc",
+    "owner_team": "sre",
+    "policy_id": "TR-7",
+    "triage_policy": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN."
+  },
+  {
+    "service": "ledger-svc",
+    "runbook_id": "RB-ledger-svc",
+    "owner_team": "sre",
+    "policy_id": "TR-7",
+    "triage_policy": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN."
+  },
+  {
+    "service": "catalog-svc",
+    "runbook_id": "RB-catalog-svc",
+    "owner_team": "sre",
+    "policy_id": "TR-7",
+    "triage_policy": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN."
+  },
+  {
+    "service": "auth-svc",
+    "runbook_id": "RB-auth-svc",
+    "owner_team": "sre",
+    "policy_id": "TR-7",
+    "triage_policy": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN."
+  }
+]

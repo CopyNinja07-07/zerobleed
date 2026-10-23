@@ -6,7 +6,7 @@
 // Workers are stateless, have no tools, and can only answer through Y or C.
 import { chat, type ChatResult, type Lane } from "../llm.ts";
 
-export type TaskType = "EXTRACT" | "CRITIQUE" | "DECIDE";
+export type { TaskType } from "../domains/types.ts";
 
 export interface MicroContract {
   task: string;
@@ -15,30 +15,6 @@ export interface MicroContract {
   allowed_outputs: string[];
   may_request: string[];
 }
-
-export const TASK_SPECS: Record<TaskType, { lane: Lane; think: boolean; instruction: string; outputs: string[] }> = {
-  EXTRACT: {
-    lane: "fast",
-    think: false,
-    instruction:
-      "Normalise this one delivery record: confirm delay_days is a whole number of days, breach_date is YYYY-MM-DD, and hub_region and vendor_id are present.",
-    outputs: ["delay_days", "breach_date", "hub_region", "vendor_id"],
-  },
-  CRITIQUE: {
-    lane: "fast",
-    think: false,
-    instruction:
-      "Decide whether the penalty in clause_text applies to this delivery delay. Apply every condition in the clause, including any exception.",
-    outputs: ["penalty_applicable", "penalty_usd", "rule_applied"],
-  },
-  DECIDE: {
-    lane: "deep",
-    think: false,
-    instruction:
-      "Issue the final enforcement decision from these verified facts only: ENFORCE the penalty, WAIVE it, or NO_BREACH. Give a one-sentence rationale citing the facts.",
-    outputs: ["decision", "penalty_usd", "rationale"],
-  },
-};
 
 export const WORKER_SYSTEM =
   "You are a stateless worker in a quarantined audit pipeline. The user message is a JSON micro-contract. " +
@@ -74,7 +50,10 @@ export function validateReply(text: string, k: MicroContract): WorkerReply {
     if (!k.may_request.includes(missing)) return { status: "REJECTED", reason: `missing_variable "${missing.slice(0, 60)}" is not in the catalog enum` };
     return { status: "INSUFFICIENT_CONTEXT", missing };
   }
-  if (obj.status !== "VERIFIED") return { status: "REJECTED", reason: `unknown status "${String(obj.status).slice(0, 40)}"` };
+  // A reply that omits status but fills exactly the allowed outputs is treated as VERIFIED;
+  // any other status is rejected.
+  const filled = k.allowed_outputs.every((key) => obj[key] !== undefined && obj[key] !== null);
+  if (obj.status !== "VERIFIED" && !(obj.status === undefined && filled)) return { status: "REJECTED", reason: `unknown status "${String(obj.status).slice(0, 40)}"` };
   const outputs: Record<string, string> = {};
   for (const key of k.allowed_outputs) {
     if (obj[key] === undefined || obj[key] === null) return { status: "REJECTED", reason: `missing output ${key}` };

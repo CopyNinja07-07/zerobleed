@@ -1,6 +1,7 @@
 // Loads settings from .env without printing them. Secrets never leave this module
 // except as request headers.
 import { readFileSync, existsSync } from "node:fs";
+import { isSampleMode } from "./replay.ts";
 
 const loaded: Record<string, string> = {};
 if (existsSync(".env")) {
@@ -13,7 +14,7 @@ if (existsSync(".env")) {
 export function env(name: string, fallback?: string): string {
   const v = process.env[name] ?? loaded[name] ?? fallback;
   // SAMPLE_MODE replays recordings, so no service credentials are needed.
-  if (/^(1|true|yes)$/i.test(process.env.SAMPLE_MODE ?? "") && (v === undefined || v.startsWith("paste-your"))) return "sample-mode";
+  if (isSampleMode() && (v === undefined || v.startsWith("paste-your"))) return "sample-mode";
   if (v === undefined || v === "" || v.startsWith("paste-your")) throw new Error(`${name} is missing from .env`);
   return v;
 }

@@ -12,7 +12,8 @@
     "conformance": "tsx scripts/conformance.ts",
     "typecheck": "tsc --noEmit",
     "benchmark": "tsx scripts/benchmark.ts",
-    "start": "tsx src/server.ts"
+    "start": "tsx src/server.ts",
+    "test": "SAMPLE_MODE=true DATA_PORT=8798 node --import tsx --test tests/*.test.ts && npm run -s conformance"
   },
   "devDependencies": {
     "tsx": "4.19.2",
