@@ -1,0 +1,5 @@
+{
+  "run_id": "example-6",
+  "input": { "alert_id": "ALR-2002" },
+  "options": { "sample_mode": false, "compare_baseline": false }
+}

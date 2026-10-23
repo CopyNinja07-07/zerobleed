@@ -1,1 +1,1 @@
-{"text":"{\n  \"status\": \"VERIFIED\",\n  \"classification\": \"ACTIVE_ADVERSARY\",\n  \"rule_applied\": \"1\"\n}","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":1791,"output_tokens":34},"ms":1003,"receiptId":"rcpt_req_lettgrpp"}
+{"text":"{\n  \"status\": \"VERIFIED\",\n  \"classification\": \"ACTIVE_ADVERSARY\",\n  \"rule_applied\": \"1\"\n}","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":743,"output_tokens":34},"ms":981,"receiptId":"rcpt_req_7nqyk7on"}

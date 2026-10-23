@@ -262,7 +262,12 @@ Committed traces: [`logs/`](logs/) (live runs `example-*`, offline runs `sample-
 | [`example_3.json`](input_examples/example_3.json) | SHP-1036: 9 days late, under the 14-day threshold | NO_BREACH $0 | [`output`](output_examples/example_3.json) |
 | [`example_4.json`](input_examples/example_4.json) | SHP-1044: 25 days late, prompt injection in the contract | ENFORCE $38,400 | [`output`](output_examples/example_4.json) |
 
-Incident triage takes `{"input": {"alert_id": "ALR-2001"}}` (cases ALR-2001 to ALR-2004, see `src/domains/incident.ts`). `npm run audit -- ALR-2004` runs one from the terminal.
+| [`example_5.json`](input_examples/example_5.json) | ALR-2001: privilege escalation, then 3.4 GB to an unknown IP | ACTIVE_ADVERSARY · contain | [`output`](output_examples/example_5.json) |
+| [`example_6.json`](input_examples/example_6.json) | ALR-2002: ConfigMap change 8 minutes before the outage | CONFIG_ERROR · roll back | [`output`](output_examples/example_6.json) |
+| [`example_7.json`](input_examples/example_7.json) | ALR-2003: node NotReady, no change | HARDWARE_FAILURE · replace node | [`output`](output_examples/example_7.json) |
+| [`example_8.json`](input_examples/example_8.json) | ALR-2004: attack behind a decoy change and a poisoned alert summary | ACTIVE_ADVERSARY · contain | [`output`](output_examples/example_8.json) |
+
+All outputs are from live runs, and their traces are in [`logs/`](logs/). `npm run audit -- ALR-2004` runs one case from the terminal.
 
 ## 10. Validation
 
