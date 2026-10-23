@@ -1,0 +1,842 @@
+[
+  {
+    "log_date": "2026-09-01",
+    "hub_region": "US-EAST",
+    "wind_knots": 14,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-02",
+    "hub_region": "US-EAST",
+    "wind_knots": 19,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-03",
+    "hub_region": "US-EAST",
+    "wind_knots": 28,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-04",
+    "hub_region": "US-EAST",
+    "wind_knots": 11,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-05",
+    "hub_region": "US-EAST",
+    "wind_knots": 21,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-06",
+    "hub_region": "US-EAST",
+    "wind_knots": 8,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-07",
+    "hub_region": "US-EAST",
+    "wind_knots": 24,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-08",
+    "hub_region": "US-EAST",
+    "wind_knots": 19,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-09",
+    "hub_region": "US-EAST",
+    "wind_knots": 5,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-10",
+    "hub_region": "US-EAST",
+    "wind_knots": 25,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-11",
+    "hub_region": "US-EAST",
+    "wind_knots": 7,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-12",
+    "hub_region": "US-EAST",
+    "wind_knots": 9,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-13",
+    "hub_region": "US-EAST",
+    "wind_knots": 25,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-14",
+    "hub_region": "US-EAST",
+    "wind_knots": 16,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-15",
+    "hub_region": "US-EAST",
+    "wind_knots": 7,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-16",
+    "hub_region": "US-EAST",
+    "wind_knots": 29,
+    "waiver_declared": false,
+    "event": "high wind advisory"
+  },
+  {
+    "log_date": "2026-09-17",
+    "hub_region": "US-EAST",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-18",
+    "hub_region": "US-EAST",
+    "wind_knots": 21,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-19",
+    "hub_region": "US-EAST",
+    "wind_knots": 20,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-20",
+    "hub_region": "US-EAST",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-21",
+    "hub_region": "US-EAST",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-22",
+    "hub_region": "US-EAST",
+    "wind_knots": 16,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-23",
+    "hub_region": "US-EAST",
+    "wind_knots": 8,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-24",
+    "hub_region": "US-EAST",
+    "wind_knots": 28,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-25",
+    "hub_region": "US-EAST",
+    "wind_knots": 25,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-26",
+    "hub_region": "US-EAST",
+    "wind_knots": 6,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-27",
+    "hub_region": "US-EAST",
+    "wind_knots": 19,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-28",
+    "hub_region": "US-EAST",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-29",
+    "hub_region": "US-EAST",
+    "wind_knots": 9,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-30",
+    "hub_region": "US-EAST",
+    "wind_knots": 23,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-01",
+    "hub_region": "US-WEST",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-02",
+    "hub_region": "US-WEST",
+    "wind_knots": 20,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-03",
+    "hub_region": "US-WEST",
+    "wind_knots": 23,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-04",
+    "hub_region": "US-WEST",
+    "wind_knots": 26,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-05",
+    "hub_region": "US-WEST",
+    "wind_knots": 20,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-06",
+    "hub_region": "US-WEST",
+    "wind_knots": 27,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-07",
+    "hub_region": "US-WEST",
+    "wind_knots": 29,
+    "waiver_declared": false,
+    "event": "high wind advisory"
+  },
+  {
+    "log_date": "2026-09-08",
+    "hub_region": "US-WEST",
+    "wind_knots": 17,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-09",
+    "hub_region": "US-WEST",
+    "wind_knots": 27,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-10",
+    "hub_region": "US-WEST",
+    "wind_knots": 9,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-11",
+    "hub_region": "US-WEST",
+    "wind_knots": 6,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-12",
+    "hub_region": "US-WEST",
+    "wind_knots": 12,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-13",
+    "hub_region": "US-WEST",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-14",
+    "hub_region": "US-WEST",
+    "wind_knots": 14,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-15",
+    "hub_region": "US-WEST",
+    "wind_knots": 6,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-16",
+    "hub_region": "US-WEST",
+    "wind_knots": 24,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-17",
+    "hub_region": "US-WEST",
+    "wind_knots": 16,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-18",
+    "hub_region": "US-WEST",
+    "wind_knots": 26,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-19",
+    "hub_region": "US-WEST",
+    "wind_knots": 26,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-20",
+    "hub_region": "US-WEST",
+    "wind_knots": 61,
+    "waiver_declared": true,
+    "event": "Category 2 storm, regional waiver FM-2026-091"
+  },
+  {
+    "log_date": "2026-09-21",
+    "hub_region": "US-WEST",
+    "wind_knots": 27,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-22",
+    "hub_region": "US-WEST",
+    "wind_knots": 5,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-23",
+    "hub_region": "US-WEST",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-24",
+    "hub_region": "US-WEST",
+    "wind_knots": 28,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-25",
+    "hub_region": "US-WEST",
+    "wind_knots": 24,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-26",
+    "hub_region": "US-WEST",
+    "wind_knots": 12,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-27",
+    "hub_region": "US-WEST",
+    "wind_knots": 27,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-28",
+    "hub_region": "US-WEST",
+    "wind_knots": 16,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-29",
+    "hub_region": "US-WEST",
+    "wind_knots": 16,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-30",
+    "hub_region": "US-WEST",
+    "wind_knots": 15,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-01",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 5,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-02",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 21,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-03",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 22,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-04",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 14,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-05",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 21,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-06",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 24,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-07",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 26,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-08",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 7,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-09",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 15,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-10",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 19,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-11",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 26,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-12",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 12,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-13",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 7,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-14",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 28,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-15",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 29,
+    "waiver_declared": false,
+    "event": "high wind advisory"
+  },
+  {
+    "log_date": "2026-09-16",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 25,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-17",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 21,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-18",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 7,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-19",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 14,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-20",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 12,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-21",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 27,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-22",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 28,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-23",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 29,
+    "waiver_declared": false,
+    "event": "high wind advisory"
+  },
+  {
+    "log_date": "2026-09-24",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 22,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-25",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-26",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 11,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-27",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-28",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 7,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-29",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 19,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-30",
+    "hub_region": "EU-CENTRAL",
+    "wind_knots": 23,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-01",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 29,
+    "waiver_declared": false,
+    "event": "high wind advisory"
+  },
+  {
+    "log_date": "2026-09-02",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 14,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-03",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 6,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-04",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 27,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-05",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 24,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-06",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 12,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-07",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 29,
+    "waiver_declared": false,
+    "event": "high wind advisory"
+  },
+  {
+    "log_date": "2026-09-08",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 26,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-09",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 19,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-10",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 15,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-11",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 17,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-12",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 9,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-13",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 9,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-14",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 28,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-15",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 12,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-16",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 15,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-17",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 12,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-18",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 28,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-19",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 28,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-20",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 22,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-21",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 20,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-22",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 15,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-23",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 18,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-24",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 22,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-25",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 13,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-26",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 10,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-27",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 16,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-28",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 6,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-29",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 16,
+    "waiver_declared": false,
+    "event": "normal"
+  },
+  {
+    "log_date": "2026-09-30",
+    "hub_region": "APAC-SOUTH",
+    "wind_knots": 15,
+    "waiver_declared": false,
+    "event": "normal"
+  }
+]
