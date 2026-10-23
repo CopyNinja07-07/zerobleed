@@ -1,0 +1,1 @@
+{"columns":["alert_id","service","severity","alert_time","metric"],"rows":[["ALR-2001","checkout-api","P1","2026-10-20T14:00:00Z","http_5xx_rate"],["ALR-2002","payments-api","P1","2026-10-20T16:30:00Z","http_5xx_rate"],["ALR-2003","search-svc","P2","2026-10-20T18:10:00Z","available_replicas"],["ALR-2004","ledger-svc","P1","2026-10-20T21:40:00Z","http_5xx_rate"]]}

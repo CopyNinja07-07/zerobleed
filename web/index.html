@@ -26,6 +26,9 @@ main { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 18px; pa
 .ship { width: 100%; text-align: left; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; color: var(--fg); cursor: pointer; font: inherit; }
 .ship.on { border-color: var(--accent); background: var(--accent-soft); }
 .ship small { color: var(--muted); display: block; }
+.tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.tab { flex: 1; padding: 7px 8px; border-radius: 8px; border: 1px solid var(--line); background: none; color: var(--muted); font: inherit; font-size: 13px; cursor: pointer; }
+.tab.on { border-color: var(--accent); color: var(--fg); background: var(--accent-soft); }
 button.go { width: 100%; padding: 10px; border: none; border-radius: 8px; background: var(--accent); color: #11140a; font: inherit; font-weight: 600; cursor: pointer; }
 button.go:disabled { opacity: 0.5; cursor: default; }
 label.toggle { display: flex; gap: 8px; align-items: center; margin-top: 10px; color: var(--muted); font-size: 14px; }
@@ -40,7 +43,8 @@ ol.log li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px
 .tag.guard { background: var(--bad-soft); color: var(--bad); }
 .tag.done { background: var(--ok-soft); color: var(--ok); }
 .decision { border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
-.decision.ENFORCE { background: var(--bad-soft); }
+.decision.ENFORCE, .decision.ACTIVE_ADVERSARY { background: var(--bad-soft); }
+.decision.CONFIG_ERROR, .decision.HARDWARE_FAILURE { background: var(--warn-soft); }
 .decision.WAIVE, .decision.NO_BREACH { background: var(--ok-soft); }
 .decision.HUMAN_REVIEW { background: var(--warn-soft); }
 .decision .big { font-size: 26px; font-weight: 700; }
@@ -65,12 +69,13 @@ td code { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); }
 <body>
 <header>
   <h1><b>Zero</b>Bleed Auditor</h1>
-  <p>Supplier penalty audits where every AI step sees only the facts it needs.</p>
+  <p>Decisions where every AI step sees only the facts it needs.</p>
 </header>
 <main>
   <aside class="stack">
     <div class="panel">
-      <h2>Late shipments</h2>
+      <div class="tabs"><button id="tab-procurement" class="tab on">Supplier penalties</button><button id="tab-incident" class="tab">Incident triage</button></div>
+      <h2 id="listTitle">Late shipments</h2>
       <div id="ships"><p class="empty">Loading from Zetaris...</p></div>
       <button class="go" id="run">Run audit</button>
       <label class="toggle"><input type="checkbox" id="compare" checked> Also run a normal shared-history agent</label>
@@ -82,7 +87,7 @@ td code { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); }
   </aside>
   <section class="stack">
     <div class="grid2">
-      <div class="panel"><h2>Live steps</h2><ol class="log" id="log"><li class="empty">Pick a shipment and run an audit.</li></ol></div>
+      <div class="panel"><h2>Live steps</h2><ol class="log" id="log"><li class="empty">Pick a case and run it.</li></ol></div>
       <div class="stack">
         <div class="panel"><h2>Decision</h2><div id="decision" class="empty">No decision yet.</div></div>
         <div class="panel"><h2>Tokens read (measured)</h2><div class="bars" id="bars"><p class="empty">Appears after a run.</p></div></div>
@@ -99,14 +104,16 @@ td code { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); }
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 let selected = "SHP-1017";
+let domain = "procurement";
 let zbTotal = null, baseTotal = null;
 
 async function loadShips() {
   // returns after the list renders
   try {
-    const rows = await (await fetch("/api/shipments")).json();
+    $("listTitle").textContent = domain === "incident" ? "Open alerts" : "Late shipments";
+    const rows = await (await fetch(`/api/targets?domain=${domain}`)).json();
     $("ships").innerHTML = rows.slice(0, 8).map((r) =>
-      `<button class="ship${r.shipment_id === selected ? " on" : ""}" data-id="${esc(r.shipment_id)}">${esc(r.shipment_id)} &middot; ${esc(r.vendor_id)}<small>${esc(r.delay_days)} days late, ${esc(r.hub_region)}, ${esc(r.breach_date ?? "")}</small></button>`).join("");
+      `<button class="ship${r.id === selected ? " on" : ""}" data-id="${esc(r.id)}">${esc(r.title)}<small>${esc(r.detail)}</small></button>`).join("");
     document.querySelectorAll(".ship").forEach((b) => b.onclick = () => { selected = b.dataset.id; loadShips(); });
   } catch { $("ships").innerHTML = '<p class="empty">Could not reach Zetaris. Is it running?</p>'; }
 }
@@ -153,7 +160,7 @@ function renderResult(r) {
   $("decision").className = "";
   $("decision").innerHTML = d ? `<div class="decision ${esc(d.decision)}">
       <span class="muted">${esc(selected)}</span>
-      <span class="big">${esc(d.decision.replace("_", " "))}${d.penalty_usd && d.penalty_usd !== "pending" ? ` &middot; $${Number(d.penalty_usd).toLocaleString()}` : ""}</span>
+      <span class="big">${esc(d.decision.replaceAll("_", " "))}${r.valueText && !/pending|-/.test(r.valueText) ? ` &middot; ${esc(r.valueText.startsWith("$") ? "$" + Number(r.valueText.slice(1)).toLocaleString() : r.valueText.replaceAll("_", " "))}` : ""}</span>
       <span>${esc(d.rationale)}</span>
       ${r.needsHumanReview ? `<span><b>Needs review:</b> ${esc(r.reviewReasons.join("; "))}</span>` : ""}
       <span class="muted">Independent check: ${esc(r.reflection ?? "none")}</span>
@@ -181,11 +188,11 @@ $("run").onclick = async () => {
   $("log").innerHTML = ""; $("bars").innerHTML = '<p class="empty">Running...</p>';
   $("decision").innerHTML = '<p class="empty">Working...</p>';
   try {
-    const zb = stream(`/api/audit?shipment=${encodeURIComponent(selected)}`, addStep).then(renderResult);
+    const zb = stream(`/api/audit?id=${encodeURIComponent(selected)}`, addStep).then(renderResult);
     const base = $("compare").checked
-      ? stream(`/api/baseline?shipment=${encodeURIComponent(selected)}`, () => {}).then((b) => {
+      ? stream(`/api/baseline?id=${encodeURIComponent(selected)}`, () => {}).then((b) => {
           baseTotal = b.totals.inputTokens;
-          addStep(`Normal agent decided ${b.decision ? `${b.decision.decision} $${b.decision.penalty_usd}` : "nothing"} after reading ${b.totals.inputTokens.toLocaleString()} tokens`);
+          addStep(`Normal agent decided ${b.decision ? `${b.decision.decision} ${b.decision.penalty_usd !== undefined ? "$" + b.decision.penalty_usd : b.decision.recommended_action ?? ""}` : "nothing"} after reading ${b.totals.inputTokens.toLocaleString()} tokens`);
           renderBars();
         })
       : Promise.resolve();
@@ -195,7 +202,10 @@ $("run").onclick = async () => {
 };
 // ?run=SHP-1044&compare=0 starts an audit on load (used for screenshots and demos).
 const params = new URLSearchParams(location.search);
-if (params.get("run")) selected = params.get("run");
+if (params.get("run")) { selected = params.get("run"); domain = selected.startsWith("ALR-") ? "incident" : "procurement"; }
+const setTabs = () => { $("tab-procurement").classList.toggle("on", domain === "procurement"); $("tab-incident").classList.toggle("on", domain === "incident"); };
+for (const d of ["procurement", "incident"]) $(`tab-${d}`).onclick = () => { domain = d; selected = d === "incident" ? "ALR-2001" : "SHP-1017"; setTabs(); loadShips(); };
+setTabs();
 if (params.get("compare") === "0") $("compare").checked = false;
 loadShips().then(() => { if (params.get("run")) $("run").click(); });
 </script>
