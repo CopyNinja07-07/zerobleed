@@ -10,3 +10,4 @@ logs/trace-SHP-*
 logs/trace-ALR-*
 docs/pdf/.*.html
 video/clips/
+video/*.mp4
