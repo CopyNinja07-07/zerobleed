@@ -11,7 +11,8 @@
     "audit": "tsx src/cli.ts",
     "conformance": "tsx scripts/conformance.ts",
     "typecheck": "tsc --noEmit",
-    "benchmark": "tsx scripts/benchmark.ts"
+    "benchmark": "tsx scripts/benchmark.ts",
+    "start": "tsx src/server.ts"
   },
   "devDependencies": {
     "tsx": "4.19.2",

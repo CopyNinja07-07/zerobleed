@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ZeroBleed Auditor</title>
+<style>
+:root {
+  --bg: #f4f6f8; --panel: #ffffff; --fg: #15202b; --muted: #5b6878; --line: #d6dde5;
+  --accent: #2747c9; --accent-soft: #e4e9fb; --ok: #1c7a52; --ok-soft: #ddf1e7;
+  --warn: #9a6200; --warn-soft: #fbefd6; --bad: #b3263e; --bad-soft: #f8e3e7; --code: #eef2f6;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f161d; --panel: #17212b; --fg: #e4eaf0; --muted: #97a6b7; --line: #2c3a48;
+    --accent: #8ca4ff; --accent-soft: #1f2c55; --ok: #5fd3a0; --ok-soft: #14342a;
+    --warn: #f2c14e; --warn-soft: #3a2d10; --bad: #ff8296; --bad-soft: #3d1a22; --code: #1d2833;
+  }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif; }
+header { padding: 18px 24px; border-bottom: 1px solid var(--line); display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+header h1 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+header p { margin: 0; color: var(--muted); }
+main { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 18px; padding: 18px 24px; }
+@media (max-width: 900px) { main { grid-template-columns: minmax(0, 1fr); padding: 16px; } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+.panel h2 { margin: 0 0 10px; font-size: 13px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+.ship { width: 100%; text-align: left; background: none; border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; color: var(--fg); cursor: pointer; font: inherit; }
+.ship.on { border-color: var(--accent); background: var(--accent-soft); }
+.ship small { color: var(--muted); display: block; }
+button.go { width: 100%; padding: 10px; border: none; border-radius: 8px; background: var(--accent); color: var(--panel); font: inherit; font-weight: 600; cursor: pointer; }
+button.go:disabled { opacity: 0.5; cursor: default; }
+label.toggle { display: flex; gap: 8px; align-items: center; margin-top: 10px; color: var(--muted); font-size: 14px; }
+.grid2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+@media (max-width: 1100px) { .grid2 { grid-template-columns: minmax(0, 1fr); } }
+ol.log { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+ol.log li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; align-items: start; font-size: 14px; }
+.tag { font: 600 11px ui-monospace, Menlo, monospace; padding: 2px 6px; border-radius: 4px; text-align: center; background: var(--code); color: var(--muted); }
+.tag.plan { background: var(--accent-soft); color: var(--accent); }
+.tag.data { background: var(--code); color: var(--fg); }
+.tag.gate { background: var(--warn-soft); color: var(--warn); }
+.tag.guard { background: var(--bad-soft); color: var(--bad); }
+.tag.done { background: var(--ok-soft); color: var(--ok); }
+.decision { border-radius: 10px; padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.decision.ENFORCE { background: var(--bad-soft); }
+.decision.WAIVE, .decision.NO_BREACH { background: var(--ok-soft); }
+.decision.HUMAN_REVIEW { background: var(--warn-soft); }
+.decision .big { font-size: 26px; font-weight: 700; }
+.decision .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.decision .actions button { padding: 7px 12px; border-radius: 7px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); font: inherit; cursor: pointer; }
+pre { margin: 0; background: var(--code); border-radius: 6px; padding: 10px; font: 12px/1.5 ui-monospace, Menlo, monospace; white-space: pre-wrap; word-break: break-word; }
+.chunks { display: flex; flex-direction: column; gap: 8px; max-height: 420px; overflow: auto; }
+.chunk h3 { margin: 0 0 4px; font-size: 13px; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+td, th { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; }
+td code { font: 12px ui-monospace, Menlo, monospace; color: var(--muted); }
+.bars { display: flex; flex-direction: column; gap: 10px; }
+.bar { display: grid; grid-template-columns: 140px minmax(0, 1fr) 90px; gap: 10px; align-items: center; font-size: 14px; }
+.bar .track { background: var(--code); border-radius: 4px; height: 16px; overflow: hidden; }
+.bar .fill { height: 100%; }
+.bar span:last-child { text-align: right; font-variant-numeric: tabular-nums; }
+.muted { color: var(--muted); }
+.empty { color: var(--muted); font-style: italic; }
+</style>
+</head>
+<body>
+<header>
+  <h1>ZeroBleed Auditor</h1>
+  <p>Supplier penalty audits where every AI step sees only the facts it needs.</p>
+</header>
+<main>
+  <aside class="stack">
+    <div class="panel">
+      <h2>Late shipments</h2>
+      <div id="ships"><p class="empty">Loading from Zetaris...</p></div>
+      <button class="go" id="run">Run audit</button>
+      <label class="toggle"><input type="checkbox" id="compare" checked> Also run a normal shared-history agent</label>
+    </div>
+    <div class="panel">
+      <h2>How it works</h2>
+      <p class="muted" style="margin:0;font-size:14px">The raw data stays in <b>Zetaris</b>. The broker plans from column names only, then sends each <b>Nemotron</b> worker a tiny card through <b>Meterless Nightshift</b>. If a worker needs a missing fact, it can only ask for a real column name, and the broker fetches that one cell. The <b>Markovian engine</b> carries a small scratchpad between steps instead of a growing conversation.</p>
+    </div>
+  </aside>
+  <section class="stack">
+    <div class="grid2">
+      <div class="panel"><h2>Live steps</h2><ol class="log" id="log"><li class="empty">Pick a shipment and run an audit.</li></ol></div>
+      <div class="stack">
+        <div class="panel"><h2>Decision</h2><div id="decision" class="empty">No decision yet.</div></div>
+        <div class="panel"><h2>Tokens read (measured)</h2><div class="bars" id="bars"><p class="empty">Appears after a run.</p></div></div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="panel"><h2>Scratchpad carried between steps</h2><div class="chunks" id="chunks"><p class="empty">Each step receives only this block, never the history.</p></div></div>
+      <div class="panel"><h2>Evidence trail</h2><div id="evidence"><p class="empty">Every fact links to the one Zetaris query that produced it.</p></div></div>
+    </div>
+    <div class="panel"><h2>Model calls</h2><div id="ledger"><p class="empty">One row per Nemotron call through Nightshift.</p></div></div>
+  </section>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+let selected = "SHP-1017";
+let zbTotal = null, baseTotal = null;
+
+async function loadShips() {
+  try {
+    const rows = await (await fetch("/api/shipments")).json();
+    $("ships").innerHTML = rows.slice(0, 8).map((r) =>
+      `<button class="ship${r.shipment_id === selected ? " on" : ""}" data-id="${esc(r.shipment_id)}">${esc(r.shipment_id)} &middot; ${esc(r.vendor_id)}<small>${esc(r.delay_days)} days late, ${esc(r.hub_region)}, ${esc(r.breach_date ?? "")}</small></button>`).join("");
+    document.querySelectorAll(".ship").forEach((b) => b.onclick = () => { selected = b.dataset.id; loadShips(); });
+  } catch { $("ships").innerHTML = '<p class="empty">Could not reach Zetaris. Is it running?</p>'; }
+}
+
+function tagFor(e) {
+  if (e.startsWith("Planner")) return ["PLAN", "plan"];
+  if (e.startsWith("Broker")) return ["POLICY", "plan"];
+  if (e.startsWith("Zetaris")) return ["ZETARIS", "data"];
+  if (e.startsWith("Gate")) return ["GATE", "gate"];
+  if (e.startsWith("Guard")) return ["GUARD", "guard"];
+  if (e.startsWith("Decision")) return ["DECISION", "done"];
+  if (e.startsWith("Reflection")) return ["REFLECT", "done"];
+  return ["WORKER", ""];
+}
+
+function addStep(e) {
+  const [t, cls] = tagFor(e);
+  const li = document.createElement("li");
+  li.innerHTML = `<span class="tag ${cls}">${t}</span><span>${esc(e)}</span>`;
+  $("log").appendChild(li);
+}
+
+function stream(path, onStep) {
+  return new Promise((resolve, reject) => {
+    const es = new EventSource(path);
+    es.addEventListener("step", (m) => onStep(JSON.parse(m.data)));
+    es.addEventListener("result", (m) => { es.close(); resolve(JSON.parse(m.data)); });
+    es.onerror = () => { es.close(); reject(new Error("stream closed")); };
+  });
+}
+
+function renderBars() {
+  const items = [];
+  if (zbTotal) items.push(["ZeroBleed", zbTotal, "var(--accent)"]);
+  if (baseTotal) items.push(["Normal agent", baseTotal, "var(--bad)"]);
+  const max = Math.max(...items.map((i) => i[1]));
+  $("bars").innerHTML = items.map(([n, v, c]) =>
+    `<div class="bar"><span>${n}</span><div class="track"><div class="fill" style="width:${Math.max(1, (v / max) * 100)}%;background:${c}"></div></div><span>${v.toLocaleString()}</span></div>`).join("") +
+    (zbTotal && baseTotal ? `<p class="muted" style="margin:0">${(100 - (zbTotal / baseTotal) * 100).toFixed(1)}% fewer input tokens</p>` : "");
+}
+
+function renderResult(r) {
+  const d = r.decision;
+  $("decision").className = "";
+  $("decision").innerHTML = d ? `<div class="decision ${esc(d.decision)}">
+      <span class="muted">${esc(selected)}</span>
+      <span class="big">${esc(d.decision.replace("_", " "))}${d.penalty_usd && d.penalty_usd !== "pending" ? ` &middot; $${Number(d.penalty_usd).toLocaleString()}` : ""}</span>
+      <span>${esc(d.rationale)}</span>
+      ${r.needsHumanReview ? `<span><b>Needs review:</b> ${esc(r.reviewReasons.join("; "))}</span>` : ""}
+      <span class="muted">Independent check: ${esc(r.reflection ?? "none")}</span>
+      <div class="actions"><button onclick="this.parentNode.innerHTML='Approved by auditor'">Approve</button><button onclick="this.parentNode.innerHTML='Sent back for manual review'">Send back</button></div>
+    </div>` : '<p class="empty">No decision.</p>';
+  $("chunks").innerHTML = r.chunks.map((c) => `<div class="chunk"><h3>Step ${c.id} received (${c.carryover.length} characters)</h3><pre>${esc(c.carryover || "(empty: first step)")}</pre>${c.tool ? `<p class="muted" style="margin:4px 0 0">Paused for <code>${esc(c.tool.input)}</code>, Zetaris returned <b>${esc(c.tool.result)}</b></p>` : ""}</div>`).join("");
+  const seen = new Set();
+  $("evidence").innerHTML = `<table><tr><th>Fact</th><th>Value</th><th>Zetaris query</th></tr>${r.citations.filter((c) => !seen.has(c.fact) && seen.add(c.fact)).map((c) =>
+    `<tr><td>${esc(c.fact)}</td><td>${esc(String(c.value).slice(0, 80))}${String(c.value).length > 80 ? "..." : ""}</td><td><code>${esc(c.sql)}</code></td></tr>`).join("")}</table>`;
+  $("ledger").innerHTML = `<table><tr><th>Step</th><th>Model</th><th>Tokens in</th><th>Tokens out</th><th>Time</th><th>Result</th></tr>${r.ledger.map((e) =>
+    `<tr><td>${esc(e.task)}</td><td>${esc(e.model.replace("nvidia/", ""))}</td><td>${e.inputTokens}</td><td>${e.outputTokens}</td><td>${(e.ms / 1000).toFixed(1)}s</td><td>${esc(e.outcome)}</td></tr>`).join("")}
+    <tr><td><b>Total</b></td><td></td><td><b>${r.totals.inputTokens}</b></td><td><b>${r.totals.outputTokens}</b></td><td><b>${(r.totals.ms / 1000).toFixed(1)}s</b></td><td></td></tr></table>`;
+  zbTotal = r.totals.inputTokens;
+  renderBars();
+}
+
+$("run").onclick = async () => {
+  $("run").disabled = true;
+  zbTotal = baseTotal = null;
+  $("log").innerHTML = ""; $("bars").innerHTML = '<p class="empty">Running...</p>';
+  $("decision").innerHTML = '<p class="empty">Working...</p>';
+  try {
+    const zb = stream(`/api/audit?shipment=${encodeURIComponent(selected)}`, addStep).then(renderResult);
+    const base = $("compare").checked
+      ? stream(`/api/baseline?shipment=${encodeURIComponent(selected)}`, () => {}).then((b) => {
+          baseTotal = b.totals.inputTokens;
+          addStep(`Normal agent decided ${b.decision ? `${b.decision.decision} $${b.decision.penalty_usd}` : "nothing"} after reading ${b.totals.inputTokens.toLocaleString()} tokens`);
+          renderBars();
+        })
+      : Promise.resolve();
+    await Promise.all([zb, base]);
+  } catch (err) { addStep("Error: " + err.message); }
+  $("run").disabled = false;
+};
+loadShips();
+</script>
+</body>
+</html>
