@@ -1,0 +1,1 @@
+{"columns":["col_name","data_type","comment"],"rows":[["contract_id","string",null],["vendor_id","string",null],["vendor_name","string",null],["clause_id","string",null],["penalty_pct","bigint",null],["penalty_usd","bigint",null],["threshold_days","bigint",null],["clause_text","string",null]]}

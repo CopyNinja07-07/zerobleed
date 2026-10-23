@@ -1,0 +1,1 @@
+{"text":"Understood. I will process the audit data and generate decisions for each shipment.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9645,"output_tokens":17},"ms":875,"receiptId":"rcpt_req_xsd021og"}

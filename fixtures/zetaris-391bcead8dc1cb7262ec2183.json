@@ -1,0 +1,1 @@
+{"columns":["col_name","data_type","comment"],"rows":[["log_date","string",null],["hub_region","string",null],["wind_knots","bigint",null],["waiver_declared","boolean",null],["event","string",null]]}

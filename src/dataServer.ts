@@ -22,7 +22,11 @@ export function startDataServer(port = PORT) {
     const records = JSON.parse(readFileSync(file, "utf8"));
     res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ records }));
   });
-  return new Promise<typeof server>((resolve) => server.listen(port, "0.0.0.0", () => resolve(server)));
+  // Rejects if the port is taken (another ZeroBleed process already serves the silos).
+  return new Promise<typeof server>((resolve, reject) => {
+    server.once("error", reject);
+    server.listen(port, "0.0.0.0", () => resolve(server));
+  });
 }
 
 if (import.meta.url === `file://${process.argv[1]}`) {

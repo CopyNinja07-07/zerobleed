@@ -12,6 +12,7 @@ import { chat } from "../llm.ts";
 import { loadCatalog, project, rowScope, type Catalog, type Table } from "./catalog.ts";
 import { dispatch, TASK_SPECS, type MicroContract } from "./contracts.ts";
 import { plan as makePlan, type Plan, type PlannedTask } from "./planner.ts";
+import { onFallback } from "../replay.ts";
 import { carryoverFromPrompt, readScratchpad, toolResultFromPrompt, writeScratchpad, type Scratchpad } from "./scratchpad.ts";
 
 export const MAX_RETRIES = 2; // Rmax: interrupts allowed per task
@@ -72,6 +73,7 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
     events.push(e);
     opts.onEvent?.(e);
   };
+  const stopFallbackLog = onFallback((m) => log(`Fallback: ${m}`));
   const book = (task: string, lane: Lane, call: ChatResult, promptChars: number, outcome: string) =>
     ledger.push({ step, task, lane, model: call.model, inputTokens: call.usage.input_tokens, outputTokens: call.usage.output_tokens, promptChars, ms: call.ms, receiptId: call.receiptId, outcome });
   const cite = (fact: string, value: string, sql: string) => citations.push({ fact, value, sql });
@@ -283,6 +285,7 @@ export async function runAudit(target: AuditTarget, opts: { onEvent?: (e: string
     onTool,
   });
 
+  stopFallbackLog();
   const finalPad = readScratchpad(lastCarry);
   if (run.status !== "completed") reviewReasons.push(`Markovian run ended as ${run.status}${run.error ? `: ${run.error}` : ""}`);
   if (!decision) reviewReasons.push("no decision was produced");

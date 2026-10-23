@@ -1,0 +1,1 @@
+{"text":"VEND-31's contract (CTR-31) has a 14-day threshold. The delay of 9 days does not exceed the threshold, so no penalty applies regardless of waiver status.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9786,"output_tokens":45},"ms":1267,"receiptId":"rcpt_req_0myhzutb"}

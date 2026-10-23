@@ -1,0 +1,1 @@
+{"text":"No waiver was active. The log for 2026-09-20 in US-WEST shows waiver_declared: false.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9890,"output_tokens":34},"ms":1347,"receiptId":"rcpt_req_2wb89oyp"}

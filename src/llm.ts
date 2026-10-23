@@ -3,6 +3,7 @@
 // meterless-scope headers, POST /v1/chat/completions, GET /v1/models.
 // Every call is stateless: the caller passes the full (tiny) message list.
 import { env } from "./env.ts";
+import { withReplay } from "./replay.ts";
 
 export type Lane = "fast" | "deep";
 
@@ -48,6 +49,10 @@ export async function chat(lane: Lane, system: string, user: string, opts: ChatO
 export async function chatMessages(lane: Lane, messages: Message[], opts: ChatOptions = {}): Promise<ChatResult> {
   const think = opts.think ?? false;
   const maxTokens = opts.maxTokens ?? (think ? 4000 : 800);
+  return withReplay("nightshift", { lane, messages, think }, () => chatLive(lane, messages, maxTokens, think));
+}
+
+async function chatLive(lane: Lane, messages: Message[], maxTokens: number, think: boolean): Promise<ChatResult> {
   try {
     return await chatOnce(lane, messages, maxTokens, think);
   } catch (err) {

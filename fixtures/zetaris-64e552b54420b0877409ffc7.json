@@ -1,0 +1,1 @@
+{"columns":["col_name","data_type","comment"],"rows":[["shipment_id","string",null],["vendor_id","string",null],["hub_region","string",null],["promised_date","string",null],["breach_date","string",null],["delay_days","bigint",null],["units","bigint",null],["carrier","string",null]]}

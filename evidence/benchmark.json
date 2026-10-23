@@ -1,6 +1,6 @@
 {
   "summary": {
-    "date": "2026-10-23T14:32:24.391Z",
+    "date": "2026-10-23T15:00:24.034Z",
     "machine": "MacBook Air (Apple M5, 16 GB), Zetaris 2.4.3.1 in Docker, Meterless Nightshift Mac M5+",
     "models": {
       "fast": "nvidia/nemotron-3.5-lightning-30b-a3b",
@@ -10,15 +10,15 @@
     "runs": 4,
     "zerobleed": {
       "correct": 4,
-      "inputTokens": 16369,
-      "outputTokens": 2019,
-      "seconds": 89.3
+      "inputTokens": 16479,
+      "outputTokens": 1972,
+      "seconds": 101.2
     },
     "baseline": {
-      "correct": 3,
-      "inputTokens": 197327,
-      "outputTokens": 980,
-      "seconds": 39.3
+      "correct": 2,
+      "inputTokens": 196002,
+      "outputTokens": 937,
+      "seconds": 55.2
     }
   },
   "rows": [
@@ -31,11 +31,11 @@
         "penalty": "48000",
         "correct": true,
         "humanReview": false,
-        "inputTokens": 4492,
-        "outputTokens": 531,
+        "inputTokens": 4443,
+        "outputTokens": 511,
         "calls": 6,
         "largestCallInput": 880,
-        "seconds": 24.7,
+        "seconds": 21,
         "interrupts": 1,
         "escalations": 0
       },
@@ -43,11 +43,11 @@
         "decision": "ENFORCE",
         "penalty": "48000",
         "correct": true,
-        "inputTokens": 49367,
-        "outputTokens": 263,
+        "inputTokens": 49028,
+        "outputTokens": 256,
         "calls": 5,
-        "largestCallInput": 10070,
-        "seconds": 12.8
+        "largestCallInput": 9992,
+        "seconds": 12.1
       }
     },
     {
@@ -59,23 +59,23 @@
         "penalty": "0",
         "correct": true,
         "humanReview": false,
-        "inputTokens": 3382,
+        "inputTokens": 3369,
         "outputTokens": 483,
         "calls": 5,
-        "largestCallInput": 839,
-        "seconds": 25.4,
+        "largestCallInput": 826,
+        "seconds": 23.9,
         "interrupts": 0,
         "escalations": 0
       },
       "baseline": {
-        "decision": "WAIVE",
-        "penalty": "0",
-        "correct": true,
-        "inputTokens": 49553,
-        "outputTokens": 274,
+        "decision": "ENFORCE",
+        "penalty": "30000",
+        "correct": false,
+        "inputTokens": 49053,
+        "outputTokens": 244,
         "calls": 5,
-        "largestCallInput": 10113,
-        "seconds": 11
+        "largestCallInput": 9989,
+        "seconds": 12.6
       }
     },
     {
@@ -87,11 +87,11 @@
         "penalty": "0",
         "correct": true,
         "humanReview": false,
-        "inputTokens": 4215,
-        "outputTokens": 501,
+        "inputTokens": 4167,
+        "outputTokens": 473,
         "calls": 6,
-        "largestCallInput": 871,
-        "seconds": 26.3,
+        "largestCallInput": 844,
+        "seconds": 39.7,
         "interrupts": 1,
         "escalations": 0
       },
@@ -99,11 +99,11 @@
         "decision": "NO_BREACH",
         "penalty": "0",
         "correct": true,
-        "inputTokens": 49446,
-        "outputTokens": 208,
+        "inputTokens": 48984,
+        "outputTokens": 201,
         "calls": 5,
-        "largestCallInput": 10015,
-        "seconds": 7.1
+        "largestCallInput": 9953,
+        "seconds": 19.5
       }
     },
     {
@@ -115,11 +115,11 @@
         "penalty": "38400",
         "correct": true,
         "humanReview": false,
-        "inputTokens": 4280,
-        "outputTokens": 504,
+        "inputTokens": 4500,
+        "outputTokens": 505,
         "calls": 6,
-        "largestCallInput": 875,
-        "seconds": 12.9,
+        "largestCallInput": 879,
+        "seconds": 16.6,
         "interrupts": 1,
         "escalations": 0
       },
@@ -127,11 +127,11 @@
         "decision": "WAIVE",
         "penalty": "0",
         "correct": false,
-        "inputTokens": 48961,
-        "outputTokens": 235,
+        "inputTokens": 48937,
+        "outputTokens": 236,
         "calls": 5,
-        "largestCallInput": 9970,
-        "seconds": 8.4
+        "largestCallInput": 9974,
+        "seconds": 11
       }
     }
   ]

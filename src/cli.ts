@@ -3,11 +3,12 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { runAudit } from "./broker/broker.ts";
 import { startDataServer } from "./dataServer.ts";
+import { SAMPLE_MODE } from "./replay.ts";
 
 const shipment_id = process.argv[2] ?? "SHP-1017";
 const server = await startDataServer().catch(() => undefined); // already running is fine
 
-console.log(`\nZeroBleed audit: ${shipment_id}\n`);
+console.log(`\nZeroBleed audit: ${shipment_id}${SAMPLE_MODE ? "  [SAMPLE_MODE: replaying recorded Zetaris and Nightshift responses]" : ""}\n`);
 const result = await runAudit({ shipment_id }, { onEvent: (e) => console.log(`  - ${e}`), historyDir: ".zerobleed" });
 
 console.log(`\nDecision: ${result.decision?.decision ?? "none"}  penalty $${result.decision?.penalty_usd ?? "-"}`);

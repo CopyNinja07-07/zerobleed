@@ -1,0 +1,1 @@
+{"text":"No waiver was active. The log for 2026-09-14 in US-EAST shows wind_knots: 16, waiver_declared: false, event: normal.","model":"nvidia/nemotron-3.5-lightning-30b-a3b","usage":{"input_tokens":9886,"output_tokens":47},"ms":1204,"receiptId":"rcpt_req_qzbnojjb"}

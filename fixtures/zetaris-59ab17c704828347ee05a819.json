@@ -1,0 +1,1 @@
+{"columns":["threshold_days","penalty_pct","penalty_usd","clause_text"],"rows":[["14","12","30000","Section 4.2: Delivery delays exceeding 14 days incur a 12% penalty ($30,000), UNLESS an official regional Force Majeure weather waiver was declared active on the breach_date."]]}

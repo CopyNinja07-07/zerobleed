@@ -2,6 +2,7 @@
 // API key as a bearer token, plus X-Org-ID and a fresh UUID X-Request-ID.
 import { randomUUID } from "node:crypto";
 import { env } from "./env.ts";
+import { withReplay } from "./replay.ts";
 
 export interface SqlResult {
   columns: string[];
@@ -10,6 +11,10 @@ export interface SqlResult {
 
 export async function runSql(sql: string): Promise<SqlResult> {
   const statement = sql.trim().replace(/;$/, "");
+  return withReplay("zetaris", statement, () => runSqlLive(statement));
+}
+
+async function runSqlLive(statement: string): Promise<SqlResult> {
   const res = await fetch(env("ZETARIS_REST_URL").replace(/\/$/, "") + "/sql-editor/sqls/run", {
     method: "POST",
     headers: {

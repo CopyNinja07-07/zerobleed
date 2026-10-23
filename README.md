@@ -68,6 +68,8 @@ npm run setup:zetaris             # registers the silos in Zetaris (safe to re-r
 npm start                         # dashboard at http://localhost:3030
 ```
 
+No Zetaris or Nightshift at hand? `SAMPLE_MODE=true npm run audit -- SHP-1017` replays the recorded responses in `fixtures/` and runs fully offline. In live mode the same recordings act as a fallback: if a service is unreachable mid-run, the broker uses the recorded response and logs a `Fallback:` step.
+
 Other commands:
 
 ```bash
