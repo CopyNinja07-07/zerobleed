@@ -1,0 +1,199 @@
+{
+  "case": "SHP-1029",
+  "run": 1,
+  "zerobleed": {
+    "decision": {
+      "decision": "WAIVE",
+      "penalty_usd": "0",
+      "rationale": "The 18-day delay on 2026-09-20 exceeds the 14-day threshold, but a Force Majeure waiver was declared active for hub_region US-WEST on the breach date, so the penalty is waived per Section 4.2."
+    },
+    "calls": [
+      {
+        "step": 1,
+        "task": "PLAN",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 692,
+        "outputTokens": 197,
+        "promptChars": 405,
+        "ms": 8428,
+        "receiptId": "rcpt_req_kh3u4k8w",
+        "outcome": "planner"
+      },
+      {
+        "step": 2,
+        "task": "T1_EXTRACT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 585,
+        "outputTokens": 61,
+        "promptChars": 744,
+        "ms": 1080,
+        "receiptId": "rcpt_req_hf0tfzyr",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 3,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 709,
+        "outputTokens": 134,
+        "promptChars": 879,
+        "ms": 1845,
+        "receiptId": "rcpt_req_s0qiunpl",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 4,
+        "task": "T3_DECIDE",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 826,
+        "outputTokens": 87,
+        "promptChars": 1076,
+        "ms": 1820,
+        "receiptId": "rcpt_req_0m7e99ce",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 5,
+        "task": "REFLECT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 556,
+        "outputTokens": 4,
+        "promptChars": 597,
+        "ms": 658,
+        "receiptId": "rcpt_req_2ssdcatj",
+        "outcome": "RATIFY"
+      }
+    ],
+    "evidence": [
+      {
+        "fact": "shipments.shipment_id",
+        "value": "SHP-1029",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.vendor_id",
+        "value": "VEND-12",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.hub_region",
+        "value": "US-WEST",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.promised_date",
+        "value": "2026-09-02",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.breach_date",
+        "value": "2026-09-20",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "shipments.delay_days",
+        "value": "18",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1029'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.penalty_pct",
+        "value": "12",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "30000",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.clause_text",
+        "value": "Section 4.2: Delivery delays exceeding 14 days incur a 12% penalty ($30,000), UNLESS an official regional Force Majeure weather waiver was declared active on the breach_date.",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_usd FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "30000",
+        "sql": "SELECT threshold_days, penalty_usd FROM zerobleed.contracts WHERE vendor_id = 'VEND-12'"
+      },
+      {
+        "fact": "force_majeure.waiver_declared",
+        "value": "true",
+        "sql": "SELECT waiver_declared FROM zerobleed.force_majeure WHERE log_date = '2026-09-20' AND hub_region = 'US-WEST'"
+      }
+    ],
+    "markovian": {
+      "chunks": 4,
+      "status": "completed",
+      "reflection": "RATIFY"
+    }
+  },
+  "baseline": {
+    "decision": {
+      "decision": "ENFORCE",
+      "penalty_usd": "30000",
+      "rationale": "Delay of 18 days exceeds the 14-day threshold with no Force Majeure waiver active on the breach date 2026-09-20 in US-WEST."
+    },
+    "calls": [
+      {
+        "turn": "LOAD",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 9633,
+        "outputTokens": 25,
+        "ms": 1281,
+        "receiptId": "rcpt_req_djew1ldw"
+      },
+      {
+        "turn": "EXTRACT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 9869,
+        "outputTokens": 38,
+        "ms": 1038,
+        "receiptId": "rcpt_req_twoln6k8"
+      },
+      {
+        "turn": "CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 9934,
+        "outputTokens": 79,
+        "ms": 1953,
+        "receiptId": "rcpt_req_j99am3d5"
+      },
+      {
+        "turn": "WEATHER",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 10043,
+        "outputTokens": 36,
+        "ms": 1254,
+        "receiptId": "rcpt_req_wz71jbub"
+      },
+      {
+        "turn": "DECIDE",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 10027,
+        "outputTokens": 72,
+        "ms": 2214,
+        "receiptId": "rcpt_req_om5vid5e"
+      }
+    ]
+  }
+}

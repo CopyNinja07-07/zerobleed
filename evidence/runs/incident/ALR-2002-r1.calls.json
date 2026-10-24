@@ -1,0 +1,248 @@
+{
+  "case": "ALR-2002",
+  "run": 1,
+  "zerobleed": {
+    "decision": {
+      "decision": "CONFIG_ERROR",
+      "recommended_action": "ROLLBACK_CHANGE",
+      "rationale": "Rule 2 (CONFIG_ERROR) applies because config_changes_30m,2 indicates ConfigMap or Deployment changes occurred in the 30 minutes before the alert, while Rule 1 (ACTIVE_ADVERSARY) does not apply since non_admin_iam_escalations_60m,0 and egress_gb_outside_allowlist_60m,0.0."
+    },
+    "calls": [
+      {
+        "step": 1,
+        "task": "PLAN",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 831,
+        "outputTokens": 264,
+        "promptChars": 503,
+        "ms": 2576,
+        "receiptId": "rcpt_req_3bjehhvp",
+        "outcome": "planner"
+      },
+      {
+        "step": 2,
+        "task": "T1_EXTRACT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 1990,
+        "outputTokens": 57,
+        "promptChars": 786,
+        "ms": 981,
+        "receiptId": "rcpt_req_zyembfke",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 3,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 1776,
+        "outputTokens": 31,
+        "promptChars": 1286,
+        "ms": 838,
+        "receiptId": "rcpt_req_mrazj4zy",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 4,
+        "task": "T3_DECIDE",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 797,
+        "outputTokens": 33,
+        "promptChars": 1001,
+        "ms": 1730,
+        "receiptId": "rcpt_req_pauqi6mx",
+        "outcome": "INSUFFICIENT_CONTEXT"
+      },
+      {
+        "step": 5,
+        "task": "T3_DECIDE",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 782,
+        "outputTokens": 125,
+        "promptChars": 1111,
+        "ms": 3642,
+        "receiptId": "rcpt_req_fw8q7xgj",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 6,
+        "task": "REFLECT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 684,
+        "outputTokens": 4,
+        "promptChars": 387,
+        "ms": 479,
+        "receiptId": "rcpt_req_07urzy9s",
+        "outcome": "RATIFY"
+      }
+    ],
+    "evidence": [
+      {
+        "fact": "alerts.alert_id",
+        "value": "ALR-2002",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alerts.ts",
+        "value": "1792513800",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alerts.alert_time",
+        "value": "2026-10-20T16:30:00Z",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alerts.service",
+        "value": "payments-api",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alerts.severity",
+        "value": "P1",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alerts.metric",
+        "value": "http_5xx_rate",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alerts.value",
+        "value": "0.52",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alerts.summary",
+        "value": "payments-api 5xx rate 52%, upstream timeouts",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "runbooks.runbook_id",
+        "value": "RB-payments-api",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'payments-api'"
+      },
+      {
+        "fact": "runbooks.owner_team",
+        "value": "sre",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'payments-api'"
+      },
+      {
+        "fact": "runbooks.policy_id",
+        "value": "TR-7",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'payments-api'"
+      },
+      {
+        "fact": "runbooks.triage_policy",
+        "value": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN.",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'payments-api'"
+      },
+      {
+        "fact": "alert_signals.alert_id",
+        "value": "ALR-2002",
+        "sql": "SELECT alert_id, non_admin_iam_escalations_60m, escalating_principal_60m, egress_gb_outside_allowlist_60m, egress_destination_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.non_admin_iam_escalations_60m",
+        "value": "0",
+        "sql": "SELECT alert_id, non_admin_iam_escalations_60m, escalating_principal_60m, egress_gb_outside_allowlist_60m, egress_destination_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.escalating_principal_60m",
+        "value": "null",
+        "sql": "SELECT alert_id, non_admin_iam_escalations_60m, escalating_principal_60m, egress_gb_outside_allowlist_60m, egress_destination_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.egress_gb_outside_allowlist_60m",
+        "value": "0.0",
+        "sql": "SELECT alert_id, non_admin_iam_escalations_60m, escalating_principal_60m, egress_gb_outside_allowlist_60m, egress_destination_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.egress_destination_outside_allowlist_60m",
+        "value": "null",
+        "sql": "SELECT alert_id, non_admin_iam_escalations_60m, escalating_principal_60m, egress_gb_outside_allowlist_60m, egress_destination_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.config_changes_30m",
+        "value": "2",
+        "sql": "SELECT alert_id, non_admin_iam_escalations_60m, escalating_principal_60m, egress_gb_outside_allowlist_60m, egress_destination_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.nodes_not_ready_30m",
+        "value": "0",
+        "sql": "SELECT alert_id, non_admin_iam_escalations_60m, escalating_principal_60m, egress_gb_outside_allowlist_60m, egress_destination_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.non_admin_iam_escalations_60m",
+        "value": "0",
+        "sql": "SELECT non_admin_iam_escalations_60m, egress_gb_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.egress_gb_outside_allowlist_60m",
+        "value": "0.0",
+        "sql": "SELECT non_admin_iam_escalations_60m, egress_gb_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.config_changes_30m",
+        "value": "2",
+        "sql": "SELECT non_admin_iam_escalations_60m, egress_gb_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.nodes_not_ready_30m",
+        "value": "0",
+        "sql": "SELECT non_admin_iam_escalations_60m, egress_gb_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      },
+      {
+        "fact": "alert_signals.config_changes_30m",
+        "value": "2",
+        "sql": "SELECT config_changes_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2002'"
+      }
+    ],
+    "markovian": {
+      "chunks": 5,
+      "status": "completed",
+      "reflection": "RATIFY"
+    }
+  },
+  "baseline": {
+    "decision": {
+      "decision": "CONFIG_ERROR",
+      "recommended_action": "ROLLBACK_CHANGE",
+      "rationale": "A ConfigMap update (timeout_ms 3000 -> 30) and Deployment rollout restart occurred in the payments-api namespace at 16:22:00Z and 16:23:00Z, within the 30-minute window before the alert, satisfying Rule 2."
+    },
+    "calls": [
+      {
+        "turn": "LOAD",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 58708,
+        "outputTokens": 17,
+        "ms": 3358,
+        "receiptId": "rcpt_req_0v11or0i"
+      },
+      {
+        "turn": "SIGNALS",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 58582,
+        "outputTokens": 233,
+        "ms": 5907,
+        "receiptId": "rcpt_req_jbh76hcf"
+      },
+      {
+        "turn": "DECIDE",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 59090,
+        "outputTokens": 94,
+        "ms": 27377,
+        "receiptId": "rcpt_req_v094xdgx"
+      }
+    ]
+  }
+}

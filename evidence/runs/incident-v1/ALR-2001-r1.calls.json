@@ -1,0 +1,381 @@
+{
+  "case": "ALR-2001",
+  "run": 1,
+  "zerobleed": {
+    "decision": {
+      "decision": "ACTIVE_ADVERSARY",
+      "recommended_action": "CONTAIN_AND_ROTATE_CREDENTIALS",
+      "rationale": "Non-admin principal ci-deploy-bot performed 2 IAM privilege escalations and exfiltrated 3.4 GB to external IP 185.220.101.44 in the 60 minutes before the alert, matching ACTIVE_ADVERSARY criteria."
+    },
+    "calls": [
+      {
+        "step": 1,
+        "task": "PLAN",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 556,
+        "outputTokens": 264,
+        "promptChars": 503,
+        "ms": 41124,
+        "receiptId": "rcpt_req_8y9zri4e",
+        "outcome": "planner"
+      },
+      {
+        "step": 2,
+        "task": "T1_EXTRACT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 904,
+        "outputTokens": 56,
+        "promptChars": 788,
+        "ms": 1020,
+        "receiptId": "rcpt_req_boon3qml",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 3,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 873,
+        "outputTokens": 39,
+        "promptChars": 1359,
+        "ms": 892,
+        "receiptId": "rcpt_req_a4zn1afm",
+        "outcome": "INSUFFICIENT_CONTEXT"
+      },
+      {
+        "step": 4,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 906,
+        "outputTokens": 39,
+        "promptChars": 1455,
+        "ms": 1025,
+        "receiptId": "rcpt_req_qzabxuw7",
+        "outcome": "INSUFFICIENT_CONTEXT"
+      },
+      {
+        "step": 5,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 943,
+        "outputTokens": 35,
+        "promptChars": 1555,
+        "ms": 949,
+        "receiptId": "rcpt_req_q5l3vygz",
+        "outcome": "INSUFFICIENT_CONTEXT"
+      },
+      {
+        "step": 6,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 980,
+        "outputTokens": 39,
+        "promptChars": 1658,
+        "ms": 1127,
+        "receiptId": "rcpt_req_1qe6bnid",
+        "outcome": "INSUFFICIENT_CONTEXT"
+      },
+      {
+        "step": 7,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 1028,
+        "outputTokens": 33,
+        "promptChars": 1778,
+        "ms": 913,
+        "receiptId": "rcpt_req_c3dsdpd1",
+        "outcome": "INSUFFICIENT_CONTEXT"
+      },
+      {
+        "step": 8,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 1057,
+        "outputTokens": 256,
+        "promptChars": 1863,
+        "ms": 8371,
+        "receiptId": "rcpt_req_1psr5vm7",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 9,
+        "task": "T3_DECIDE",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 1137,
+        "outputTokens": 113,
+        "promptChars": 2012,
+        "ms": 3675,
+        "receiptId": "rcpt_req_4p7vlewy",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 10,
+        "task": "REFLECT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 492,
+        "outputTokens": 4,
+        "promptChars": 243,
+        "ms": 577,
+        "receiptId": "rcpt_req_sasr4fvs",
+        "outcome": "RATIFY"
+      }
+    ],
+    "evidence": [
+      {
+        "fact": "alerts.alert_id",
+        "value": "ALR-2001",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alerts.ts",
+        "value": "1792504800",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alerts.alert_time",
+        "value": "2026-10-20T14:00:00Z",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alerts.service",
+        "value": "checkout-api",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alerts.severity",
+        "value": "P1",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alerts.metric",
+        "value": "http_5xx_rate",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alerts.value",
+        "value": "0.37",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alerts.summary",
+        "value": "checkout-api 5xx rate 37% and p99 latency 9.8s",
+        "sql": "SELECT alert_id, ts, alert_time, service, severity, metric, value, summary FROM incidents.alerts WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "runbooks.runbook_id",
+        "value": "RB-checkout-api",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.owner_team",
+        "value": "sre",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.policy_id",
+        "value": "TR-7",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.triage_policy",
+        "value": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN.",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "alert_signals.non_admin_iam_escalations_60m",
+        "value": "2",
+        "sql": "SELECT non_admin_iam_escalations_60m FROM incidents.alert_signals WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "runbooks.runbook_id",
+        "value": "RB-checkout-api",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.owner_team",
+        "value": "sre",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.policy_id",
+        "value": "TR-7",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.triage_policy",
+        "value": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN.",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "alert_signals.egress_gb_outside_allowlist_60m",
+        "value": "3.4",
+        "sql": "SELECT egress_gb_outside_allowlist_60m FROM incidents.alert_signals WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "runbooks.runbook_id",
+        "value": "RB-checkout-api",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.owner_team",
+        "value": "sre",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.policy_id",
+        "value": "TR-7",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.triage_policy",
+        "value": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN.",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "alert_signals.escalating_principal_60m",
+        "value": "ci-deploy-bot",
+        "sql": "SELECT escalating_principal_60m FROM incidents.alert_signals WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "runbooks.runbook_id",
+        "value": "RB-checkout-api",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.owner_team",
+        "value": "sre",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.policy_id",
+        "value": "TR-7",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.triage_policy",
+        "value": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN.",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "alert_signals.egress_destination_outside_allowlist_60m",
+        "value": "185.220.101.44",
+        "sql": "SELECT egress_destination_outside_allowlist_60m FROM incidents.alert_signals WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "runbooks.runbook_id",
+        "value": "RB-checkout-api",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.owner_team",
+        "value": "sre",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.policy_id",
+        "value": "TR-7",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.triage_policy",
+        "value": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN.",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "alert_signals.config_changes_30m",
+        "value": "0",
+        "sql": "SELECT config_changes_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "runbooks.runbook_id",
+        "value": "RB-checkout-api",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.owner_team",
+        "value": "sre",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.policy_id",
+        "value": "TR-7",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "runbooks.triage_policy",
+        "value": "Triage policy TR-7. Check in this order. (1) ACTIVE_ADVERSARY if, in the 60 minutes before the alert, a non-admin principal performed an IAM privilege escalation AND more than 1 GB left the VPC to a destination outside the allowlist. (2) CONFIG_ERROR if a ConfigMap or Deployment change happened in the 30 minutes before the alert. (3) HARDWARE_FAILURE if a node went NotReady in the 30 minutes before the alert. (4) Otherwise UNKNOWN.",
+        "sql": "SELECT runbook_id, owner_team, policy_id, triage_policy FROM incidents.runbooks WHERE service = 'checkout-api'"
+      },
+      {
+        "fact": "alert_signals.non_admin_iam_escalations_60m",
+        "value": "2",
+        "sql": "SELECT non_admin_iam_escalations_60m, egress_gb_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alert_signals.egress_gb_outside_allowlist_60m",
+        "value": "3.4",
+        "sql": "SELECT non_admin_iam_escalations_60m, egress_gb_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alert_signals.config_changes_30m",
+        "value": "0",
+        "sql": "SELECT non_admin_iam_escalations_60m, egress_gb_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2001'"
+      },
+      {
+        "fact": "alert_signals.nodes_not_ready_30m",
+        "value": "0",
+        "sql": "SELECT non_admin_iam_escalations_60m, egress_gb_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m FROM incidents.alert_signals WHERE alert_id = 'ALR-2001'"
+      }
+    ],
+    "markovian": {
+      "chunks": 9,
+      "status": "completed",
+      "reflection": "RATIFY"
+    }
+  },
+  "baseline": {
+    "decision": {
+      "decision": "UNKNOWN",
+      "recommended_action": "INVESTIGATE",
+      "rationale": "No non-admin IAM privilege escalation with >1GB exfiltration to non-allowlist destinations, no ConfigMap/Deployment changes, and no node NotReady events in the relevant windows."
+    },
+    "calls": [
+      {
+        "turn": "LOAD",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 63128,
+        "outputTokens": 31,
+        "ms": 3715,
+        "receiptId": "rcpt_req_lkanackj"
+      },
+      {
+        "turn": "SIGNALS",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 63239,
+        "outputTokens": 93,
+        "ms": 3590,
+        "receiptId": "rcpt_req_6w94s0z1"
+      },
+      {
+        "turn": "DECIDE",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 63620,
+        "outputTokens": 67,
+        "ms": 4524,
+        "receiptId": "rcpt_req_y2qki6t4"
+      }
+    ]
+  }
+}

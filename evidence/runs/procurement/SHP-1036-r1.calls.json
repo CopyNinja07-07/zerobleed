@@ -1,0 +1,231 @@
+{
+  "case": "SHP-1036",
+  "run": 1,
+  "zerobleed": {
+    "decision": {
+      "decision": "NO_BREACH",
+      "penalty_usd": "0",
+      "rationale": "No breach occurred because the 9-day delay on 2026-09-14 did not exceed the 14-day threshold specified in Section 4.2, making the penalty inapplicable regardless of waiver status."
+    },
+    "calls": [
+      {
+        "step": 1,
+        "task": "PLAN",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 692,
+        "outputTokens": 197,
+        "promptChars": 405,
+        "ms": 5579,
+        "receiptId": "rcpt_req_dy3x4icu",
+        "outcome": "planner"
+      },
+      {
+        "step": 2,
+        "task": "T1_EXTRACT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 713,
+        "outputTokens": 46,
+        "promptChars": 746,
+        "ms": 1020,
+        "receiptId": "rcpt_req_hasqbr6k",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 3,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 604,
+        "outputTokens": 34,
+        "promptChars": 881,
+        "ms": 1142,
+        "receiptId": "rcpt_req_4ijcl8k4",
+        "outcome": "INSUFFICIENT_CONTEXT"
+      },
+      {
+        "step": 4,
+        "task": "T2_CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 742,
+        "outputTokens": 140,
+        "promptChars": 964,
+        "ms": 2284,
+        "receiptId": "rcpt_req_3y68tevc",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 5,
+        "task": "T3_DECIDE",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 875,
+        "outputTokens": 78,
+        "promptChars": 1165,
+        "ms": 3248,
+        "receiptId": "rcpt_req_mqex6e2v",
+        "outcome": "VERIFIED"
+      },
+      {
+        "step": 6,
+        "task": "REFLECT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 597,
+        "outputTokens": 4,
+        "promptChars": 690,
+        "ms": 426,
+        "receiptId": "rcpt_req_67vr6ju0",
+        "outcome": "RATIFY"
+      }
+    ],
+    "evidence": [
+      {
+        "fact": "shipments.shipment_id",
+        "value": "SHP-1036",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1036'"
+      },
+      {
+        "fact": "shipments.vendor_id",
+        "value": "VEND-31",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1036'"
+      },
+      {
+        "fact": "shipments.hub_region",
+        "value": "EU-CENTRAL",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1036'"
+      },
+      {
+        "fact": "shipments.promised_date",
+        "value": "2026-09-05",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1036'"
+      },
+      {
+        "fact": "shipments.breach_date",
+        "value": "2026-09-14",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1036'"
+      },
+      {
+        "fact": "shipments.delay_days",
+        "value": "9",
+        "sql": "SELECT shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days FROM zerobleed.shipments WHERE shipment_id = 'SHP-1036'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      },
+      {
+        "fact": "contracts.penalty_pct",
+        "value": "12",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "21600",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      },
+      {
+        "fact": "contracts.clause_text",
+        "value": "Section 4.2: Delivery delays exceeding 14 days incur a 12% penalty ($21,600), UNLESS an official regional Force Majeure weather waiver was declared active on the breach_date.",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      },
+      {
+        "fact": "force_majeure.waiver_declared",
+        "value": "false",
+        "sql": "SELECT waiver_declared FROM zerobleed.force_majeure WHERE log_date = '2026-09-14' AND hub_region = 'EU-CENTRAL'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      },
+      {
+        "fact": "contracts.penalty_pct",
+        "value": "12",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "21600",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      },
+      {
+        "fact": "contracts.clause_text",
+        "value": "Section 4.2: Delivery delays exceeding 14 days incur a 12% penalty ($21,600), UNLESS an official regional Force Majeure weather waiver was declared active on the breach_date.",
+        "sql": "SELECT threshold_days, penalty_pct, penalty_usd, clause_text FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      },
+      {
+        "fact": "contracts.threshold_days",
+        "value": "14",
+        "sql": "SELECT threshold_days, penalty_usd FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      },
+      {
+        "fact": "contracts.penalty_usd",
+        "value": "21600",
+        "sql": "SELECT threshold_days, penalty_usd FROM zerobleed.contracts WHERE vendor_id = 'VEND-31'"
+      }
+    ],
+    "markovian": {
+      "chunks": 5,
+      "status": "completed",
+      "reflection": "RATIFY"
+    }
+  },
+  "baseline": {
+    "decision": {
+      "decision": "NO_BREACH",
+      "penalty_usd": "0",
+      "rationale": "Delay of 9 days is below the 14-day threshold, so no penalty applies regardless of Force Majeure status."
+    },
+    "calls": [
+      {
+        "turn": "LOAD",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 9672,
+        "outputTokens": 24,
+        "ms": 5580,
+        "receiptId": "rcpt_req_kh84lhcn"
+      },
+      {
+        "turn": "EXTRACT",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 9731,
+        "outputTokens": 37,
+        "ms": 1409,
+        "receiptId": "rcpt_req_p764x89m"
+      },
+      {
+        "turn": "CRITIQUE",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 9795,
+        "outputTokens": 56,
+        "ms": 1837,
+        "receiptId": "rcpt_req_ldgd4azk"
+      },
+      {
+        "turn": "WEATHER",
+        "lane": "fast",
+        "model": "nvidia/nemotron-3.5-lightning-30b-a3b",
+        "inputTokens": 9880,
+        "outputTokens": 50,
+        "ms": 3163,
+        "receiptId": "rcpt_req_8l34eycr"
+      },
+      {
+        "turn": "DECIDE",
+        "lane": "deep",
+        "model": "nvidia/nemotron-3-ultra-550b-a55b",
+        "inputTokens": 9991,
+        "outputTokens": 53,
+        "ms": 2900,
+        "receiptId": "rcpt_req_cbhfpfnq"
+      }
+    ]
+  }
+}
