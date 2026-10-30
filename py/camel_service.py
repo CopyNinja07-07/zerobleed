@@ -56,6 +56,9 @@ class Proxy(BaseHTTPRequestHandler):
         body = self.rfile.read(int(self.headers.get("content-length", 0)))
         req = json.loads(body)
         req.setdefault("temperature", 0)
+        # Same model settings as every other framework: Nemotron's thinking mode off.
+        # With it on, the planner reasons step by step and writes only a first step.
+        req.setdefault("chat_template_kwargs", {"enable_thinking": False})
         started = time.time()
         r = urllib.request.Request(
             NIGHTSHIFT + self.path.removeprefix("/v1"),

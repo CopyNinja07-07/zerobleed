@@ -20,7 +20,18 @@ createServer(async (req, res) => {
   }
   const chunks: Buffer[] = [];
   for await (const c of req) chunks.push(c as Buffer);
-  const body = Buffer.concat(chunks).toString("utf8");
+  let body = Buffer.concat(chunks).toString("utf8");
+  // Same model settings as every other framework: temperature 0, Nemotron's thinking mode off.
+  if (url.pathname.endsWith("/chat/completions")) {
+    try {
+      const j = JSON.parse(body);
+      j.temperature ??= 0;
+      j.chat_template_kwargs ??= { enable_thinking: false };
+      body = JSON.stringify(j);
+    } catch {
+      // not JSON: forward as is
+    }
+  }
   const started = Date.now();
   try {
     const upstream = await fetch(baseUrl() + url.pathname.replace(/^\/v1/, "") + url.search, {
