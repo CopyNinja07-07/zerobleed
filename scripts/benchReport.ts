@@ -132,6 +132,11 @@ for (const d of DOMAINS) {
     md.push(`| ${NAMES[f]} | ${t[0]} / ${pct(o.accuracy)} | ${t[1]} / ${pct(o.asr)} | ${t[2]} / ${Number.isFinite(o.pvr) ? pct(o.pvr) : "n/a"} | ${fmt((t[3] * 1000) / 4)} / ${fmt(o.meanTokens)} | ${fmt(t[4])} / ${fmt(o.peakInput)} | ${t[5]} / ${o.p50.toFixed(1)} | ${t[6]} / ${o.p95.toFixed(1)} |`);
   }
   md.push("", "Table 2's token, peak-prompt and P50 figures for the shared-history and ZeroBleed (Sequential) rows are the measured 4-run hackathon numbers (RESULTS.md); its token totals are per 4 runs, so they are shown here per case. Its other figures are targets.", "");
+  // Procedure: the carried scratchpad stays under 500 characters (measured on runs that record it).
+  for (const f of frameworks.filter((x) => x.startsWith("zerobleed"))) {
+    const pads = rows.filter((r) => r.framework === f && Number.isFinite(r.maxScratchpadChars)).map((r) => r.maxScratchpadChars as number);
+    if (pads.length) md.push(`Scratchpad, ${NAMES[f]}: ${pads.filter((n) => n <= 500).length} of ${pads.length} measured runs stayed within 500 characters (longest ${Math.max(...pads)}).`, "");
+  }
   summary.domains[d.id] = out;
 }
 

@@ -100,7 +100,7 @@ for (const c of order) {
           peakInput: Math.max(0, ...zb.ledger.map((e) => e.inputTokens)),
           seconds: +(zb.totals.ms / 1000).toFixed(2),
           modelRequests: requests.length, deniedRequests: requests.filter((e) => e.includes("DENIED")).length,
-          planSource: zb.plan?.source,
+          planSource: zb.plan?.source, maxScratchpadChars: zb.maxScratchpadChars,
           ledger: zb.ledger.map((e) => ({ task: e.task, lane: e.lane, model: e.model, in: e.inputTokens, out: e.outputTokens, ms: e.ms, receipt: e.receiptId, outcome: e.outcome })),
           trace: `${traceDir}/${runId}.trace.jsonl`,
         };

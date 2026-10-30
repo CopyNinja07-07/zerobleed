@@ -58,6 +58,7 @@ export interface AuditResult {
   run: MarkovianRun;
   runId: string;
   traceFile: string;
+  maxScratchpadChars: number; // the procedure caps the carried state at 500 characters; measured, not enforced
   totals: { inputTokens: number; outputTokens: number; llmCalls: number; ms: number };
 }
 
@@ -98,6 +99,13 @@ export async function runAudit(
   let thePlan: Plan | undefined;
   let step = 0;
   const speculative = !!opts.speculative;
+  // Longest carried state of the run (procedure: scratchpad <= 500 characters).
+  let maxPad = 0;
+  const checkpoint = (pad: Scratchpad) => {
+    const text = writeScratchpad(pad);
+    maxPad = Math.max(maxPad, text.length);
+    return text;
+  };
 
   // Speculative-batch broker (procedure Algorithm 1). Every planned column of a
   // table is fetched in one background query as soon as deterministic code knows
@@ -230,7 +238,7 @@ export async function runAudit(
       log(p.source === "planner" ? `Planner (Nemotron Ultra, schema only): ${p.tasks.map((t) => `${t.id}[${t.columns.length} cols]`).join(" -> ")}` : `Planner output unusable (${p.note}); using the fallback plan`, p.source === "planner");
       if (p.source === "planner" && p.note) log(`Broker: ${p.note}`);
       const pad: Scratchpad = { completed: ["PLAN"], remaining: p.tasks.map((t) => t.id), facts: {}, context: { [domain.targetKey]: target.id } };
-      return { text: `Planned ${p.tasks.length} micro-contracts from a ${catalog.enum.length}-column catalog.\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
+      return { text: `Planned ${p.tasks.length} micro-contracts from a ${catalog.enum.length}-column catalog.\n[STATE_CHECKPOINT]\n${checkpoint(pad)}`, metadata: usage() };
     }
 
     const pad = readScratchpad(carry);
@@ -262,7 +270,7 @@ export async function runAudit(
       pad.remaining.shift();
       pad.completed.push(`${task.id}(skipped)`);
       log(`Decision withheld: ${unresolved.join(", ")} unverified, routed to a human reviewer`);
-      return { text: `${decision.rationale}\n[TASK_COMPLETE]\n\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
+      return { text: `${decision.rationale}\n[TASK_COMPLETE]\n\n[STATE_CHECKPOINT]\n${checkpoint(pad)}`, metadata: usage() };
     }
 
     const spec = domain.taskSpecs[task.type];
@@ -294,12 +302,12 @@ export async function runAudit(
         reviewReasons.push(`${task.id} still lacked context after ${MAX_RETRIES} fetches`);
         pad.remaining.shift();
         pad.completed.push(`${task.id}(unresolved)`);
-        return { text: `${task.id} gave up after ${MAX_RETRIES} fetches.\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
+        return { text: `${task.id} gave up after ${MAX_RETRIES} fetches.\n[STATE_CHECKPOINT]\n${checkpoint(pad)}`, metadata: usage() };
       }
       pad.context[`retries_${task.id}`] = String(tries);
       pad.context.pending = reply.missing;
       return {
-        text: `${task.id} paused: needs ${reply.missing}.\n[NEEDS_TOOL tool="${reply.missing.includes("|") ? "zetaris_cells" : "zetaris_cell"}" input="${reply.missing}"]\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`,
+        text: `${task.id} paused: needs ${reply.missing}.\n[NEEDS_TOOL tool="${reply.missing.includes("|") ? "zetaris_cells" : "zetaris_cell"}" input="${reply.missing}"]\n[STATE_CHECKPOINT]\n${checkpoint(pad)}`,
         metadata: usage(),
       };
     }
@@ -309,7 +317,7 @@ export async function runAudit(
       reviewReasons.push(`${task.id} reply rejected twice: ${reply.reason}`);
       pad.remaining.shift();
       pad.completed.push(`${task.id}(rejected)`);
-      return { text: `${task.id} rejected.\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
+      return { text: `${task.id} rejected.\n[STATE_CHECKPOINT]\n${checkpoint(pad)}`, metadata: usage() };
     }
 
     // VERIFIED
@@ -319,7 +327,7 @@ export async function runAudit(
       if (problem && !pad.context[`escalate_${task.id}`]) {
         log(`Guard: ${problem}. Escalating ${task.id} to Nemotron Ultra`);
         pad.context[`escalate_${task.id}`] = "1";
-        return { text: `${task.id} failed the consistency guard; re-running on the deep lane.\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
+        return { text: `${task.id} failed the consistency guard; re-running on the deep lane.\n[STATE_CHECKPOINT]\n${checkpoint(pad)}`, metadata: usage() };
       }
       if (problem) {
         reviewReasons.push(`guard: ${problem}`);
@@ -333,14 +341,14 @@ export async function runAudit(
       pad.facts.decision = reply.outputs.decision;
       pad.facts[`final_${domain.valueKey}`] = reply.outputs[domain.valueKey];
       log(`Decision: ${decision.decision} (${showValue(domain, decision[domain.valueKey])})`, true);
-      return { text: `Decision: ${decision.decision}. ${decision.rationale}\n[TASK_COMPLETE]\n\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
+      return { text: `Decision: ${decision.decision}. ${decision.rationale}\n[TASK_COMPLETE]\n\n[STATE_CHECKPOINT]\n${checkpoint(pad)}`, metadata: usage() };
     }
     Object.assign(pad.facts, reply.outputs);
     if (task.type === "EXTRACT") for (const k of domain.extractContext) pad.context[k] = reply.outputs[k];
     prefetch({ ...pad.facts, ...pad.context });
     pad.remaining.shift();
     pad.completed.push(task.id);
-    return { text: `${task.id} verified: ${Object.entries(reply.outputs).map(([a, b]) => `${a}=${b}`).join(", ")}\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
+    return { text: `${task.id} verified: ${Object.entries(reply.outputs).map(([a, b]) => `${a}=${b}`).join(", ")}\n[STATE_CHECKPOINT]\n${checkpoint(pad)}`, metadata: usage() };
   }
 
   // The NEEDS_TOOL handler: the security gate, then a single-cell fetch.
@@ -428,6 +436,7 @@ export async function runAudit(
     events,
     run,
     traceFile: tracer.file,
+    maxScratchpadChars: maxPad,
     runId: tracer.runId,
     totals: {
       inputTokens: ledger.reduce((s, e) => s + e.inputTokens, 0),
