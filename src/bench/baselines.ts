@@ -252,6 +252,9 @@ const REACT_TABLES: Record<string, string> = {
   incident: "alerts(alert_id, ts, alert_time, service, severity, metric, value, summary); runbooks(service, runbook_id, owner_team, policy_id, triage_policy); cloudtrail(event_id, ts, event_time, principal, principal_type, action, resource, source_ip, result); vpc_flows(flow_id, ts, flow_time, src_ip, dst_ip, dst_owner, dst_port, bytes_out, action); k8s_events(event_id, ts, event_time, namespace, object, reason, node, message). ts is Unix seconds.",
 };
 
+// Raised from 8 after the trial: incident cases need several log queries before an answer.
+const REACT_MAX_STEPS = 12;
+
 async function react(domainId: string, id: string, rec: Recorder): Promise<FrameworkResult> {
   const family = familyOf(domainId);
   const c = getDomain(domainId).container;
@@ -268,7 +271,7 @@ async function react(domainId: string, id: string, rec: Recorder): Promise<Frame
     },
     { role: "user", content: getDomain(domainId).goal(id) },
   ];
-  for (let step = 1; step <= 8; step++) {
+  for (let step = 1; step <= REACT_MAX_STEPS; step++) {
     const lane: Lane = "fast";
     const r = rec.add(`STEP_${step}`, lane, await chatMessages(lane, history, { maxTokens: 1000 }));
     history.push({ role: "assistant", content: r.text });
@@ -300,7 +303,7 @@ async function react(domainId: string, id: string, rec: Recorder): Promise<Frame
     }
     history.push({ role: "user", content: `Observation: ${obs}` });
   }
-  return rec.result({ reads, error: "no final answer after 8 steps" });
+  return rec.result({ reads, error: `no final answer after ${REACT_MAX_STEPS} steps` });
 }
 
 const RUNNERS: Record<Framework, (d: string, id: string, rec: Recorder) => Promise<FrameworkResult>> = { shared: (d, i, r) => shared(d, i, r), summary, guard: guarded, dual, react };
