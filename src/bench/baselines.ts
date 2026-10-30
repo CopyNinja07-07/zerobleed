@@ -340,7 +340,7 @@ async function camel(domainId: string, id: string, rec: Recorder): Promise<Frame
   const out = await svc(CAMEL_URL, { family: familyOf(domainId), container: getDomain(domainId).container, id });
   for (const [i, c] of (out.calls ?? []).entries())
     rec.turns.push({ turn: `CAMEL_${i + 1}${c.tools ? "_Q" : "_P"}`, lane: String(c.model).includes("ultra") ? "deep" : "fast", model: c.model, inputTokens: c.in, outputTokens: c.out, ms: c.ms, receiptId: c.receipt });
-  return rec.result({ decision: out.decision ?? undefined, error: out.error });
+  return { ...rec.result({ decision: out.decision ?? undefined, error: out.error }), camelCode: out.code } as FrameworkResult;
 }
 
 // MemGPT / Letta: a fresh agent per case; the working set goes into its archival

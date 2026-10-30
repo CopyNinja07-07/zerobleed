@@ -119,6 +119,7 @@ for (const c of order) {
         modelRequests: res.reads?.length, deniedRequests: res.reads ? res.reads.filter((x) => x.outOfScope > 0).length : undefined,
         reads: res.reads,
         compression: (res as { compression?: unknown }).compression,
+        camelCode: (res as { camelCode?: unknown }).camelCode,
         ledger: res.turns.map((t) => ({ task: t.turn, lane: t.lane, model: t.model, in: t.inputTokens, out: t.outputTokens, ms: t.ms, receipt: t.receiptId })),
       };
     }

@@ -276,7 +276,9 @@ def run(family: str, container: str, case_id: str) -> dict:
             decision = {k: str(v) for k, v in json.loads(found[-1]).items()}
         except Exception:
             decision = None
-    return {"decision": decision, "text": text[-2000:], "calls": list(CALLS), "ms": int((time.time() - started) * 1000)}
+    # The P-LLM's program(s), kept as evidence of what CaMeL actually ran.
+    code = [ad_types.get_text_content_as_str(m["content"]) for m in messages if m["role"] == "assistant" and m.get("content") and "```" in ad_types.get_text_content_as_str(m["content"])]
+    return {"decision": decision, "text": text[-2000:], "code": [c[-3000:] for c in code], "calls": list(CALLS), "ms": int((time.time() - started) * 1000)}
 
 
 class Service(BaseHTTPRequestHandler):
