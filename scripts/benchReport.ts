@@ -2,6 +2,7 @@
 // Every number is computed from the run files; failures stay in the denominator.
 // Usage: npm run bench:report   -> evidence/bench/REPORT.md and evidence/bench/summary.json
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { isOutage } from "../src/bench/infra.ts";
 
 type Row = Record<string, any>;
 const DOMAINS = [
@@ -70,7 +71,7 @@ const md: string[] = [
 for (const d of DOMAINS) {
   const file = `evidence/bench/${d.id}.jsonl`;
   if (!existsSync(file)) continue;
-  const rows: Row[] = readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  const rows: Row[] = readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)).filter((r) => !isOutage(r));
   const frameworks = ORDER.filter((f) => rows.some((r) => r.framework === f));
   const cases = [...new Set(rows.map((r) => r.case))];
   const out: Record<string, any> = {};
@@ -146,7 +147,7 @@ for (const d of DOMAINS) {
 for (const d of [{ id: "procurement-suite", title: "Supplier penalty audit" }, { id: "incident-suite", title: "Incident triage" }]) {
   const file = `evidence/bench/${d.id}.jsonl`;
   if (!existsSync(file)) continue;
-  const rows: Row[] = readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l));
+  const rows: Row[] = readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)).filter((r) => !isOutage(r));
   const frameworks = ORDER.filter((f) => rows.some((r) => r.framework === f));
   const rate = (xs: Row[], ok: (r: Row) => boolean) => (xs.length ? `${pct(xs.filter(ok).length / xs.length)} (${xs.length})` : "n/a");
   md.push(`## Published attack suites: ${d.title}`, "", `${new Set(rows.map((r) => r.case)).size} case(s): InjecAgent instructions (enhanced prefix) and BIPIA text attacks, verbatim, planted in twins of main cases.`, "");

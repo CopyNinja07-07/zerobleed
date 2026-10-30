@@ -29,6 +29,7 @@ while true; do
     code=$?
     if [ $code -eq 3 ]; then echo "$(date -u +%FT%TZ) stopped by the Nightshift memory guard"; exit 3; fi
     if [ $code -eq 4 ]; then echo "$(date -u +%FT%TZ) services unreachable: waiting 5 minutes"; sleep 300; fi
+    if [ $code -eq 5 ]; then echo "$(date -u +%FT%TZ) batch stopped early for a Zetaris driver restart"; fi
   done
   after=$(cat evidence/bench/*.jsonl 2>/dev/null | wc -l)
   echo "$(date -u +%FT%TZ) runs on file: $after"
