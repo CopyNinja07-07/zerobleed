@@ -17,6 +17,7 @@ import { runFramework, type Framework } from "../src/bench/baselines.ts";
 import { startDataServer } from "../src/dataServer.ts";
 import { getDomain } from "../src/domains/index.ts";
 import { STRICT_LIVE } from "../src/replay.ts";
+import { takeRateLimitWaitMs } from "../src/llm.ts";
 
 // Every call must be live: no recordings used or written. npm run bench sets STRICT_LIVE=true.
 if (!STRICT_LIVE) throw new Error("benchmark runs must be strict live: use npm run bench (sets STRICT_LIVE=true)");
@@ -67,7 +68,7 @@ function nightshiftGb(): number {
 }
 const MAX_NIGHTSHIFT_GB = Number(process.env.MAX_NIGHTSHIFT_GB ?? 6);
 
-const INFRA = /ECONNREFUSED|ECONNRESET|fetch failed|socket hang up|ETIMEDOUT|aborted due to timeout|Zetaris 5\d\d|Nightshift (429|5\d\d)|Connection refused/i;
+const INFRA = /ECONNREFUSED|ECONNRESET|fetch failed|socket hang up|ETIMEDOUT|aborted due to timeout|Zetaris 5\d\d|Nightshift (429|5\d\d)|empty_response|Connection refused/i;
 let ran = 0, picked = 0, infraFailures = 0;
 for (const c of order) {
   if (picked >= LIMIT) break;
@@ -82,6 +83,7 @@ for (const c of order) {
     }
     const base = { case: c.id, split: c.split, adversarial: c.adversarial, attack: c.attack?.template, framework: f, run: r, expect: c.expect, value: c.value, at: new Date().toISOString() };
     let row: Record<string, unknown>;
+    takeRateLimitWaitMs();
     if (f === "zerobleed" || f === "zerobleed-batch") {
       const runId = `${c.id}-${f}-r${r}`;
       try {
@@ -123,6 +125,8 @@ for (const c of order) {
         ledger: res.turns.map((t) => ({ task: t.turn, lane: t.lane, model: t.model, in: t.inputTokens, out: t.outputTokens, ms: t.ms, receipt: t.receiptId })),
       };
     }
+    const waited = takeRateLimitWaitMs();
+    if (waited) row.rateLimitWaitSeconds = waited / 1000;
     // An outage (Zetaris or Nightshift unreachable, gateway errors, rate limits)
     // is not a result: leave the run unrecorded so the next pass retries it.
     const why = [row.error, ...((row.reviewReasons as string[] | undefined) ?? [])].filter(Boolean).join(" ");

@@ -63,28 +63,52 @@ export async function chatMessages(lane: Lane, messages: Message[], opts: ChatOp
   return withReplay("nightshift", { lane, messages, think }, () => chatLive(lane, messages, maxTokens, think));
 }
 
+// Time spent waiting out provider rate limits since the last reset. The
+// benchmark records it per run and leaves those runs out of the latency figures.
+let rateLimitWait = 0;
+export function takeRateLimitWaitMs(): number {
+  const ms = rateLimitWait;
+  rateLimitWait = 0;
+  return ms;
+}
+
+// Nightshift reports NVIDIA's 429 either directly or wrapped in a 502.
+const RATE_LIMITED = /Nightshift 429|Nightshift 502[\s\S]*(429|Too Many Requests)/i;
+
 // One bounded retry: an empty answer gets double the budget, a transient
-// gateway error (502/503/504) is simply tried again.
+// gateway error (502/503/504) is simply tried again. Rate limits back off for
+// up to about 8 minutes before giving up, so one busy spell doesn't stop the batch.
 async function chatLive(lane: Lane, messages: Message[], maxTokens: number, think: boolean): Promise<ChatResult> {
   try {
     return await chatOnce(lane, messages, maxTokens, think);
   } catch (err) {
     const msg = (err as Error).message;
-    if (/empty_response/.test(msg)) return chatOnce(lane, messages, maxTokens * 2, think);
-    if (/Nightshift 50[234]/.test(msg)) return chatOnce(lane, messages, maxTokens, think);
-    // Rate limited: back off and try a few more times (long benchmark runs hit provider limits).
-    if (/Nightshift 429/.test(msg)) {
-      for (const wait of [5_000, 15_000, 45_000]) {
-        await new Promise((r) => setTimeout(r, wait));
-        try {
-          return await chatOnce(lane, messages, maxTokens, think);
-        } catch (e) {
-          if (!/Nightshift 429/.test((e as Error).message)) throw e;
-        }
+    if (/empty_response/.test(msg)) {
+      try {
+        return await chatOnce(lane, messages, maxTokens * 2, think);
+      } catch (e) {
+        if (!/empty_response/.test((e as Error).message)) throw e;
+        return backOff(lane, messages, maxTokens * 2, think, e as Error);
       }
     }
+    if (RATE_LIMITED.test(msg)) return backOff(lane, messages, maxTokens, think, err as Error);
+    if (/Nightshift 50[234]/.test(msg)) return chatOnce(lane, messages, maxTokens, think);
     throw err;
   }
+}
+
+async function backOff(lane: Lane, messages: Message[], maxTokens: number, think: boolean, last: Error): Promise<ChatResult> {
+  for (const wait of [10_000, 30_000, 60_000, 120_000, 240_000]) {
+    await new Promise((r) => setTimeout(r, wait));
+    rateLimitWait += wait;
+    try {
+      return await chatOnce(lane, messages, maxTokens, think);
+    } catch (e) {
+      last = e as Error;
+      if (!RATE_LIMITED.test(last.message) && !/empty_response|Nightshift 50[234]/.test(last.message)) throw last;
+    }
+  }
+  throw last;
 }
 
 async function chatOnce(lane: Lane, messages: Message[], maxTokens: number, think: boolean): Promise<ChatResult> {
