@@ -17,7 +17,11 @@
     "report": "tsx scripts/report.ts",
     "pdf": "tsx scripts/pdf.ts",
     "build:site": "SAMPLE_MODE=true DATA_PORT=8791 tsx scripts/buildSite.ts",
-    "publish:site": "git subtree split --prefix site -b gh-pages-tmp && git push -f origin gh-pages-tmp:gh-pages && git branch -D gh-pages-tmp"
+    "publish:site": "git subtree split --prefix site -b gh-pages-tmp && git push -f origin gh-pages-tmp:gh-pages && git branch -D gh-pages-tmp",
+    "bench:data": "tsx scripts/makeBenchData.ts",
+    "bench:setup": "tsx scripts/setupZetaris.ts procurement-bench && tsx scripts/setupZetaris.ts incident-bench",
+    "bench": "STRICT_LIVE=true tsx scripts/bench.ts",
+    "bench:report": "tsx scripts/benchReport.ts"
   },
   "devDependencies": {
     "@types/node": "22.10.1",

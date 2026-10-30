@@ -9,6 +9,8 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 
 const DIR = "fixtures";
 export const SAMPLE_MODE = /^(1|true|yes)$/i.test(process.env.SAMPLE_MODE ?? "");
+// Benchmark runs: every call must be live. No recording, and no fallback to a recording.
+export const STRICT_LIVE = /^(1|true|yes)$/i.test(process.env.STRICT_LIVE ?? "");
 
 // Per-run override, so one API request can ask for sample mode on a live server.
 const sampleScope = new AsyncLocalStorage<boolean>();
@@ -36,6 +38,7 @@ export async function withReplay<T>(service: "zetaris" | "nightshift", request: 
     if (hit === undefined) throw new Error(`SAMPLE_MODE: no recording for this ${service} request. Run once live to record it.`);
     return hit;
   }
+  if (STRICT_LIVE) return live();
   try {
     const result = await live();
     mkdirSync(DIR, { recursive: true });

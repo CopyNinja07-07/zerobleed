@@ -24,6 +24,11 @@ export const WORKER_SYSTEM =
   "If a condition you must apply depends on a fact that is not in inputs, do not guess: reply with status INSUFFICIENT_CONTEXT " +
   "and missing_variable set to exactly one name copied from may_request.";
 
+// Speculative-batch broker (Algorithm 1): a worker may name several missing
+// facts at once, each still copied from may_request.
+export const BATCH_RULE =
+  " If several facts are missing, reply with missing_variables, a JSON array of names copied from may_request, instead of missing_variable.";
+
 export type WorkerReply =
   | { status: "VERIFIED"; outputs: Record<string, string> }
   | { status: "INSUFFICIENT_CONTEXT"; missing: string }
@@ -46,6 +51,12 @@ export function validateReply(text: string, k: MicroContract): WorkerReply {
   const obj = firstJson(text);
   if (!obj) return { status: "REJECTED", reason: "reply was not a JSON object" };
   if (obj.status === "INSUFFICIENT_CONTEXT") {
+    if (Array.isArray(obj.missing_variables) && obj.missing_variables.length) {
+      const names = obj.missing_variables.map(String);
+      const bad = names.find((n) => !k.may_request.includes(n));
+      if (bad !== undefined) return { status: "REJECTED", reason: `missing_variable "${bad.slice(0, 60)}" is not in the catalog enum` };
+      return { status: "INSUFFICIENT_CONTEXT", missing: [...new Set(names)].join("|") };
+    }
     const missing = String(obj.missing_variable ?? "");
     if (!k.may_request.includes(missing)) return { status: "REJECTED", reason: `missing_variable "${missing.slice(0, 60)}" is not in the catalog enum` };
     return { status: "INSUFFICIENT_CONTEXT", missing };
@@ -62,8 +73,8 @@ export function validateReply(text: string, k: MicroContract): WorkerReply {
   return { status: "VERIFIED", outputs };
 }
 
-export async function dispatch(k: MicroContract, lane: Lane, think = false): Promise<{ reply: WorkerReply; call: ChatResult; payload: string }> {
+export async function dispatch(k: MicroContract, lane: Lane, think = false, batch = false): Promise<{ reply: WorkerReply; call: ChatResult; payload: string }> {
   const payload = JSON.stringify(k);
-  const call = await chat(lane, WORKER_SYSTEM, payload, { think });
+  const call = await chat(lane, batch ? WORKER_SYSTEM + BATCH_RULE : WORKER_SYSTEM, payload, { think });
   return { reply: validateReply(call.text, k), call, payload };
 }

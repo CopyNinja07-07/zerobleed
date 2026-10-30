@@ -14,7 +14,9 @@ export interface Plan {
   note?: string;
 }
 
-export async function plan(goal: string, catalog: Catalog): Promise<{ plan: Plan; call?: ChatResult; prompt: string }> {
+// keepCrossSilo (speculative-batch broker): the planner's cross-silo columns are
+// kept as predicted dependencies and pre-fetched, instead of waiting for an interrupt.
+export async function plan(goal: string, catalog: Catalog, opts: { keepCrossSilo?: boolean } = {}): Promise<{ plan: Plan; call?: ChatResult; prompt: string }> {
   const domain = catalog.domain;
   const prompt = `Goal: ${goal}\nCatalog: ${catalogText(catalog)}`;
   const fallback = (note: string) => ({ tasks: domain.fallbackPlan, source: "fallback" as const, note });
@@ -40,7 +42,7 @@ export async function plan(goal: string, catalog: Catalog): Promise<{ plan: Plan
     // cross-silo fact must be requested through the interrupt gate, so every
     // cross-silo read is individually authorised and logged.
     const dropped: string[] = [];
-    for (const t of tasks) {
+    if (!opts.keepCrossSilo) for (const t of tasks) {
       const homes = ([] as string[]).concat(domain.homeTable[t.type]).filter(Boolean);
       const atHome = (c: string) => homes.some((h) => c.startsWith(`${h}.`));
       dropped.push(...t.columns.filter((c) => !atHome(c)));

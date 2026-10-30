@@ -72,6 +72,17 @@ async function chatLive(lane: Lane, messages: Message[], maxTokens: number, thin
     const msg = (err as Error).message;
     if (/empty_response/.test(msg)) return chatOnce(lane, messages, maxTokens * 2, think);
     if (/Nightshift 50[234]/.test(msg)) return chatOnce(lane, messages, maxTokens, think);
+    // Rate limited: back off and try a few more times (long benchmark runs hit provider limits).
+    if (/Nightshift 429/.test(msg)) {
+      for (const wait of [5_000, 15_000, 45_000]) {
+        await new Promise((r) => setTimeout(r, wait));
+        try {
+          return await chatOnce(lane, messages, maxTokens, think);
+        } catch (e) {
+          if (!/Nightshift 429/.test((e as Error).message)) throw e;
+        }
+      }
+    }
     throw err;
   }
 }

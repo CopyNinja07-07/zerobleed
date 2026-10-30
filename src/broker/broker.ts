@@ -10,7 +10,7 @@ import { Markovian, type MarkovianRun } from "../engines/markovian/index.ts";
 import type { ChatResult, Lane } from "../llm.ts";
 import { chat } from "../llm.ts";
 import { getDomain, type Domain } from "../domains/index.ts";
-import { loadCatalog, project, rowScope, type Catalog, type Table } from "./catalog.ts";
+import { loadCatalog, project, rowScope, type Catalog, type Projection, type Table } from "./catalog.ts";
 import { dispatch, type MicroContract } from "./contracts.ts";
 import { plan as makePlan, type Plan, type PlannedTask } from "./planner.ts";
 import { isSampleMode, onFallback } from "../replay.ts";
@@ -81,7 +81,7 @@ function traceOf(e: string): TraceEvent {
 
 export async function runAudit(
   target: AuditTarget,
-  opts: { onEvent?: (e: string) => void; historyDir?: string; runId?: string; quiet?: boolean } = {}
+  opts: { onEvent?: (e: string) => void; historyDir?: string; runId?: string; quiet?: boolean; speculative?: boolean } = {}
 ): Promise<AuditResult> {
   const started = Date.now();
   const domain: Domain = getDomain(target.domain);
@@ -97,6 +97,38 @@ export async function runAudit(
   let decision: AuditResult["decision"];
   let thePlan: Plan | undefined;
   let step = 0;
+  const speculative = !!opts.speculative;
+
+  // Speculative-batch broker (procedure Algorithm 1). Every planned column of a
+  // table is fetched in one background query as soon as deterministic code knows
+  // that table's row key; later reads (inputs, guard, interrupts) are served from
+  // it. Workers still see only the columns their contract authorises.
+  const predicted = new Map<Table, Set<string>>();
+  const prefetched = new Map<string, Promise<Projection>>();
+  const rowKey = (t: Table, facts: Record<string, string>) => {
+    const k = domain.keys[t]?.(facts);
+    return k ? `${t}|${JSON.stringify(k)}` : undefined;
+  };
+  const prefetch = (facts: Record<string, string>) => {
+    if (!speculative) return;
+    for (const [t, cols] of predicted) {
+      const key = rowKey(t, facts);
+      if (!key || prefetched.has(key)) continue;
+      const p = project(t, [...cols], facts, catalog);
+      p.catch(() => undefined); // a failed prefetch falls back to a direct read
+      prefetched.set(key, p);
+      log(`Broker: pre-fetching ${cols.size} predicted cell(s) from ${t} in the background`);
+    }
+  };
+  async function read(t: Table, cols: string[], facts: Record<string, string>): Promise<Projection> {
+    const key = speculative ? rowKey(t, facts) : undefined;
+    const hit = key ? prefetched.get(key) : undefined;
+    if (hit) {
+      const p = await hit.catch(() => undefined);
+      if (p && cols.every((c) => c in p.values)) return { values: Object.fromEntries(cols.map((c) => [c, p.values[c]])), sql: p.sql };
+    }
+    return project(t, cols, facts, catalog);
+  }
 
   const log = (e: string, traced = false) => {
     events.push(e);
@@ -129,12 +161,16 @@ export async function runAudit(
       if (pad.facts[c] !== undefined) inputs[c] = pad.facts[c];
       else byTable.set(t, [...(byTable.get(t) ?? []), c]);
     }
-    for (const [t, cols] of byTable) {
-      const p = await project(t, cols, { ...pad.facts, ...pad.context }, catalog);
+    const facts = { ...pad.facts, ...pad.context };
+    // Speculative mode keeps cross-silo predictions; one whose row key is not known yet is left to an interrupt.
+    const ready = [...byTable].filter(([t]) => !speculative || rowKey(t, facts));
+    const fetched = await Promise.all(ready.map(([t, cols]) => read(t, cols, facts)));
+    ready.forEach(([t, cols], i) => {
+      const p = fetched[i];
       Object.assign(inputs, p.values);
       for (const [c, v] of Object.entries(p.values)) cite(`${t}.${c}`, v, p.sql);
       log(`Zetaris: fetched ${cols.length} cell(s) from ${t} for ${task.id}`);
-    }
+    });
     for (const extra of (pad.context.extra ?? "").split(",").filter(Boolean)) {
       const [t, c] = extra.split(".") as [Table, string];
       if (pad.facts[c] === undefined) continue;
@@ -155,7 +191,7 @@ export async function runAudit(
   // broker reads itself. A mismatch lowers confidence: escalate, then flag.
   const guardCritique = (pad: Scratchpad, outputs: Record<string, string>) =>
     domain.guard({ ...pad.facts, ...pad.context }, outputs, {
-      project: (table, columns, facts) => project(table, columns, facts, catalog),
+      project: (table, columns, facts) => read(table, columns, facts),
       cite,
     });
 
@@ -181,8 +217,15 @@ export async function runAudit(
     const carry = carryoverFromPrompt(prompt);
     // Chunk 1: plan from the schema catalog only.
     if (!carry) {
-      const { plan: p, call, prompt: planPrompt } = await makePlan(goal, catalog);
+      const { plan: p, call, prompt: planPrompt } = await makePlan(goal, catalog, { keepCrossSilo: speculative });
       thePlan = p;
+      if (speculative) {
+        for (const t of p.tasks) for (const qc of t.columns) {
+          const [tb, c] = qc.split(".");
+          predicted.set(tb, (predicted.get(tb) ?? new Set()).add(c));
+        }
+        prefetch({ [domain.targetKey]: target.id });
+      }
       if (call) book("PLAN", "deep", call, planPrompt.length, p.source);
       log(p.source === "planner" ? `Planner (Nemotron Ultra, schema only): ${p.tasks.map((t) => `${t.id}[${t.columns.length} cols]`).join(" -> ")}` : `Planner output unusable (${p.note}); using the fallback plan`, p.source === "planner");
       if (p.source === "planner" && p.note) log(`Broker: ${p.note}`);
@@ -198,6 +241,15 @@ export async function runAudit(
       if (m && !m[2].startsWith("DENIED")) {
         pad.facts[m[1].split(".")[1]] = m[2];
         pad.context.extra = [...(pad.context.extra ?? "").split(",").filter(Boolean), m[1]].join(",");
+      }
+      // Batched interrupt: zetaris_cells(a|b) = {"a": "...", "b": "..."}
+      const b = tool.match(/^zetaris_cells\(([\w.|]+)\) = (\{.*\})$/);
+      if (b) {
+        const got: Record<string, string> = JSON.parse(b[2]);
+        for (const [qc, v] of Object.entries(got)) {
+          pad.facts[qc.split(".")[1]] = String(v).replace(/[;\n=]/g, ",");
+          pad.context.extra = [...(pad.context.extra ?? "").split(",").filter(Boolean), qc].join(",");
+        }
       }
     }
     const task = thePlan!.tasks.find((t) => t.id === pad.remaining[0]);
@@ -223,7 +275,7 @@ export async function runAudit(
       may_request: catalog.enum.filter((n) => inputs[n.split(".")[1]] === undefined && inputs[n] === undefined),
     };
     let lane: Lane = pad.context[`escalate_${task.id}`] ? "deep" : spec.lane;
-    let { reply, call, payload } = await dispatch(k, lane, spec.think);
+    let { reply, call, payload } = await dispatch(k, lane, spec.think, speculative);
     book(task.id, lane, call, payload.length, reply.status);
     log(`${task.id} on ${lane === "fast" ? "Nemotron Lightning" : "Nemotron Ultra"} (${call.usage.input_tokens} tokens in): ${reply.status}${reply.status === "INSUFFICIENT_CONTEXT" ? ` -> needs ${reply.missing}` : ""}${reply.status === "REJECTED" ? ` (${reply.reason})` : ""}`, true);
 
@@ -231,7 +283,7 @@ export async function runAudit(
     if (reply.status === "REJECTED") {
       const thinkAgain = lane === "fast";
       lane = "deep";
-      ({ reply, call, payload } = await dispatch(k, lane, thinkAgain));
+      ({ reply, call, payload } = await dispatch(k, lane, thinkAgain, speculative));
       book(task.id, lane, call, payload.length, reply.status);
       log(`${task.id} retried on Nemotron Ultra: ${reply.status}`, true);
     }
@@ -247,7 +299,7 @@ export async function runAudit(
       pad.context[`retries_${task.id}`] = String(tries);
       pad.context.pending = reply.missing;
       return {
-        text: `${task.id} paused: needs ${reply.missing}.\n[NEEDS_TOOL tool="zetaris_cell" input="${reply.missing}"]\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`,
+        text: `${task.id} paused: needs ${reply.missing}.\n[NEEDS_TOOL tool="${reply.missing.includes("|") ? "zetaris_cells" : "zetaris_cell"}" input="${reply.missing}"]\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`,
         metadata: usage(),
       };
     }
@@ -284,6 +336,7 @@ export async function runAudit(
     }
     Object.assign(pad.facts, reply.outputs);
     if (task.type === "EXTRACT") for (const k of domain.extractContext) pad.context[k] = reply.outputs[k];
+    prefetch({ ...pad.facts, ...pad.context });
     pad.remaining.shift();
     pad.completed.push(task.id);
     return { text: `${task.id} verified: ${Object.entries(reply.outputs).map(([a, b]) => `${a}=${b}`).join(", ")}\n[STATE_CHECKPOINT]\n${writeScratchpad(pad)}`, metadata: usage() };
@@ -291,6 +344,26 @@ export async function runAudit(
 
   // The NEEDS_TOOL handler: the security gate, then a single-cell fetch.
   async function onTool(callReq: { tool: string; input: string }): Promise<string> {
+    if (callReq.tool === "zetaris_cells") {
+      // Batched: every name is gated; one name outside the catalog denies the whole batch.
+      const names = callReq.input.split("|");
+      const bad = names.filter((n) => !catalog.enum.includes(n));
+      if (bad.length) {
+        reviewReasons.push(`denied tool request ${callReq.tool}(${callReq.input})`);
+        log(`Gate: DENIED ${callReq.tool}(${callReq.input})`);
+        return "DENIED: not in catalog";
+      }
+      const pad = readScratchpad(lastCarry);
+      const facts = { ...pad.facts, ...pad.context };
+      const got = await Promise.all(names.map((n) => { const [t, c] = n.split("."); return read(t, [c], facts).then((p) => [n, c, p] as const); }));
+      const out: Record<string, string> = {};
+      for (const [n, c, p] of got) {
+        out[n] = p.values[c];
+        cite(n, p.values[c], p.sql);
+      }
+      log(`Gate: ${names.length} names are in the catalog. Zetaris returned ${names.length} cells in one batch`);
+      return JSON.stringify(out);
+    }
     if (callReq.tool !== "zetaris_cell" || !catalog.enum.includes(callReq.input)) {
       reviewReasons.push(`denied tool request ${callReq.tool}(${callReq.input})`);
       log(`Gate: DENIED ${callReq.tool}(${callReq.input})`);
@@ -298,7 +371,7 @@ export async function runAudit(
     }
     const pad = readScratchpad(lastCarry);
     const [t, c] = callReq.input.split(".") as [Table, string];
-    const p = await project(t, [c], { ...pad.facts, ...pad.context }, catalog);
+    const p = await read(t, [c], { ...pad.facts, ...pad.context });
     cite(callReq.input, p.values[c], p.sql);
     log(`Gate: ${callReq.input} is in the catalog. Zetaris returned 1 cell: ${p.values[c]}`);
     return p.values[c];

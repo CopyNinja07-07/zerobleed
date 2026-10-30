@@ -15,6 +15,15 @@ const silos: Record<string, string> = {
   "/k8s/events": "data/incident/k8s_events.json",
   "/datadog/alerts": "data/incident/alerts.json",
   "/sre/runbooks": "data/incident/runbooks.json",
+  // N = 400 benchmark planes (npm run bench:data)
+  "/bench/erp/shipments": "data/bench/shipments.json",
+  "/bench/legal/contracts": "data/bench/contracts.json",
+  "/bench/weather/force_majeure": "data/bench/force_majeure.json",
+  "/bench/aws/cloudtrail": "data/bench/incident/cloudtrail.json",
+  "/bench/aws/vpc_flows": "data/bench/incident/vpc_flows.json",
+  "/bench/k8s/events": "data/bench/incident/k8s_events.json",
+  "/bench/datadog/alerts": "data/bench/incident/alerts.json",
+  "/bench/sre/runbooks": "data/bench/incident/runbooks.json",
 };
 
 export function startDataServer(port = PORT) {

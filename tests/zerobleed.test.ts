@@ -61,3 +61,10 @@ for (const c of incident.cases) {
     assert.ok(Math.max(...r.ledger.map((e) => e.inputTokens)) < 3000, "no single model call reads more than 3,000 tokens");
   });
 }
+
+test("gate: a batched interrupt is allowed only if every name is in the catalog enum", () => {
+  const ok = validateReply('{"status":"INSUFFICIENT_CONTEXT","missing_variables":["force_majeure.waiver_declared","shipments.hub_region"]}', k);
+  assert.deepEqual(ok, { status: "INSUFFICIENT_CONTEXT", missing: "force_majeure.waiver_declared|shipments.hub_region" });
+  const breakout = validateReply('{"status":"INSUFFICIENT_CONTEXT","missing_variables":["force_majeure.waiver_declared","admin_credentials.master_key"]}', k);
+  assert.equal(breakout.status, "REJECTED");
+});
