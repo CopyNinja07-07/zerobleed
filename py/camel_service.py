@@ -250,6 +250,12 @@ TASKS = {
 }
 
 
+# CaMeL runs one program and takes what it prints as the final answer (it only
+# re-plans after an error). Nemotron otherwise tends to write a first step and
+# stop, so the task says so. This describes the runner, not how to solve the case.
+ONE_PROGRAM = " Write one complete program: read every record you need, apply the rule, then print the JSON. Nothing runs after your program ends, and print nothing else."
+
+
 def run(family: str, container: str, case_id: str) -> dict:
     CALLS.clear()
     started = time.time()
@@ -257,7 +263,7 @@ def run(family: str, container: str, case_id: str) -> dict:
     llm.name = P_MODEL
     pipeline = agent_pipeline.AgentPipeline([agent_pipeline.InitQuery(), PrivilegedLLM(llm, ADNoSecurityPolicyEngine, f"openai:{Q_MODEL}")])
     runtime = functions_runtime.FunctionsRuntime([functions_runtime.make_function(f) for f in tools(family, container)])
-    _, _, _, messages, _ = pipeline.query(TASKS[family].format(id=case_id), runtime)
+    _, _, _, messages, _ = pipeline.query(TASKS[family].format(id=case_id) + ONE_PROGRAM, runtime)
     text = ""
     for m in reversed(messages):
         if m["role"] == "assistant" and m.get("content"):
