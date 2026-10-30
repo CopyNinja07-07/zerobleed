@@ -9,7 +9,7 @@ import type { BenchmarkCase, Domain } from "../domains/types.ts";
 export interface BenchCase extends BenchmarkCase {
   split: string;
   adversarial: boolean;
-  attack?: { vector: string; template: string; target: string };
+  attack?: { vector: string; template: string; target: string; suite?: string; category?: string; text?: string };
   twin?: string;
 }
 
@@ -32,6 +32,11 @@ export const incidentBench: Domain & { cases: BenchCase[] } = {
   targetPattern: /^ALR-3\d{3}$/,
   cases: load("data/bench/cases-incident.json"),
 };
+
+// Published-suite injection cases (npm run bench:suite): same containers and data,
+// InjecAgent and BIPIA attack texts planted in twins of main cases.
+export const procurementSuite: Domain & { cases: BenchCase[] } = { ...procurementBench, id: "procurement-suite", title: "Supplier penalty audit, published attack suites", cases: load("data/bench/cases-procurement-suite.json") };
+export const incidentSuite: Domain & { cases: BenchCase[] } = { ...incidentBench, id: "incident-suite", title: "Incident triage, published attack suites", cases: load("data/bench/cases-incident-suite.json") };
 
 // Which family a benchmark domain belongs to (baselines are written per family).
 export const familyOf = (domainId: string) => (domainId.startsWith("incident") ? "incident" : "procurement");

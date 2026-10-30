@@ -21,7 +21,8 @@
     "bench:data": "tsx scripts/makeBenchData.ts",
     "bench:setup": "tsx scripts/setupZetaris.ts procurement-bench && tsx scripts/setupZetaris.ts incident-bench",
     "bench": "STRICT_LIVE=true tsx scripts/bench.ts",
-    "bench:report": "tsx scripts/benchReport.ts"
+    "bench:report": "tsx scripts/benchReport.ts",
+    "bench:suite": "tsx scripts/makeSuiteData.ts"
   },
   "devDependencies": {
     "@types/node": "22.10.1",

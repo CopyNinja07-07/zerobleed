@@ -1,11 +1,11 @@
-import { incidentBench, procurementBench } from "../bench/domains.ts";
+import { incidentBench, incidentSuite, procurementBench, procurementSuite } from "../bench/domains.ts";
 import { incident } from "./incident.ts";
 import { procurement } from "./procurement.ts";
 import type { Domain } from "./types.ts";
 
 export const DOMAINS: Record<string, Domain> = { procurement, incident };
 // The N = 400 benchmark domains: reachable by id, kept out of the demo, report and site lists.
-const BENCH: Record<string, Domain> = { "procurement-bench": procurementBench, "incident-bench": incidentBench };
+const BENCH: Record<string, Domain> = { "procurement-bench": procurementBench, "incident-bench": incidentBench, "procurement-suite": procurementSuite, "incident-suite": incidentSuite };
 
 export function getDomain(id = "procurement"): Domain {
   const d = DOMAINS[id] ?? BENCH[id];
