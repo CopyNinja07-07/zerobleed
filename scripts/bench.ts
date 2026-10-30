@@ -50,6 +50,10 @@ const bySplit = new Map<string, BenchCase[]>();
 for (const c of cases) if (!SPLITS || SPLITS.includes(c.split)) bySplit.set(c.split, [...(bySplit.get(c.split) ?? []), c]);
 const order: BenchCase[] = [];
 for (let i = 0; order.length < [...bySplit.values()].reduce((s, x) => s + x.length, 0); i++) for (const xs of bySplit.values()) if (xs[i]) order.push(xs[i]);
+// --shard k/n: this process takes every n-th case of the order, starting at k, so
+// several loops can share one domain without ever running the same case.
+const [shardK, shardN] = (arg("shard", "0/1")!).split("/").map(Number);
+const mine = order.filter((_, i) => i % shardN === shardK);
 
 const norm = (v: unknown) => {
   const s = String(v ?? "").trim().toUpperCase().replace(/[$,]/g, "");
@@ -70,7 +74,7 @@ const MAX_NIGHTSHIFT_GB = Number(process.env.MAX_NIGHTSHIFT_GB ?? 6);
 
 const INFRA = /ECONNREFUSED|ECONNRESET|fetch failed|socket hang up|ETIMEDOUT|aborted due to timeout|Zetaris 5\d\d|Nightshift (429|5\d\d)|empty_response|Connection refused/i;
 let ran = 0, picked = 0, infraFailures = 0;
-for (const c of order) {
+for (const c of mine) {
   if (picked >= LIMIT) break;
   const todo = FRAMEWORKS.flatMap((f) => Array.from({ length: RUNS }, (_, i) => [f, i + 1] as const)).filter(([f, r]) => !done.has(`${c.id}|${f}|${r}`));
   if (!todo.length) continue;

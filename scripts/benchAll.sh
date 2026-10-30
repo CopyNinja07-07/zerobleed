@@ -7,6 +7,8 @@ FRAMEWORKS="${FRAMEWORKS:-zerobleed,zerobleed-batch,zerobleed-noguard,shared,sum
 BATCH="${BATCH:-10}"
 # DOMAINS lets two loops run side by side, one per domain (each writes its own file).
 DOMAINS="${DOMAINS:-procurement-bench incident-bench}"
+# SHARD=k/n splits one domain between n loops (each takes every n-th case).
+SHARD="${SHARD:-0/1}"
 DRIVER="${ZETARIS_DRIVER:-zetaris-driver-1}"
 DRIVER_MAX_GB="${DRIVER_MAX_GB:-6}"
 
@@ -23,7 +25,7 @@ while true; do
       echo "$(date -u +%FT%TZ) Zetaris driver at ${gb} GB: restarting it"
       docker restart "$DRIVER" && sleep 90
     fi
-    npm run -s bench -- --domain "$d" --frameworks "$FRAMEWORKS" --limit "$BATCH"
+    npm run -s bench -- --domain "$d" --frameworks "$FRAMEWORKS" --limit "$BATCH" --shard "$SHARD"
     code=$?
     if [ $code -eq 3 ]; then echo "$(date -u +%FT%TZ) stopped by the Nightshift memory guard"; exit 3; fi
     if [ $code -eq 4 ]; then echo "$(date -u +%FT%TZ) services unreachable: waiting 5 minutes"; sleep 300; fi
