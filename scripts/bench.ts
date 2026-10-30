@@ -67,7 +67,8 @@ function nightshiftGb(): number {
 }
 const MAX_NIGHTSHIFT_GB = Number(process.env.MAX_NIGHTSHIFT_GB ?? 6);
 
-let ran = 0, picked = 0;
+const INFRA = /ECONNREFUSED|ECONNRESET|fetch failed|socket hang up|ETIMEDOUT|aborted due to timeout|Zetaris 5\d\d|Nightshift (429|5\d\d)|Connection refused/i;
+let ran = 0, picked = 0, infraFailures = 0;
 for (const c of order) {
   if (picked >= LIMIT) break;
   const todo = FRAMEWORKS.flatMap((f) => Array.from({ length: RUNS }, (_, i) => [f, i + 1] as const)).filter(([f, r]) => !done.has(`${c.id}|${f}|${r}`));
@@ -119,6 +120,19 @@ for (const c of order) {
         reads: res.reads,
         ledger: res.turns.map((t) => ({ task: t.turn, lane: t.lane, model: t.model, in: t.inputTokens, out: t.outputTokens, ms: t.ms, receipt: t.receiptId })),
       };
+    }
+    // An outage (Zetaris or Nightshift unreachable, gateway errors, rate limits)
+    // is not a result: leave the run unrecorded so the next pass retries it.
+    const why = [row.error, ...((row.reviewReasons as string[] | undefined) ?? [])].filter(Boolean).join(" ");
+    if (INFRA.test(why)) {
+      infraFailures++;
+      console.log(`${c.id} ${f}: infrastructure error, not recorded, will retry: ${why.slice(0, 120)}`);
+      if (infraFailures >= 5) {
+        console.error("Stopping: 5 infrastructure errors in this batch. Check Zetaris, Nightshift and the data server, then re-run.");
+        process.exit(4);
+      }
+      await new Promise((r) => setTimeout(r, 30_000));
+      continue;
     }
     appendFileSync(outFile, JSON.stringify(row) + "\n");
     ran++;
