@@ -18,7 +18,7 @@ import { chat, chatMessages, type ChatResult, type Lane, type Message } from "..
 import { query } from "../zetaris.ts";
 import { familyOf } from "./domains.ts";
 
-export type Framework = "shared" | "summary" | "guard" | "dual" | "react";
+export type Framework = "shared" | "summary" | "guard" | "dual" | "react" | "llmlingua" | "letta" | "camel";
 
 export interface Turn { turn: string; lane: Lane; model: string; inputTokens: number; outputTokens: number; ms: number; receiptId?: string }
 
@@ -39,7 +39,16 @@ const iso = (s: string, n: number) => new Date(Date.parse(s + "T00:00:00Z") + n 
 // hub's audit batch (shipments promised within 3 days of this one), their
 // vendors' contracts, and the hub's weather log for a month. Incident: the
 // alert, its runbook and every raw log row from the hour before the alert.
+type Section = [string, Record<string, unknown>[]];
 async function workingSet(domainId: string, id: string): Promise<string> {
+  return render(await workingSections(domainId, id));
+}
+// One line per section (what the pipelines read), or one line per record (for
+// compressors and memory stores that chunk on lines).
+const render = (sections: Section[], perRecord = false) =>
+  sections.map(([name, rows]) => (perRecord ? `${name}:\n${rows.map((r) => JSON.stringify(r)).join("\n")}` : `${name}: ${JSON.stringify(rows.length === 1 && name === "ALERT" ? rows[0] : rows)}`)).join("\n");
+
+async function workingSections(domainId: string, id: string): Promise<Section[]> {
   const c = getDomain(domainId).container;
   if (familyOf(domainId) === "procurement") {
     const [s] = await query(`SELECT * FROM ${c}.shipments WHERE shipment_id = ${q(id)}`);
@@ -52,7 +61,7 @@ async function workingSet(domainId: string, id: string): Promise<string> {
       query(`SELECT * FROM ${c}.contracts WHERE vendor_id IN (${vendors.map(q).join(", ")})`),
       query(`SELECT * FROM ${c}.force_majeure WHERE hub_region = ${q(s.hub_region)} AND log_date BETWEEN ${q(iso(when, -15))} AND ${q(iso(when, 15))}`),
     ]);
-    return `SHIPMENTS: ${JSON.stringify(batch)}\nCONTRACTS: ${JSON.stringify(contracts)}\nFORCE_MAJEURE_LOGS: ${JSON.stringify(weather)}`;
+    return [["SHIPMENTS", batch], ["CONTRACTS", contracts], ["FORCE_MAJEURE_LOGS", weather]];
   }
   const [alert] = await query(`SELECT * FROM ${c}.alerts WHERE alert_id = ${q(id)}`);
   if (!alert) throw new Error(`no alert ${id}`);
@@ -64,10 +73,7 @@ async function workingSet(domainId: string, id: string): Promise<string> {
     query(`SELECT flow_time, src_ip, dst_ip, dst_owner, bytes_out FROM ${c}.vpc_flows WHERE ${win}`),
     query(`SELECT event_time, namespace, object, reason, node, message FROM ${c}.k8s_events WHERE ${win}`),
   ]);
-  return (
-    `ALERT: ${JSON.stringify(alert)}\nRUNBOOK: ${JSON.stringify(runbook)}\nCLOUDTRAIL_LAST_HOUR: ${JSON.stringify(cloudtrail)}\n` +
-    `VPC_FLOWS_LAST_HOUR: ${JSON.stringify(flows)}\nK8S_EVENTS_LAST_HOUR: ${JSON.stringify(k8s)}`
-  );
+  return [["ALERT", [alert]], ["RUNBOOK", runbook], ["CLOUDTRAIL_LAST_HOUR", cloudtrail], ["VPC_FLOWS_LAST_HOUR", flows], ["K8S_EVENTS_LAST_HOUR", k8s]];
 }
 
 const FINAL: Record<string, string> = {
@@ -308,7 +314,85 @@ async function react(domainId: string, id: string, rec: Recorder): Promise<Frame
   return rec.result({ reads, error: `no final answer after ${REACT_MAX_STEPS} steps` });
 }
 
-const RUNNERS: Record<Framework, (d: string, id: string, rec: Recorder) => Promise<FrameworkResult>> = { shared: (d, i, r) => shared(d, i, r), summary, guard: guarded, dual, react };
+// ------------------------------------------------------------ official third-party systems
+// These call local services that run each project's own published code
+// (py/llmlingua_service.py, py/camel_service.py, a Letta server in Docker).
+const svc = async (url: string, body: unknown, timeoutMs = 600_000) => {
+  const r = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(timeoutMs) });
+  const text = await r.text();
+  if (!r.ok) throw new Error(`${url} ${r.status}: ${text.slice(0, 200)}`);
+  return JSON.parse(text);
+};
+
+// LLMLingua-2: compress the working set (one record per line), then the shared-history turns.
+const LLMLINGUA_URL = process.env.LLMLINGUA_URL ?? "http://127.0.0.1:8096/compress";
+const LLMLINGUA_RATE = Number(process.env.LLMLINGUA_RATE ?? 0.33);
+async function llmlingua(domainId: string, id: string, rec: Recorder): Promise<FrameworkResult> {
+  const sections = await workingSections(domainId, id);
+  const c = await svc(LLMLINGUA_URL, { text: render(sections, true), rate: LLMLINGUA_RATE });
+  if (c.error) throw new Error(`LLMLingua-2: ${c.error}`);
+  return { ...(await shared(domainId, id, rec, c.text)), compression: { originTokens: c.origin_tokens, compressedTokens: c.compressed_tokens, ms: c.ms } } as FrameworkResult;
+}
+
+// CaMeL: the official interpreter with our read-only tools over the ZeroBleed catalog.
+const CAMEL_URL = process.env.CAMEL_URL ?? "http://127.0.0.1:8097/run";
+async function camel(domainId: string, id: string, rec: Recorder): Promise<FrameworkResult> {
+  const out = await svc(CAMEL_URL, { family: familyOf(domainId), container: getDomain(domainId).container, id });
+  for (const [i, c] of (out.calls ?? []).entries())
+    rec.turns.push({ turn: `CAMEL_${i + 1}${c.tools ? "_Q" : "_P"}`, lane: String(c.model).includes("ultra") ? "deep" : "fast", model: c.model, inputTokens: c.in, outputTokens: c.out, ms: c.ms, receiptId: c.receipt });
+  return rec.result({ decision: out.decision ?? undefined, error: out.error });
+}
+
+// MemGPT / Letta: a fresh agent per case; the working set goes into its archival
+// memory (vector store) and the agent pages it in with its own memory tools.
+const LETTA_URL = (process.env.LETTA_URL ?? "http://127.0.0.1:8283").replace(/\/$/, "");
+const LETTA_CONTEXT = Number(process.env.LETTA_CONTEXT ?? 16384);
+const letta = async (method: string, path: string, body?: unknown) => {
+  const r = await fetch(`${LETTA_URL}${path}`, { method, headers: { "Content-Type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(600_000) });
+  const text = await r.text();
+  if (!r.ok) throw new Error(`Letta ${method} ${path} ${r.status}: ${text.slice(0, 200)}`);
+  return text ? JSON.parse(text) : {};
+};
+const PROXY_URL = (process.env.NIGHTSHIFT_PROXY_URL ?? "http://127.0.0.1:8095").replace(/\/$/, "");
+async function proxyCalls(since: number): Promise<{ last: number; calls: { seq: number; kind: string; model: string; in: number; out: number; ms: number; receipt?: string }[] }> {
+  const r = await fetch(`${PROXY_URL}/calls?since=${since}`);
+  return r.json();
+}
+async function memgpt(domainId: string, id: string, rec: Recorder): Promise<FrameworkResult> {
+  const family = familyOf(domainId);
+  const sections = await workingSections(domainId, id);
+  const proxy = process.env.LETTA_MODEL_ENDPOINT ?? "http://host.docker.internal:8095/v1";
+  const agent = await letta("POST", "/v1/agents/", {
+    name: `zb-${id}-${Date.now()}`,
+    memory_blocks: [
+      { label: "persona", value: `I am an autonomous ${family === "procurement" ? "supplier audit" : "incident triage"} agent. The audit data is in my archival memory; I search it before deciding.` },
+      { label: "human", value: "The user is an operations lead who needs one final JSON decision." },
+    ],
+    llm_config: { model: process.env.METERLESS_MODEL ?? "nvidia/nemotron-3.5-lightning-30b-a3b", model_endpoint_type: "openai", model_endpoint: proxy, context_window: LETTA_CONTEXT, temperature: 0 },
+    embedding_config: { embedding_endpoint_type: "openai", embedding_endpoint: proxy, embedding_model: process.env.LETTA_EMBEDDING_MODEL ?? "local-runtime/nomic-embed-text-v1.5", embedding_dim: Number(process.env.LETTA_EMBEDDING_DIM ?? 768), embedding_chunk_size: 300 },
+    include_base_tools: true,
+  });
+  try {
+    // ~30 records per passage, each tagged with its source table.
+    for (const [name, rows] of sections)
+      for (let i = 0; i < Math.max(1, rows.length); i += 30)
+        await letta("POST", `/v1/agents/${agent.id}/archival-memory`, { text: `${name}:\n${rows.slice(i, i + 30).map((r) => JSON.stringify(r)).join("\n")}` });
+    const since = (await proxyCalls(0)).last;
+    const res = await letta("POST", `/v1/agents/${agent.id}/messages`, {
+      messages: [{ role: "user", content: `${getDomain(domainId).goal(id)} Search your archival memory for the records you need. ${FINAL[family]} Send that JSON object as your message.` }],
+    });
+    // Per-call usage and receipts come from the Nightshift proxy Letta talks through.
+    const { calls } = await proxyCalls(since);
+    for (const [i, c] of calls.filter((x) => x.kind === "chat").entries())
+      rec.turns.push({ turn: `LETTA_STEP_${i + 1}`, lane: "fast", model: c.model, inputTokens: c.in, outputTokens: c.out, ms: c.ms, receiptId: c.receipt });
+    const said = (res.messages ?? []).filter((m: any) => m.message_type === "assistant_message").map((m: any) => (typeof m.content === "string" ? m.content : JSON.stringify(m.content)));
+    return rec.result({ decision: lastJson(said.at(-1) ?? "") });
+  } finally {
+    await letta("DELETE", `/v1/agents/${agent.id}`).catch(() => undefined);
+  }
+}
+
+const RUNNERS: Record<Framework, (d: string, id: string, rec: Recorder) => Promise<FrameworkResult>> = { shared: (d, i, r) => shared(d, i, r), summary, guard: guarded, dual, react, llmlingua, letta: memgpt, camel };
 
 export async function runFramework(framework: Framework, domainId: string, id: string): Promise<FrameworkResult> {
   const rec = new Recorder();

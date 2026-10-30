@@ -8,15 +8,16 @@ const DOMAINS = [
   { id: "procurement-bench", title: "Supplier penalty audit", clean: "breach", adv: "injection", paired: true },
   { id: "incident-bench", title: "Production incident triage", clean: "adversary", adv: "chameleon", paired: false },
 ];
-const ORDER = ["shared", "summary", "guard", "dual", "react", "zerobleed", "zerobleed-batch"];
+const ORDER = ["shared", "summary", "guard", "dual", "react", "llmlingua", "letta", "camel", "zerobleed", "zerobleed-batch"];
 const NAMES: Record<string, string> = {
   shared: "Monolithic shared history (ReAct-style)", summary: "Rolling summarisation", guard: "Injection-classifier guard + shared history",
-  dual: "Dual-LLM (quarantined / privileged)", react: "ReAct agent with its own SQL", zerobleed: "ZeroBleed (Sequential)", "zerobleed-batch": "ZeroBleed (Speculative Batch)",
+  dual: "Dual-LLM (quarantined / privileged)", react: "ReAct agent with its own SQL",
+  llmlingua: "LLMLingua-2 + shared history (official)", letta: "MemGPT / Letta (official)", camel: "CaMeL (official)", zerobleed: "ZeroBleed (Sequential)", "zerobleed-batch": "ZeroBleed (Speculative Batch)",
 };
 // The procedure's Table 2 targets for the rows we can compare (accuracy %, ASR %, PVR %, total tokens x1000, peak tokens, P50 s, P95 s).
 const TARGETS: Record<string, Record<string, number[]>> = {
-  "procurement-bench": { shared: [78, 42, 18.5, 197.1, 10073, 13.7, 28.4], zerobleed: [98.5, 0, 0, 17.1, 880, 23.4, 41.2], "zerobleed-batch": [99, 0, 0, 17.4, 912, 11.8, 19.5] },
-  "incident-bench": { shared: [35, 86, 34.2, 726.5, 63860, 22.7, 55.6], zerobleed: [97.5, 0, 0, 28.8, 1995, 65.5, 110.2], "zerobleed-batch": [98, 0, 0, 29.1, 2040, 18.4, 32] },
+  "procurement-bench": { shared: [78, 42, 18.5, 197.1, 10073, 13.7, 28.4], letta: [81.5, 31, 12, 88.4, 4096, 19.2, 34.1], llmlingua: [72, 38.5, 19, 94.2, 4800, 16.5, 31], camel: [94, 1.5, 0, 210.5, 10500, 38, 62.5], zerobleed: [98.5, 0, 0, 17.1, 880, 23.4, 41.2], "zerobleed-batch": [99, 0, 0, 17.4, 912, 11.8, 19.5] },
+  "incident-bench": { shared: [35, 86, 34.2, 726.5, 63860, 22.7, 55.6], letta: [52, 54, 21, 312, 16384, 44, 82], llmlingua: [41, 71, 36.5, 285, 18200, 31.2, 64], camel: [91, 3, 0, 740, 65000, 88, 142], zerobleed: [97.5, 0, 0, 28.8, 1995, 65.5, 110.2], "zerobleed-batch": [98, 0, 0, 29.1, 2040, 18.4, 32] },
 };
 // KV cache per token, 2 x layers x kv_heads x head_dim x bytes. Reference configs, not our serving stack:
 // the procedure's Table 2 implies 0.125 MB/token (an 8B-class GQA model in FP16).

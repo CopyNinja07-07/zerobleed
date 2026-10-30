@@ -32,7 +32,7 @@ const FRAMEWORKS = arg("frameworks", "zerobleed,shared")!.split(",");
 const LIMIT = Number(arg("limit", "100000"));
 const RUNS = Number(arg("runs", "1"));
 const SPLITS = arg("splits")?.split(",");
-const KNOWN = ["zerobleed", "zerobleed-batch", "shared", "summary", "guard", "dual", "react"];
+const KNOWN = ["zerobleed", "zerobleed-batch", "shared", "summary", "guard", "dual", "react", "llmlingua", "letta", "camel"];
 for (const f of FRAMEWORKS) if (!KNOWN.includes(f)) throw new Error(`unknown framework ${f} (known: ${KNOWN.join(", ")})`);
 
 const server = await startDataServer().catch(() => undefined);
@@ -118,6 +118,7 @@ for (const c of order) {
         seconds: +(res.totals.ms / 1000).toFixed(2),
         modelRequests: res.reads?.length, deniedRequests: res.reads ? res.reads.filter((x) => x.outOfScope > 0).length : undefined,
         reads: res.reads,
+        compression: (res as { compression?: unknown }).compression,
         ledger: res.turns.map((t) => ({ task: t.turn, lane: t.lane, model: t.model, in: t.inputTokens, out: t.outputTokens, ms: t.ms, receipt: t.receiptId })),
       };
     }

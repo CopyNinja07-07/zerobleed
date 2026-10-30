@@ -14,3 +14,4 @@ video/clips/
 video/*.mp4
 docs/pdf/
 data/bench/
+.venv-py/
