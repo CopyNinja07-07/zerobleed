@@ -273,6 +273,8 @@ async function react(domainId: string, id: string, rec: Recorder): Promise<Frame
   ];
   for (let step = 1; step <= REACT_MAX_STEPS; step++) {
     const lane: Lane = "fast";
+    // Standard ReAct budget handling: on the last step the agent is told to answer now.
+    if (step === REACT_MAX_STEPS) history.push({ role: "user", content: 'This is your last step. Reply now with {"action": "final", "answer": {...}} based on what you have seen.' });
     const r = rec.add(`STEP_${step}`, lane, await chatMessages(lane, history, { maxTokens: 1000 }));
     history.push({ role: "assistant", content: r.text });
     let o: any;
