@@ -256,7 +256,7 @@ def run(family: str, container: str, case_id: str) -> dict:
     llm = agent_pipeline.OpenAILLM(openai.OpenAI(), P_MODEL)
     llm.name = P_MODEL
     pipeline = agent_pipeline.AgentPipeline([agent_pipeline.InitQuery(), PrivilegedLLM(llm, ADNoSecurityPolicyEngine, f"openai:{Q_MODEL}")])
-    runtime = functions_runtime.FunctionsRuntime(tools(family, container))
+    runtime = functions_runtime.FunctionsRuntime([functions_runtime.make_function(f) for f in tools(family, container)])
     _, _, _, messages, _ = pipeline.query(TASKS[family].format(id=case_id), runtime)
     text = ""
     for m in reversed(messages):
