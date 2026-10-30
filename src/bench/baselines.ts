@@ -369,7 +369,8 @@ async function memgpt(domainId: string, id: string, rec: Recorder): Promise<Fram
       { label: "human", value: "The user is an operations lead who needs one final JSON decision." },
     ],
     llm_config: { model: process.env.METERLESS_MODEL ?? "nvidia/nemotron-3.5-lightning-30b-a3b", model_endpoint_type: "openai", model_endpoint: proxy, context_window: LETTA_CONTEXT, temperature: 0 },
-    embedding_config: { embedding_endpoint_type: "openai", embedding_endpoint: proxy, embedding_model: process.env.LETTA_EMBEDDING_MODEL ?? "local-runtime/nomic-embed-text-v1.5", embedding_dim: Number(process.env.LETTA_EMBEDDING_DIM ?? 768), embedding_chunk_size: 300 },
+    // Nightshift serves no embeddings, so archival memory uses a small local embedding model (py/embed_service.py).
+    embedding_config: { embedding_endpoint_type: "openai", embedding_endpoint: process.env.LETTA_EMBEDDING_ENDPOINT ?? "http://host.docker.internal:8094/v1", embedding_model: process.env.LETTA_EMBEDDING_MODEL ?? "BAAI/bge-small-en-v1.5", embedding_dim: Number(process.env.LETTA_EMBEDDING_DIM ?? 384), embedding_chunk_size: 300 },
     include_base_tools: true,
   });
   try {

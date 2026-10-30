@@ -36,7 +36,7 @@ class Service(BaseHTTPRequestHandler):
         req = json.loads(self.rfile.read(int(self.headers.get("content-length", 0))))
         started = time.time()
         try:
-            # Records are one per line, so each line is a chunk; ids, numbers and JSON punctuation are kept.
+            # Records are one per line, so each line is a chunk; numbers and JSON punctuation are always kept.
             with LOCK:
                 r = compressor.compress_prompt(
                     req["text"],
@@ -44,6 +44,7 @@ class Service(BaseHTTPRequestHandler):
                     force_tokens=["\n", ":", ",", "{", "}", '"', "-"],
                     chunk_end_tokens=["\n"],
                     drop_consecutive=True,
+                    force_reserve_digit=True,  # keep amounts, days and ids intact: the fairest setting for audits
                 )
             out = {"text": r["compressed_prompt"], "origin_tokens": r["origin_tokens"], "compressed_tokens": r["compressed_tokens"], "ms": int((time.time() - started) * 1000)}
         except Exception as e:
