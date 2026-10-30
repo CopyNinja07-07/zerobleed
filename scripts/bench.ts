@@ -125,6 +125,7 @@ for (const c of order) {
         ledger: res.turns.map((t) => ({ task: t.turn, lane: t.lane, model: t.model, in: t.inputTokens, out: t.outputTokens, ms: t.ms, receipt: t.receiptId })),
       };
     }
+    if (process.env.BENCH_PARALLEL) row.parallel = Number(process.env.BENCH_PARALLEL);
     const waited = takeRateLimitWaitMs();
     if (waited) row.rateLimitWaitSeconds = waited / 1000;
     // An outage (Zetaris or Nightshift unreachable, gateway errors, rate limits)

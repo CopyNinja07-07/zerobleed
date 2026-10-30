@@ -5,6 +5,8 @@
 set -u
 FRAMEWORKS="${FRAMEWORKS:-zerobleed,zerobleed-batch,zerobleed-noguard,shared,summary,guard,dual,react}"
 BATCH="${BATCH:-10}"
+# DOMAINS lets two loops run side by side, one per domain (each writes its own file).
+DOMAINS="${DOMAINS:-procurement-bench incident-bench}"
 DRIVER="${ZETARIS_DRIVER:-zetaris-driver-1}"
 DRIVER_MAX_GB="${DRIVER_MAX_GB:-6}"
 
@@ -14,7 +16,7 @@ driver_gb() {
 
 while true; do
   before=$(cat evidence/bench/*.jsonl 2>/dev/null | wc -l)
-  for d in procurement-bench incident-bench; do
+  for d in $DOMAINS; do
     # The Zetaris driver's memory grows over long runs; restart it before it nears Docker's limit.
     gb=$(driver_gb)
     if awk "BEGIN{exit !(${gb:-0} > $DRIVER_MAX_GB)}"; then
