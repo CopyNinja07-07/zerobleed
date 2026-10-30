@@ -96,8 +96,10 @@ threading.Thread(target=ThreadingHTTPServer(("127.0.0.1", PROXY_PORT), Proxy).se
 # ------------------------------------------------------------------ CaMeL (official code)
 import openai  # noqa: E402
 import pydantic  # noqa: E402
+from agentdojo import attacks, benchmark  # noqa: E402,F401  (as CaMeL's main.py does, before importing camel)
 from agentdojo import agent_pipeline, functions_runtime  # noqa: E402
 from agentdojo import types as ad_types  # noqa: E402
+from agentdojo.task_suite import get_suite  # noqa: E402,F401  (import order as in CaMeL's main.py: avoids an agentdojo circular import)
 
 import camel.custom_yaml  # noqa: E402,F401
 from camel.pipeline_elements.privileged_llm import PrivilegedLLM  # noqa: E402
