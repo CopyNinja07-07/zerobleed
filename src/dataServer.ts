@@ -3,6 +3,7 @@
 // REST tables, so the agent only ever reaches the data through Zetaris SQL.
 import { createServer } from "node:http";
 import { readFileSync } from "node:fs";
+import { pathToFileURL } from "node:url";
 
 const PORT = Number(process.env.DATA_PORT ?? 8787);
 const silos: Record<string, string> = {
@@ -43,7 +44,8 @@ export function startDataServer(port = PORT) {
   });
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// pathToFileURL: a folder name with a space ("genai hackathon") is %20 in import.meta.url.
+if (import.meta.url === pathToFileURL(process.argv[1]).href) {
   await startDataServer();
   console.log(`data silos on http://localhost:${PORT}: ${Object.keys(silos).join(", ")}`);
 }
