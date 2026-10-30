@@ -3,7 +3,7 @@
 # run under every framework, then writes the report. Safe to restart: finished
 # runs are skipped. Usage: nohup bash scripts/benchAll.sh > evidence/bench/run.log 2>&1 &
 set -u
-FRAMEWORKS="${FRAMEWORKS:-zerobleed,zerobleed-batch,shared,summary,guard,dual,react}"
+FRAMEWORKS="${FRAMEWORKS:-zerobleed,zerobleed-batch,zerobleed-noguard,shared,summary,guard,dual,react}"
 BATCH="${BATCH:-10}"
 DRIVER="${ZETARIS_DRIVER:-zetaris-driver-1}"
 DRIVER_MAX_GB="${DRIVER_MAX_GB:-6}"

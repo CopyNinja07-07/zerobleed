@@ -81,7 +81,7 @@ function traceOf(e: string): TraceEvent {
 
 export async function runAudit(
   target: AuditTarget,
-  opts: { onEvent?: (e: string) => void; historyDir?: string; runId?: string; quiet?: boolean; speculative?: boolean } = {}
+  opts: { onEvent?: (e: string) => void; historyDir?: string; runId?: string; quiet?: boolean; speculative?: boolean; noGuard?: boolean } = {}
 ): Promise<AuditResult> {
   const started = Date.now();
   const domain: Domain = getDomain(target.domain);
@@ -314,7 +314,8 @@ export async function runAudit(
 
     // VERIFIED
     if (task.type === "CRITIQUE") {
-      const problem = await guardCritique(pad, reply.outputs);
+      // Ablation (zerobleed-noguard): no deterministic check, the critic's word stands.
+      const problem = opts.noGuard ? undefined : await guardCritique(pad, reply.outputs);
       if (problem && !pad.context[`escalate_${task.id}`]) {
         log(`Guard: ${problem}. Escalating ${task.id} to Nemotron Ultra`);
         pad.context[`escalate_${task.id}`] = "1";

@@ -67,13 +67,16 @@ async function workingSections(domainId: string, id: string): Promise<Section[]>
   if (!alert) throw new Error(`no alert ${id}`);
   const ts = Number(alert.ts);
   const win = `ts BETWEEN ${ts - 3600} AND ${ts}`;
-  const [runbook, cloudtrail, flows, k8s] = await Promise.all([
+  // Same evidence ZeroBleed can read: the per-alert signals Zetaris computes from
+  // these raw rows (they also define the allowlist: any dst_owner 'unknown' is outside it).
+  const [runbook, signals, cloudtrail, flows, k8s] = await Promise.all([
     query(`SELECT * FROM ${c}.runbooks WHERE service = ${q(alert.service)}`),
+    query(`SELECT * FROM ${c}.alert_signals WHERE alert_id = ${q(id)}`),
     query(`SELECT event_time, principal, principal_type, action, resource, source_ip FROM ${c}.cloudtrail WHERE ${win}`),
     query(`SELECT flow_time, src_ip, dst_ip, dst_owner, bytes_out FROM ${c}.vpc_flows WHERE ${win}`),
     query(`SELECT event_time, namespace, object, reason, node, message FROM ${c}.k8s_events WHERE ${win}`),
   ]);
-  return [["ALERT", [alert]], ["RUNBOOK", runbook], ["CLOUDTRAIL_LAST_HOUR", cloudtrail], ["VPC_FLOWS_LAST_HOUR", flows], ["K8S_EVENTS_LAST_HOUR", k8s]];
+  return [["ALERT", [alert]], ["RUNBOOK", runbook], ["ALERT_SIGNALS", signals], ["CLOUDTRAIL_LAST_HOUR", cloudtrail], ["VPC_FLOWS_LAST_HOUR", flows], ["K8S_EVENTS_LAST_HOUR", k8s]];
 }
 
 const FINAL: Record<string, string> = {
@@ -255,7 +258,7 @@ function scopeOf(domainId: string, id: string): (table: string, row: Record<stri
 
 const REACT_TABLES: Record<string, string> = {
   procurement: "shipments(shipment_id, vendor_id, hub_region, promised_date, breach_date, delay_days, units, carrier); contracts(contract_id, vendor_id, vendor_name, clause_id, penalty_pct, penalty_usd, threshold_days, clause_text); force_majeure(log_date, hub_region, wind_knots, waiver_declared, event)",
-  incident: "alerts(alert_id, ts, alert_time, service, severity, metric, value, summary); runbooks(service, runbook_id, owner_team, policy_id, triage_policy); cloudtrail(event_id, ts, event_time, principal, principal_type, action, resource, source_ip, result); vpc_flows(flow_id, ts, flow_time, src_ip, dst_ip, dst_owner, dst_port, bytes_out, action); k8s_events(event_id, ts, event_time, namespace, object, reason, node, message). ts is Unix seconds.",
+  incident: "alerts(alert_id, ts, alert_time, service, severity, metric, value, summary); runbooks(service, runbook_id, owner_team, policy_id, triage_policy); cloudtrail(event_id, ts, event_time, principal, principal_type, action, resource, source_ip, result); vpc_flows(flow_id, ts, flow_time, src_ip, dst_ip, dst_owner, dst_port, bytes_out, action); k8s_events(event_id, ts, event_time, namespace, object, reason, node, message); alert_signals(alert_id, non_admin_iam_escalations_60m, escalating_principal_60m, egress_gb_outside_allowlist_60m, egress_destination_outside_allowlist_60m, config_changes_30m, nodes_not_ready_30m), computed per alert from the raw logs (outside the allowlist = dst_owner 'unknown'). ts is Unix seconds.",
 };
 
 // Raised from 8 after the trial: incident cases need several log queries before an answer.

@@ -5,7 +5,7 @@
 //
 // Usage: npm run bench -- --domain procurement-bench --frameworks zerobleed,shared --limit 10
 //   --domain      procurement-bench | incident-bench
-//   --frameworks  zerobleed, zerobleed-batch, shared, summary, guard, dual, react (comma list)
+//   --frameworks  zerobleed, zerobleed-batch, zerobleed-noguard, shared, summary, guard, dual, react (comma list)
 //   --limit N     at most N cases this batch (cases are interleaved across splits)
 //   --splits a,b  only these splits (breach, waiver, below, injection / adversary, config, hardware, chameleon)
 //   --runs N      repeats per case (default 1)
@@ -33,7 +33,7 @@ const FRAMEWORKS = arg("frameworks", "zerobleed,shared")!.split(",");
 const LIMIT = Number(arg("limit", "100000"));
 const RUNS = Number(arg("runs", "1"));
 const SPLITS = arg("splits")?.split(",");
-const KNOWN = ["zerobleed", "zerobleed-batch", "shared", "summary", "guard", "dual", "react", "llmlingua", "letta", "camel"];
+const KNOWN = ["zerobleed", "zerobleed-batch", "zerobleed-noguard", "shared", "summary", "guard", "dual", "react", "llmlingua", "letta", "camel"];
 for (const f of FRAMEWORKS) if (!KNOWN.includes(f)) throw new Error(`unknown framework ${f} (known: ${KNOWN.join(", ")})`);
 
 const server = await startDataServer().catch(() => undefined);
@@ -84,10 +84,10 @@ for (const c of order) {
     const base = { case: c.id, split: c.split, adversarial: c.adversarial, attack: c.attack?.template, framework: f, run: r, expect: c.expect, value: c.value, at: new Date().toISOString() };
     let row: Record<string, unknown>;
     takeRateLimitWaitMs();
-    if (f === "zerobleed" || f === "zerobleed-batch") {
+    if (f.startsWith("zerobleed")) {
       const runId = `${c.id}-${f}-r${r}`;
       try {
-        const zb = await runAudit({ id: c.id, domain: domain.id }, { quiet: true, runId, speculative: f === "zerobleed-batch" });
+        const zb = await runAudit({ id: c.id, domain: domain.id }, { quiet: true, runId, speculative: f === "zerobleed-batch", noGuard: f === "zerobleed-noguard" });
         renameSync(zb.traceFile, `${traceDir}/${runId}.trace.jsonl`);
         const requests = zb.events.filter((e) => e.startsWith("Gate:"));
         row = {

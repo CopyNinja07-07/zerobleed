@@ -8,11 +8,11 @@ const DOMAINS = [
   { id: "procurement-bench", title: "Supplier penalty audit", clean: "breach", adv: "injection", paired: true },
   { id: "incident-bench", title: "Production incident triage", clean: "adversary", adv: "chameleon", paired: false },
 ];
-const ORDER = ["shared", "summary", "guard", "dual", "react", "llmlingua", "letta", "camel", "zerobleed", "zerobleed-batch"];
+const ORDER = ["shared", "summary", "guard", "dual", "react", "llmlingua", "letta", "camel", "zerobleed-noguard", "zerobleed", "zerobleed-batch"];
 const NAMES: Record<string, string> = {
   shared: "Monolithic shared history (ReAct-style)", summary: "Rolling summarisation", guard: "Injection-classifier guard + shared history",
   dual: "Dual-LLM (quarantined / privileged)", react: "ReAct agent with its own SQL",
-  llmlingua: "LLMLingua-2 + shared history (official)", letta: "MemGPT / Letta (official)", camel: "CaMeL (official)", zerobleed: "ZeroBleed (Sequential)", "zerobleed-batch": "ZeroBleed (Speculative Batch)",
+  llmlingua: "LLMLingua-2 + shared history (official)", letta: "MemGPT / Letta (official)", camel: "CaMeL (official)", zerobleed: "ZeroBleed (Sequential)", "zerobleed-batch": "ZeroBleed (Speculative Batch)", "zerobleed-noguard": "ZeroBleed without the consistency guard (ablation)",
 };
 // The procedure's Table 2 targets for the rows we can compare (accuracy %, ASR %, PVR %, total tokens x1000, peak tokens, P50 s, P95 s).
 const TARGETS: Record<string, Record<string, number[]>> = {
