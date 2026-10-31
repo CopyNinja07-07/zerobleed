@@ -420,6 +420,8 @@ async function memgpt(domainId: string, id: string, rec: Recorder): Promise<Fram
     // send_message tools. 0.16.8's default (letta_v1_agent) has no archival search.
     agent_type: process.env.LETTA_AGENT_TYPE ?? "memgpt_v2_agent",
     include_base_tools: true,
+    // 0.16.8 leaves archival search off every agent type's base set, so it is attached by name.
+    tools: (process.env.LETTA_EXTRA_TOOLS ?? "archival_memory_search").split(",").filter(Boolean),
   });
   try {
     // ~30 records per passage, each tagged with its source table.
