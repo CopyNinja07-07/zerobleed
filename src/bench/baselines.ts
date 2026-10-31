@@ -416,6 +416,9 @@ async function memgpt(domainId: string, id: string, rec: Recorder): Promise<Fram
     llm_config: { model: process.env.METERLESS_MODEL ?? "nvidia/nemotron-3.5-lightning-30b-a3b", model_endpoint_type: "openai", model_endpoint: proxy, context_window: LETTA_CONTEXT, temperature: 0 },
     // Nightshift serves no embeddings, so archival memory uses a small local embedding model (py/embed_service.py).
     embedding_config: { embedding_endpoint_type: "openai", embedding_endpoint: process.env.LETTA_EMBEDDING_ENDPOINT ?? "http://host.docker.internal:8094/v1", embedding_model: process.env.LETTA_EMBEDDING_MODEL ?? "BAAI/bge-small-en-v1.5", embedding_dim: Number(process.env.LETTA_EMBEDDING_DIM ?? 384), embedding_chunk_size: 300 },
+    // The MemGPT agent type, which has the procedure's archival_memory_search and
+    // send_message tools. 0.16.8's default (letta_v1_agent) has no archival search.
+    agent_type: process.env.LETTA_AGENT_TYPE ?? "memgpt_v2_agent",
     include_base_tools: true,
   });
   try {
