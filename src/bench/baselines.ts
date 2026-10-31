@@ -13,6 +13,7 @@
 //   react    Tool-using ReAct agent: the model writes its own SQL against
 //            Zetaris, and every observation stays in its history.
 import { readFileSync } from "node:fs";
+import { request as httpRequest } from "node:http";
 import { getDomain } from "../domains/index.ts";
 import { addRateLimitWaitMs, chat, chatMessages, type ChatResult, type Lane, type Message } from "../llm.ts";
 import { query } from "../zetaris.ts";
@@ -376,12 +377,27 @@ async function camel(domainId: string, id: string, rec: Recorder): Promise<Frame
 // memory (vector store) and the agent pages it in with its own memory tools.
 const LETTA_URL = (process.env.LETTA_URL ?? "http://127.0.0.1:8283").replace(/\/$/, "");
 const LETTA_CONTEXT = Number(process.env.LETTA_CONTEXT ?? 16384);
-const letta = async (method: string, path: string, body?: unknown) => {
-  const r = await fetch(`${LETTA_URL}${path}`, { method, headers: { "Content-Type": "application/json" }, body: body === undefined ? undefined : JSON.stringify(body), signal: AbortSignal.timeout(600_000) });
-  const text = await r.text();
-  if (!r.ok) throw new Error(`Letta ${method} ${path} ${r.status}: ${text.slice(0, 200)}`);
-  return text ? JSON.parse(text) : {};
-};
+// Same step budget as ReAct: an agent that has not answered by then counts as wrong.
+const LETTA_MAX_STEPS = Number(process.env.LETTA_MAX_STEPS ?? REACT_MAX_STEPS);
+// node:http, not fetch: fetch gives up after 300 s waiting for headers, and a
+// Letta run that waits out NVIDIA rate limits can take longer than that.
+const letta = (method: string, path: string, body?: unknown): Promise<any> =>
+  new Promise((resolve, reject) => {
+    const data = body === undefined ? undefined : JSON.stringify(body);
+    const req = httpRequest(`${LETTA_URL}${path}`, { method, headers: { "Content-Type": "application/json", ...(data ? { "Content-Length": Buffer.byteLength(data) } : {}) }, timeout: 1_800_000 }, (res) => {
+      const chunks: Buffer[] = [];
+      res.on("data", (c) => chunks.push(c));
+      res.on("end", () => {
+        const text = Buffer.concat(chunks).toString("utf8");
+        if ((res.statusCode ?? 500) >= 400) return reject(new Error(`Letta ${method} ${path} ${res.statusCode}: ${text.slice(0, 200)}`));
+        try { resolve(text ? JSON.parse(text) : {}); } catch (e) { reject(e); }
+      });
+    });
+    req.on("timeout", () => req.destroy(new Error(`Letta ${method} ${path} timed out after 30 min`)));
+    req.on("error", reject);
+    if (data) req.write(data);
+    req.end();
+  });
 const PROXY_URL = (process.env.NIGHTSHIFT_PROXY_URL ?? "http://127.0.0.1:8095").replace(/\/$/, "");
 async function proxyCalls(since: number): Promise<{ last: number; calls: { seq: number; kind: string; model: string; in: number; out: number; ms: number; receipt?: string; wait?: number }[] }> {
   const r = await fetch(`${PROXY_URL}/calls?since=${since}`);
@@ -410,6 +426,7 @@ async function memgpt(domainId: string, id: string, rec: Recorder): Promise<Fram
     const since = (await proxyCalls(0)).last;
     const res = await letta("POST", `/v1/agents/${agent.id}/messages`, {
       messages: [{ role: "user", content: `${getDomain(domainId).goal(id)} Search your archival memory for the records you need. ${FINAL[family]} Send that JSON object as your message.` }],
+      max_steps: LETTA_MAX_STEPS,
     });
     // Per-call usage and receipts come from the Nightshift proxy Letta talks through.
     const { calls } = await proxyCalls(since);
@@ -417,6 +434,7 @@ async function memgpt(domainId: string, id: string, rec: Recorder): Promise<Fram
     for (const [i, c] of calls.filter((x) => x.kind === "chat").entries())
       rec.turns.push({ turn: `LETTA_STEP_${i + 1}`, lane: "fast", model: c.model, inputTokens: c.in, outputTokens: c.out, ms: c.ms, receiptId: c.receipt });
     const said = (res.messages ?? []).filter((m: any) => m.message_type === "assistant_message").map((m: any) => (typeof m.content === "string" ? m.content : JSON.stringify(m.content)));
+    if (!said.length) return rec.result({ error: `no final answer after ${LETTA_MAX_STEPS} steps` });
     return rec.result({ decision: lastJson(said.at(-1) ?? "") });
   } finally {
     await letta("DELETE", `/v1/agents/${agent.id}`).catch(() => undefined);
