@@ -8,7 +8,7 @@ import { baseUrl } from "../src/llm.ts";
 import { env } from "../src/env.ts";
 
 const PORT = Number(process.env.PROXY_PORT ?? 8095);
-const calls: { seq: number; kind: string; model: string; in: number; out: number; ms: number; receipt?: string }[] = [];
+const calls: { seq: number; kind: string; model: string; in: number; out: number; ms: number; receipt?: string; wait?: number }[] = [];
 let seq = 0;
 
 createServer(async (req, res) => {
@@ -32,9 +32,8 @@ createServer(async (req, res) => {
       // not JSON: forward as is
     }
   }
-  const started = Date.now();
-  try {
-    const upstream = await fetch(baseUrl() + url.pathname.replace(/^\/v1/, "") + url.search, {
+  const send = () =>
+    fetch(baseUrl() + url.pathname.replace(/^\/v1/, "") + url.search, {
       method: req.method,
       headers: {
         Authorization: "Bearer " + env("METERLESS_RUNTIME_TOKEN"),
@@ -46,12 +45,26 @@ createServer(async (req, res) => {
       body: req.method === "GET" ? undefined : body,
       signal: AbortSignal.timeout(180_000),
     });
-    const text = await upstream.text();
+  try {
+    // Same rate-limit backoff as src/llm.ts, so Letta is not failed by limits every
+    // other framework waits out. The wait is logged per call and left out of latency.
+    let started = Date.now();
+    let upstream = await send();
+    let text = await upstream.text();
+    let wait = 0;
+    for (const ms of [10_000, 30_000, 60_000, 120_000, 240_000]) {
+      if (!(upstream.status === 429 || (upstream.status >= 502 && upstream.status <= 504))) break;
+      await new Promise((r) => setTimeout(r, ms));
+      wait += ms;
+      started = Date.now();
+      upstream = await send();
+      text = await upstream.text();
+    }
     try {
       const d = JSON.parse(text);
       if (d.usage) {
         const kind = url.pathname.endsWith("/embeddings") ? "embed" : "chat";
-        calls.push({ seq: ++seq, kind, model: d.model ?? "", in: d.usage.prompt_tokens ?? 0, out: d.usage.completion_tokens ?? 0, ms: Date.now() - started, receipt: d.meterless?.receipt_id });
+        calls.push({ seq: ++seq, kind, model: d.model ?? "", in: d.usage.prompt_tokens ?? 0, out: d.usage.completion_tokens ?? 0, ms: Date.now() - started, receipt: d.meterless?.receipt_id, wait });
         if (calls.length > 50_000) calls.splice(0, 10_000);
       }
     } catch {

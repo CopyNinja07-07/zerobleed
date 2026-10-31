@@ -71,6 +71,10 @@ export function takeRateLimitWaitMs(): number {
   rateLimitWait = 0;
   return ms;
 }
+// Waits that happen outside this process (the Nightshift proxy Letta talks through).
+export function addRateLimitWaitMs(ms: number): void {
+  rateLimitWait += ms;
+}
 
 // Nightshift reports NVIDIA's 429 either directly or wrapped in a 502.
 const RATE_LIMITED = /Nightshift 429|Nightshift 502[\s\S]*(429|Too Many Requests)/i;

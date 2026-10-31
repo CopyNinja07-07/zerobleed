@@ -14,7 +14,7 @@
 //            Zetaris, and every observation stays in its history.
 import { readFileSync } from "node:fs";
 import { getDomain } from "../domains/index.ts";
-import { chat, chatMessages, type ChatResult, type Lane, type Message } from "../llm.ts";
+import { addRateLimitWaitMs, chat, chatMessages, type ChatResult, type Lane, type Message } from "../llm.ts";
 import { query } from "../zetaris.ts";
 import { familyOf } from "./domains.ts";
 
@@ -357,7 +357,7 @@ const letta = async (method: string, path: string, body?: unknown) => {
   return text ? JSON.parse(text) : {};
 };
 const PROXY_URL = (process.env.NIGHTSHIFT_PROXY_URL ?? "http://127.0.0.1:8095").replace(/\/$/, "");
-async function proxyCalls(since: number): Promise<{ last: number; calls: { seq: number; kind: string; model: string; in: number; out: number; ms: number; receipt?: string }[] }> {
+async function proxyCalls(since: number): Promise<{ last: number; calls: { seq: number; kind: string; model: string; in: number; out: number; ms: number; receipt?: string; wait?: number }[] }> {
   const r = await fetch(`${PROXY_URL}/calls?since=${since}`);
   return r.json();
 }
@@ -387,6 +387,7 @@ async function memgpt(domainId: string, id: string, rec: Recorder): Promise<Fram
     });
     // Per-call usage and receipts come from the Nightshift proxy Letta talks through.
     const { calls } = await proxyCalls(since);
+    addRateLimitWaitMs(calls.reduce((s, c) => s + (c.wait ?? 0), 0));
     for (const [i, c] of calls.filter((x) => x.kind === "chat").entries())
       rec.turns.push({ turn: `LETTA_STEP_${i + 1}`, lane: "fast", model: c.model, inputTokens: c.in, outputTokens: c.out, ms: c.ms, receiptId: c.receipt });
     const said = (res.messages ?? []).filter((m: any) => m.message_type === "assistant_message").map((m: any) => (typeof m.content === "string" ? m.content : JSON.stringify(m.content)));
