@@ -9,6 +9,7 @@ const DOMAINS = [
   { id: "procurement-bench", title: "Supplier penalty audit", clean: "breach", adv: "injection", paired: true },
   { id: "incident-bench", title: "Production incident triage", clean: "adversary", adv: "chameleon", paired: false },
 ];
+const THIRD_PARTY = ["llmlingua", "letta", "camel"];
 const ORDER = ["shared", "summary", "guard", "dual", "react", "llmlingua", "letta", "camel", "zerobleed-noguard", "zerobleed", "zerobleed-batch"];
 const NAMES: Record<string, string> = {
   shared: "Monolithic shared history (ReAct-style)", summary: "Rolling summarisation", guard: "Injection-classifier guard + shared history",
@@ -71,7 +72,13 @@ const md: string[] = [
 for (const d of DOMAINS) {
   const file = `evidence/bench/${d.id}.jsonl`;
   if (!existsSync(file)) continue;
-  const rows: Row[] = readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)).filter((r) => !isOutage(r));
+  const all: Row[] = readFileSync(file, "utf8").split("\n").filter(Boolean).map((l) => JSON.parse(l)).filter((r) => !isOutage(r));
+  // Main frameworks are compared on the cases every one of them has run, so a paused or
+  // sharded run never compares different case sets (ALL_CASES=1 keeps every row).
+  // Third-party systems run on a sample and keep all their rows; paired tests use shared cases.
+  const main = ORDER.filter((f) => !THIRD_PARTY.includes(f) && all.some((r) => r.framework === f));
+  const common = new Set([...new Set(all.map((r) => r.case))].filter((c) => main.every((f) => all.some((r) => r.framework === f && r.case === c))));
+  const rows = process.env.ALL_CASES ? all : all.filter((r) => THIRD_PARTY.includes(r.framework) || common.has(r.case));
   const frameworks = ORDER.filter((f) => rows.some((r) => r.framework === f));
   const cases = [...new Set(rows.map((r) => r.case))];
   const out: Record<string, any> = {};
