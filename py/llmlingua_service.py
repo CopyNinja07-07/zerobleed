@@ -6,6 +6,8 @@ llmlingua-2-xlm-roberta-large-meetingbank model, running locally.
     .venv-py/bin/python py/llmlingua_service.py
 
 Serves POST http://127.0.0.1:8096/compress {"text": "...", "rate": 0.33}
+or {"segments": [[text, compress?], ...], "rate": 0.33} (structure-aware: only
+segments marked true are compressed, the rest pass through unchanged)
 -> {"text": compressed, "origin_tokens": n, "compressed_tokens": m, "ms": t}.
 The benchmark's `llmlingua` framework compresses the shared-history working
 set with it, then runs the same shared-history turns on the compressed text.
@@ -36,6 +38,32 @@ class Service(BaseHTTPRequestHandler):
         req = json.loads(self.rfile.read(int(self.headers.get("content-length", 0))))
         started = time.time()
         try:
+            if "segments" in req:
+                # Structure-aware mode (LLMLingua's structured-compression idea): keys, ids and
+                # short fields are kept as they are; only long free-text values are compressed.
+                parts, origin, kept = [], 0, 0
+                with LOCK:
+                    for text, compress in req["segments"]:
+                        if not compress:
+                            parts.append(text)
+                            continue
+                        r = compressor.compress_prompt(
+                            text,
+                            rate=float(req.get("rate", 0.33)),
+                            force_tokens=["\n", ".", "?", "!"],
+                            force_reserve_digit=True,
+                        )
+                        parts.append(r["compressed_prompt"])
+                        origin += r["origin_tokens"]
+                        kept += r["compressed_tokens"]
+                text = "".join(parts)
+                out = {"text": text, "origin_tokens": origin, "compressed_tokens": kept, "origin_chars": sum(len(t) for t, _ in req["segments"]), "compressed_chars": len(text), "ms": int((time.time() - started) * 1000)}
+                body = json.dumps(out).encode()
+                self.send_response(200)
+                self.send_header("content-type", "application/json")
+                self.end_headers()
+                self.wfile.write(body)
+                return
             # Records are one per line, so each line is a chunk; numbers and JSON punctuation are always kept.
             with LOCK:
                 r = compressor.compress_prompt(

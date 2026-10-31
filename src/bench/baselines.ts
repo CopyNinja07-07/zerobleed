@@ -330,11 +330,37 @@ const svc = async (url: string, body: unknown, timeoutMs = 600_000) => {
 // LLMLingua-2: compress the working set (one record per line), then the shared-history turns.
 const LLMLINGUA_URL = process.env.LLMLINGUA_URL ?? "http://127.0.0.1:8096/compress";
 const LLMLINGUA_RATE = Number(process.env.LLMLINGUA_RATE ?? 0.33);
+// Compressing raw JSON at a third of its tokens strips the field names and ids (the
+// model then cannot tell which record a number belongs to), so by default only long
+// free-text values are compressed and the record structure is kept. LLMLINGUA_MODE=flat
+// restores whole-text compression.
+const LLMLINGUA_MODE = process.env.LLMLINGUA_MODE ?? "structured";
+const LONG_TEXT = 60;
+function segments(sections: Section[]): [string, boolean][] {
+  const out: [string, boolean][] = [];
+  const keep = (t: string) => (out.length && !out[out.length - 1][1] ? (out[out.length - 1][0] += t) : out.push([t, false]));
+  for (const [name, rows] of sections) {
+    keep(`${name}:\n`);
+    for (const r of rows) {
+      keep("{");
+      Object.entries(r).forEach(([k, v], i) => {
+        keep(`${i ? "," : ""}${JSON.stringify(k)}:`);
+        if (typeof v === "string" && v.length >= LONG_TEXT) {
+          keep('"');
+          out.push([v, true]);
+          keep('"');
+        } else keep(JSON.stringify(v));
+      });
+      keep("}\n");
+    }
+  }
+  return out;
+}
 async function llmlingua(domainId: string, id: string, rec: Recorder): Promise<FrameworkResult> {
   const sections = await workingSections(domainId, id);
-  const c = await svc(LLMLINGUA_URL, { text: render(sections, true), rate: LLMLINGUA_RATE });
+  const c = await svc(LLMLINGUA_URL, LLMLINGUA_MODE === "flat" ? { text: render(sections, true), rate: LLMLINGUA_RATE } : { segments: segments(sections), rate: LLMLINGUA_RATE });
   if (c.error) throw new Error(`LLMLingua-2: ${c.error}`);
-  return { ...(await shared(domainId, id, rec, c.text)), compression: { originTokens: c.origin_tokens, compressedTokens: c.compressed_tokens, ms: c.ms } } as FrameworkResult;
+  return { ...(await shared(domainId, id, rec, c.text)), compression: { mode: LLMLINGUA_MODE, originTokens: c.origin_tokens, compressedTokens: c.compressed_tokens, originChars: c.origin_chars, compressedChars: c.compressed_chars, ms: c.ms } } as FrameworkResult;
 }
 
 // CaMeL: the official interpreter with our read-only tools over the ZeroBleed catalog.
