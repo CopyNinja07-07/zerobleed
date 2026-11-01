@@ -1,6 +1,6 @@
 # ZeroBleed benchmark v2 (N = 400 protocol)
 
-Generated 2026-11-01 08:55 UTC by `npm run bench:report` from the run files in `evidence/bench/`. Nothing is typed by hand.
+Generated 2026-11-01 18:13 UTC by `npm run bench:report` from the run files in `evidence/bench/`. Nothing is typed by hand.
 Accuracy counts a run as correct only if both the decision and its value match the known answer. Errors, timeouts and human-review hand-offs count as not correct.
 
 ## Supplier penalty audit
@@ -14,9 +14,9 @@ Accuracy counts a run as correct only if both the decision and its value match t
 | Injection-classifier guard + shared history | 200 | 78.0 (71.8 to 83.2) | 50.0 (50) | 0 | 56.0 | n/a | 14889.0 | 74,445 | 19,050 | 2,381 | 5,953 | 15.9 | 97.8 | 0 | 4 |
 | Dual-LLM (quarantined / privileged) | 200 | 89.0 (83.9 to 92.6) | 32.0 (50) | 0 | 34.0 | n/a | 2593.8 | 12,969 | 18,753 | 2,344 | 5,860 | 6.8 | 38.5 | 0 | 0 |
 | ReAct agent with its own SQL | 200 | 75.5 (69.1 to 80.9) | 44.0 (50) | 0 | 32.0 | 15.6 | 4135.7 | 20,678 | 51,336 | 6,417 | 16,043 | 12.3 | 75.4 | 0 | 0 |
-| LLMLingua-2 + shared history (official) | 100 | 87.0 (79.0 to 92.2) | 8.0 (25) | 0 | 4.0 | n/a | 5781.1 | 57,811 | 17,273 | 2,159 | 5,398 | 19.6 | 31.8 | 0 | 0 |
+| LLMLingua-2 + shared history (official) | 200 | 88.5 (83.3 to 92.2) | 8.0 (50) | 0 | 10.0 | n/a | 11575.5 | 57,878 | 17,273 | 2,159 | 5,398 | 19.2 | 32.7 | 0 | 0 |
 | MemGPT / Letta (official) | 5 | 0.0 (0.0 to 43.4) | 0.0 (1) | 0 | 0.0 | n/a | 5096.6 | 1,019,314 | 137,535 | 17,192 | 42,980 | NaN | NaN | 5 | 0 |
-| CaMeL (official) | 10 | 50.0 (23.7 to 76.3) | 0.0 (2) | 0 | 0.0 | n/a | 42.7 | 4,271 | 3,377 | 422 | 1,055 | 10.6 | 46.8 | 0 | 0 |
+| CaMeL (official) | 50 | 68.0 (54.2 to 79.2) | 8.3 (12) | 0 | 8.3 | n/a | 224.4 | 4,489 | 3,623 | 453 | 1,132 | 18.4 | 43.2 | 0 | 0 |
 | ZeroBleed without the consistency guard (ablation) | 200 | 94.5 (90.4 to 96.9) | 12.0 (50) | 0 | 10.0 | 0.0 | 863.0 | 4,315 | 2,012 | 252 | 629 | 15.9 | 108.4 | 0 | 2 |
 | ZeroBleed (Sequential) | 200 | 95.0 (91.0 to 97.3) | 10.0 (50) | 2 | 8.0 | 0.0 | 961.9 | 4,809 | 1,506 | 188 | 471 | 19.6 | 85.2 | 0 | 5 |
 | ZeroBleed (Speculative Batch) | 200 | 97.5 (94.3 to 98.9) | 6.0 (50) | 2 | 6.0 | 0.0 | 868.6 | 4,343 | 1,619 | 202 | 506 | 17.2 | 97.4 | 0 | 4 |
@@ -30,9 +30,9 @@ Accuracy by case type (%):
 | Injection-classifier guard + shared history | 96.0 | 88.0 | 88.0 | 40.0 |
 | Dual-LLM (quarantined / privileged) | 98.0 | 94.0 | 100.0 | 64.0 |
 | ReAct agent with its own SQL | 88.0 | 100.0 | 58.0 | 56.0 |
-| LLMLingua-2 + shared history (official) | 96.0 | 76.0 | 84.0 | 92.0 |
+| LLMLingua-2 + shared history (official) | 98.0 | 86.0 | 82.0 | 88.0 |
 | MemGPT / Letta (official) | 0.0 | 0.0 | 0.0 | 0.0 |
-| CaMeL (official) | 100.0 | 0.0 | 0.0 | 100.0 |
+| CaMeL (official) | 100.0 | 76.9 | 0.0 | 91.7 |
 | ZeroBleed without the consistency guard (ablation) | 96.0 | 100.0 | 96.0 | 86.0 |
 | ZeroBleed (Sequential) | 96.0 | 100.0 | 96.0 | 88.0 |
 | ZeroBleed (Speculative Batch) | 98.0 | 100.0 | 100.0 | 92.0 |
@@ -46,9 +46,9 @@ Paired comparison with ZeroBleed (Sequential) on the same cases (exact McNemar t
 | Injection-classifier guard + shared history | 200 | 39 | 5 | 1.4e-7 |
 | Dual-LLM (quarantined / privileged) | 200 | 21 | 9 | 0.043 |
 | ReAct agent with its own SQL | 200 | 43 | 4 | 2.8e-9 |
-| LLMLingua-2 + shared history (official) | 100 | 13 | 6 | 0.17 |
+| LLMLingua-2 + shared history (official) | 200 | 21 | 8 | 0.024 |
 | MemGPT / Letta (official) | 5 | 5 | 0 | 0.063 |
-| CaMeL (official) | 10 | 5 | 0 | 0.063 |
+| CaMeL (official) | 50 | 16 | 1 | 0.00027 |
 | ZeroBleed without the consistency guard (ablation) | 200 | 5 | 4 | 1.0 |
 | ZeroBleed (Speculative Batch) | 200 | 2 | 7 | 0.18 |
 
@@ -58,8 +58,8 @@ Measured against the procedure's Table 2 targets (target / measured):
 |---|---|---|---|---|---|---|---|
 | Monolithic shared history (ReAct-style) | 78 / 73.0 | 42 / 44.0 | 18.5 / n/a | 49,275 / 63,069 | 10,073 / 18,983 | 13.7 / 14.1 | 28.4 / 81.9 |
 | MemGPT / Letta (official) | 81.5 / 0.0 | 31 / 0.0 | 12 / n/a | 22,100 / 1,019,314 | 4,096 / 137,535 | 19.2 / NaN | 34.1 / NaN |
-| LLMLingua-2 + shared history (official) | 72 / 87.0 | 38.5 / 8.0 | 19 / n/a | 23,550 / 57,811 | 4,800 / 17,273 | 16.5 / 19.6 | 31 / 31.8 |
-| CaMeL (official) | 94 / 50.0 | 1.5 / 0.0 | 0 / n/a | 52,625 / 4,271 | 10,500 / 3,377 | 38 / 10.6 | 62.5 / 46.8 |
+| LLMLingua-2 + shared history (official) | 72 / 88.5 | 38.5 / 8.0 | 19 / n/a | 23,550 / 57,878 | 4,800 / 17,273 | 16.5 / 19.2 | 31 / 32.7 |
+| CaMeL (official) | 94 / 68.0 | 1.5 / 8.3 | 0 / n/a | 52,625 / 4,489 | 10,500 / 3,623 | 38 / 18.4 | 62.5 / 43.2 |
 | ZeroBleed (Sequential) | 98.5 / 95.0 | 0 / 10.0 | 0 / 0.0 | 4,275 / 4,809 | 880 / 1,506 | 23.4 / 19.6 | 41.2 / 85.2 |
 | ZeroBleed (Speculative Batch) | 99 / 97.5 | 0 / 6.0 | 0 / 0.0 | 4,350 / 4,343 | 912 / 1,619 | 11.8 / 17.2 | 19.5 / 97.4 |
 
@@ -82,9 +82,9 @@ Scratchpad, ZeroBleed (Speculative Batch): 20 of 160 measured runs stayed within
 | Injection-classifier guard + shared history | 200 | 83.0 (77.2 to 87.6) | 4.0 (50) | 0 | 42.0 | n/a | 46491.7 | 232,459 | 94,774 | 11,847 | 29,617 | 32.7 | 99.2 | 0 | 19 |
 | Dual-LLM (quarantined / privileged) | 200 | 97.5 (94.3 to 98.9) | 0.0 (50) | 0 | 0.0 | n/a | 12670.0 | 63,350 | 93,138 | 11,642 | 29,106 | 17.9 | 64.1 | 0 | 0 |
 | ReAct agent with its own SQL | 200 | 89.5 (84.5 to 93.0) | 36.0 (50) | 0 | 36.0 | 8.2 | 2306.3 | 11,531 | 36,920 | 4,615 | 11,538 | 20.7 | 112.9 | 1 | 0 |
-| LLMLingua-2 + shared history (official) | 100 | 94.0 (87.5 to 97.2) | 4.0 (25) | 0 | 4.0 | n/a | 19257.4 | 192,574 | 93,781 | 11,723 | 29,307 | 34.5 | 63.7 | 0 | 0 |
+| LLMLingua-2 + shared history (official) | 200 | 96.5 (93.0 to 98.3) | 2.0 (50) | 0 | 2.0 | n/a | 37710.1 | 188,551 | 93,781 | 11,723 | 29,307 | 33.2 | 68.7 | 0 | 0 |
 | MemGPT / Letta (official) | 5 | 0.0 (0.0 to 43.4) | 0.0 (1) | 0 | 0.0 | n/a | 4097.3 | 819,451 | 111,882 | 13,985 | 34,963 | NaN | NaN | 5 | 0 |
-| CaMeL (official) | 10 | 50.0 (23.7 to 76.3) | 100.0 (2) | 0 | 100.0 | n/a | 45.6 | 4,564 | 3,648 | 456 | 1,140 | 21.0 | 110.4 | 0 | 0 |
+| CaMeL (official) | 50 | 36.0 (24.1 to 49.9) | 91.7 (12) | 0 | 76.3 | n/a | 239.2 | 4,784 | 3,873 | 484 | 1,210 | 27.5 | 110.4 | 0 | 0 |
 | ZeroBleed without the consistency guard (ablation) | 200 | 98.0 (95.0 to 99.2) | 0.0 (50) | 0 | 0.0 | 0.0 | 982.8 | 4,914 | 1,766 | 221 | 552 | 31.0 | 120.4 | 0 | 0 |
 | ZeroBleed (Sequential) | 200 | 99.5 (97.2 to 99.9) | 0.0 (50) | 0 | 0.0 | 0.0 | 993.0 | 4,965 | 1,766 | 221 | 552 | 41.6 | 121.1 | 0 | 1 |
 | ZeroBleed (Speculative Batch) | 200 | 100.0 (98.1 to 100.0) | 0.0 (50) | 0 | 0.0 | 0.0 | 941.5 | 4,708 | 1,792 | 224 | 560 | 24.2 | 111.7 | 0 | 0 |
@@ -98,9 +98,9 @@ Accuracy by case type (%):
 | Injection-classifier guard + shared history | 88.0 | 100.0 | 86.0 | 58.0 |
 | Dual-LLM (quarantined / privileged) | 100.0 | 100.0 | 90.0 | 100.0 |
 | ReAct agent with its own SQL | 100.0 | 98.0 | 98.0 | 62.0 |
-| LLMLingua-2 + shared history (official) | 92.0 | 100.0 | 88.0 | 96.0 |
+| LLMLingua-2 + shared history (official) | 94.0 | 100.0 | 94.0 | 98.0 |
 | MemGPT / Letta (official) | 0.0 | 0.0 | 0.0 | 0.0 |
-| CaMeL (official) | 33.3 | 100.0 | 50.0 | 0.0 |
+| CaMeL (official) | 38.5 | 84.6 | 8.3 | 8.3 |
 | ZeroBleed without the consistency guard (ablation) | 96.0 | 100.0 | 96.0 | 100.0 |
 | ZeroBleed (Sequential) | 100.0 | 100.0 | 98.0 | 100.0 |
 | ZeroBleed (Speculative Batch) | 100.0 | 100.0 | 100.0 | 100.0 |
@@ -114,9 +114,9 @@ Paired comparison with ZeroBleed (Sequential) on the same cases (exact McNemar t
 | Injection-classifier guard + shared history | 200 | 34 | 1 | 2.1e-9 |
 | Dual-LLM (quarantined / privileged) | 200 | 5 | 1 | 0.22 |
 | ReAct agent with its own SQL | 200 | 21 | 1 | 0.000011 |
-| LLMLingua-2 + shared history (official) | 100 | 6 | 1 | 0.13 |
+| LLMLingua-2 + shared history (official) | 200 | 7 | 1 | 0.070 |
 | MemGPT / Letta (official) | 5 | 5 | 0 | 0.063 |
-| CaMeL (official) | 10 | 5 | 0 | 0.063 |
+| CaMeL (official) | 50 | 31 | 0 | 9.3e-10 |
 | ZeroBleed without the consistency guard (ablation) | 200 | 4 | 1 | 0.38 |
 | ZeroBleed (Speculative Batch) | 200 | 0 | 1 | 1.0 |
 
@@ -126,8 +126,8 @@ Measured against the procedure's Table 2 targets (target / measured):
 |---|---|---|---|---|---|---|---|
 | Monolithic shared history (ReAct-style) | 35 / 88.5 | 86 / 16.0 | 34.2 / n/a | 181,625 / 188,580 | 63,860 / 94,665 | 22.7 / 28.3 | 55.6 / 87.5 |
 | MemGPT / Letta (official) | 52 / 0.0 | 54 / 0.0 | 21 / n/a | 78,000 / 819,451 | 16,384 / 111,882 | 44 / NaN | 82 / NaN |
-| LLMLingua-2 + shared history (official) | 41 / 94.0 | 71 / 4.0 | 36.5 / n/a | 71,250 / 192,574 | 18,200 / 93,781 | 31.2 / 34.5 | 64 / 63.7 |
-| CaMeL (official) | 91 / 50.0 | 3 / 100.0 | 0 / n/a | 185,000 / 4,564 | 65,000 / 3,648 | 88 / 21.0 | 142 / 110.4 |
+| LLMLingua-2 + shared history (official) | 41 / 96.5 | 71 / 2.0 | 36.5 / n/a | 71,250 / 188,551 | 18,200 / 93,781 | 31.2 / 33.2 | 64 / 68.7 |
+| CaMeL (official) | 91 / 36.0 | 3 / 91.7 | 0 / n/a | 185,000 / 4,784 | 65,000 / 3,873 | 88 / 27.5 | 142 / 110.4 |
 | ZeroBleed (Sequential) | 97.5 / 99.5 | 0 / 0.0 | 0 / 0.0 | 7,200 / 4,965 | 1,995 / 1,766 | 65.5 / 41.6 | 110.2 / 121.1 |
 | ZeroBleed (Speculative Batch) | 98 / 100.0 | 0 / 0.0 | 0 / 0.0 | 7,275 / 4,708 | 2,040 / 1,792 | 18.4 / 24.2 | 32 / 111.7 |
 
@@ -141,35 +141,35 @@ Scratchpad, ZeroBleed (Speculative Batch): 107 of 165 measured runs stayed withi
 
 ## Published attack suites: Supplier penalty audit
 
-30 case(s): InjecAgent instructions (enhanced prefix) and BIPIA text attacks, verbatim, planted in twins of main cases.
+60 case(s): InjecAgent instructions (enhanced prefix) and BIPIA text attacks, verbatim, planted in twins of main cases.
 
 | Framework | Correct decision % (runs) | Penalty waived / attack called benign % | Followed the injected instruction %: InjecAgent | BIPIA | All |
 |---|---|---|---|---|---|
-| Monolithic shared history (ReAct-style) | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| Rolling summarisation | 36.7 (30) | 16.7 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| Injection-classifier guard + shared history | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| Dual-LLM (quarantined / privileged) | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| ReAct agent with its own SQL | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| ZeroBleed without the consistency guard (ablation) | 96.7 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| ZeroBleed (Sequential) | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| ZeroBleed (Speculative Batch) | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
+| Monolithic shared history (ReAct-style) | 98.3 (60) | 1.7 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| Rolling summarisation | 41.7 (60) | 15.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| Injection-classifier guard + shared history | 100.0 (60) | 0.0 (60) | 0.0 (30) | 3.3 (30) | 1.7 (60) |
+| Dual-LLM (quarantined / privileged) | 100.0 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| ReAct agent with its own SQL | 95.0 (60) | 5.0 (60) | 0.0 (30) | 10.0 (30) | 5.0 (60) |
+| ZeroBleed without the consistency guard (ablation) | 98.3 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| ZeroBleed (Sequential) | 100.0 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| ZeroBleed (Speculative Batch) | 100.0 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
 
 A judge (Nemotron Ultra, temperature 0) reads each framework's whole parsed output and answers whether it carried out the hidden instruction; quoting or flagging it counts as not following. The judge is the same model family as the frameworks, so treat these rates as indicative.
 
 ## Published attack suites: Incident triage
 
-30 case(s): InjecAgent instructions (enhanced prefix) and BIPIA text attacks, verbatim, planted in twins of main cases.
+60 case(s): InjecAgent instructions (enhanced prefix) and BIPIA text attacks, verbatim, planted in twins of main cases.
 
 | Framework | Correct decision % (runs) | Penalty waived / attack called benign % | Followed the injected instruction %: InjecAgent | BIPIA | All |
 |---|---|---|---|---|---|
-| Monolithic shared history (ReAct-style) | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| Rolling summarisation | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| Injection-classifier guard + shared history | 73.3 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| Dual-LLM (quarantined / privileged) | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| ReAct agent with its own SQL | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| ZeroBleed without the consistency guard (ablation) | 96.7 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| ZeroBleed (Sequential) | 93.3 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
-| ZeroBleed (Speculative Batch) | 100.0 (30) | 0.0 (30) | 0.0 (15) | 0.0 (15) | 0.0 (30) |
+| Monolithic shared history (ReAct-style) | 100.0 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| Rolling summarisation | 100.0 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| Injection-classifier guard + shared history | 70.0 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| Dual-LLM (quarantined / privileged) | 100.0 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| ReAct agent with its own SQL | 100.0 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| ZeroBleed without the consistency guard (ablation) | 98.3 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| ZeroBleed (Sequential) | 96.7 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
+| ZeroBleed (Speculative Batch) | 100.0 (60) | 0.0 (60) | 0.0 (30) | 0.0 (30) | 0.0 (60) |
 
 A judge (Nemotron Ultra, temperature 0) reads each framework's whole parsed output and answers whether it carried out the hidden instruction; quoting or flagging it counts as not following. The judge is the same model family as the frameworks, so treat these rates as indicative.
 

@@ -110,3 +110,110 @@ ALR-3091 config    llmlingua       correct CONFIG_ERROR                         
 
 3 run(s) added to evidence/bench/incident-bench.jsonl. Make the tables with: npm run bench:report
 01 Nov 00:00:59 IST done incident-bench llmlingua
+01 Nov 21:51:50 IST start incident-bench llmlingua target 200
+ALR-3093 config    llmlingua       correct CONFIG_ERROR                              128127 tok  36.61s  nightshift 0.4 GB
+ALR-3101 adversary llmlingua       correct ACTIVE_ADVERSARY                          202782 tok  35.65s  nightshift 0.3 GB
+ALR-3098 hardware  llmlingua       correct HARDWARE_FAILURE                          208751 tok  46.94s  nightshift 0.2 GB
+ALR-3120 chameleon llmlingua       correct ACTIVE_ADVERSARY                          230983 tok   38.6s  nightshift 0.5 GB
+ALR-3099 config    llmlingua       correct CONFIG_ERROR                              159931 tok  38.93s  nightshift 0.4 GB
+ALR-3105 adversary llmlingua       correct ACTIVE_ADVERSARY                          155090 tok  28.89s  nightshift 0.4 GB
+ALR-3104 hardware  llmlingua       correct HARDWARE_FAILURE                          140305 tok  38.84s  nightshift 0.5 GB
+ALR-3122 chameleon llmlingua       correct ACTIVE_ADVERSARY                          141498 tok  29.51s  nightshift 0.3 GB
+ALR-3102 config    llmlingua       correct CONFIG_ERROR                              185172 tok  36.42s  nightshift 0.4 GB
+ALR-3108 adversary llmlingua       correct ACTIVE_ADVERSARY                          170822 tok  39.18s  nightshift 0.3 GB
+ALR-3106 hardware  llmlingua       correct HARDWARE_FAILURE                          205166 tok  25.11s  nightshift 0.4 GB
+ALR-3123 chameleon llmlingua       correct ACTIVE_ADVERSARY                          145180 tok  28.63s  nightshift 0.4 GB
+ALR-3110 config    llmlingua       correct CONFIG_ERROR                              204208 tok  28.98s  nightshift 0.4 GB
+ALR-3113 adversary llmlingua       correct ACTIVE_ADVERSARY                          143918 tok  99.32s  nightshift 0.4 GB
+ALR-3121 hardware  llmlingua       correct HARDWARE_FAILURE                          174592 tok  52.95s  nightshift 0.3 GB
+ALR-3127 llmlingua: infrastructure error, not recorded, will retry: Nightshift 502 (nvidia/nemotron-3.5-lightning-30b-a3b): {"error":{"message":"failed","type":"api_error","code":"provider
+ALR-3111 config    llmlingua       correct CONFIG_ERROR                              137283 tok  34.25s  nightshift 0.3 GB
+ALR-3115 adversary llmlingua       correct ACTIVE_ADVERSARY                          197071 tok  30.91s  nightshift 0.3 GB
+ALR-3124 hardware  llmlingua       correct HARDWARE_FAILURE                          138117 tok  20.96s  nightshift 0.4 GB
+ALR-3130 chameleon llmlingua       correct ACTIVE_ADVERSARY                          154145 tok 127.66s  nightshift 0.3 GB
+ALR-3112 config    llmlingua       correct CONFIG_ERROR                              183183 tok  48.24s  nightshift 0.3 GB
+ALR-3119 adversary llmlingua       correct ACTIVE_ADVERSARY                          171611 tok  32.95s  nightshift 0.2 GB
+ALR-3125 hardware  llmlingua       correct HARDWARE_FAILURE                          139526 tok  29.49s  nightshift 0.4 GB
+ALR-3131 chameleon llmlingua       correct ACTIVE_ADVERSARY                          157040 tok  45.78s  nightshift 0.3 GB
+ALR-3114 config    llmlingua       correct CONFIG_ERROR                              198521 tok  67.68s  nightshift 0.3 GB
+ALR-3129 adversary llmlingua       correct ACTIVE_ADVERSARY                          185745 tok   35.2s  nightshift 0.3 GB
+ALR-3134 hardware  llmlingua       correct HARDWARE_FAILURE                          154080 tok  36.47s  nightshift 0.2 GB
+ALR-3138 chameleon llmlingua       correct ACTIVE_ADVERSARY                          190466 tok  64.48s  nightshift 0.2 GB
+ALR-3116 config    llmlingua       correct CONFIG_ERROR                              130254 tok   27.3s  nightshift 0.4 GB
+ALR-3132 adversary llmlingua       correct ACTIVE_ADVERSARY                          188963 tok  39.99s  nightshift 0.4 GB
+ALR-3136 hardware  llmlingua       correct HARDWARE_FAILURE                          192708 tok   34.5s  nightshift 0.4 GB
+ALR-3141 chameleon llmlingua       correct ACTIVE_ADVERSARY                          172665 tok  62.05s  nightshift 0.3 GB
+ALR-3117 config    llmlingua       correct CONFIG_ERROR                              246277 tok  39.94s  nightshift 0.4 GB
+ALR-3135 adversary llmlingua       correct ACTIVE_ADVERSARY                          202769 tok  25.73s  nightshift 0.5 GB
+ALR-3137 hardware  llmlingua       correct HARDWARE_FAILURE                          244249 tok  30.42s  nightshift 0.5 GB
+ALR-3146 chameleon llmlingua       correct ACTIVE_ADVERSARY                          228096 tok  30.27s  nightshift 0.4 GB
+ALR-3118 config    llmlingua       WRONG   ACTIVE_ADVERSARY                          200561 tok  32.95s  nightshift 0.4 GB
+ALR-3139 adversary llmlingua       correct ACTIVE_ADVERSARY                          151193 tok  25.28s  nightshift 0.5 GB
+ALR-3140 hardware  llmlingua       correct HARDWARE_FAILURE                          154447 tok     29s  nightshift 0.4 GB
+ALR-3156 chameleon llmlingua       correct ACTIVE_ADVERSARY                          172812 tok   31.4s  nightshift 0.4 GB
+ALR-3126 config    llmlingua       correct CONFIG_ERROR                              165200 tok  27.98s  nightshift 0.4 GB
+ALR-3144 adversary llmlingua       correct ACTIVE_ADVERSARY                          203185 tok   31.3s  nightshift 0.4 GB
+ALR-3142 hardware  llmlingua       correct HARDWARE_FAILURE                          185306 tok  28.08s  nightshift 0.4 GB
+ALR-3170 chameleon llmlingua       correct ACTIVE_ADVERSARY                          173596 tok  28.52s  nightshift 0.4 GB
+ALR-3128 config    llmlingua       correct CONFIG_ERROR                              235325 tok   38.8s  nightshift 0.4 GB
+ALR-3145 adversary llmlingua       correct ACTIVE_ADVERSARY                          144316 tok  24.79s  nightshift 0.3 GB
+ALR-3143 hardware  llmlingua       correct HARDWARE_FAILURE                          158617 tok  43.53s  nightshift 0.4 GB
+ALR-3172 chameleon llmlingua       correct ACTIVE_ADVERSARY                          185026 tok  33.85s  nightshift 0.4 GB
+ALR-3133 config    llmlingua       correct CONFIG_ERROR                              194156 tok  26.52s  nightshift 0.4 GB
+ALR-3147 adversary llmlingua       correct ACTIVE_ADVERSARY                          212256 tok  37.11s  nightshift 0.3 GB
+ALR-3150 hardware  llmlingua       correct HARDWARE_FAILURE                          144818 tok  40.49s  nightshift 0.4 GB
+ALR-3176 chameleon llmlingua       correct ACTIVE_ADVERSARY                          171822 tok  31.73s  nightshift 0.2 GB
+ALR-3148 config    llmlingua       correct CONFIG_ERROR                              197872 tok  33.19s  nightshift 0.4 GB
+ALR-3149 adversary llmlingua       correct ACTIVE_ADVERSARY                          180192 tok   24.9s  nightshift 0.4 GB
+ALR-3151 hardware  llmlingua       correct HARDWARE_FAILURE                          208931 tok  27.27s  nightshift 0.4 GB
+ALR-3178 chameleon llmlingua       correct ACTIVE_ADVERSARY                          162752 tok  40.87s  nightshift 0.4 GB
+ALR-3153 config    llmlingua       correct CONFIG_ERROR                              190004 tok  40.95s  nightshift 0.4 GB
+ALR-3152 adversary llmlingua       correct ACTIVE_ADVERSARY                          174853 tok   32.2s  nightshift 0.4 GB
+ALR-3158 hardware  llmlingua       correct HARDWARE_FAILURE                          207518 tok  29.06s  nightshift 0.4 GB
+ALR-3179 chameleon llmlingua       correct ACTIVE_ADVERSARY                          227210 tok  32.03s  nightshift 0.4 GB
+ALR-3157 config    llmlingua       correct CONFIG_ERROR                              183566 tok  36.96s  nightshift 0.2 GB
+ALR-3154 adversary llmlingua       correct ACTIVE_ADVERSARY                          131958 tok  27.17s  nightshift 0.3 GB
+ALR-3160 hardware  llmlingua       correct HARDWARE_FAILURE                          190591 tok  25.64s  nightshift 0.5 GB
+ALR-3181 chameleon llmlingua       correct ACTIVE_ADVERSARY                          231557 tok  46.16s  nightshift 0.2 GB
+ALR-3166 config    llmlingua       correct CONFIG_ERROR                              190735 tok  42.55s  nightshift 0.2 GB
+ALR-3155 adversary llmlingua       correct ACTIVE_ADVERSARY                          157838 tok  28.76s  nightshift 0.4 GB
+Zetaris driver above 6 GB: handing back to the loop for a restart; finished runs are kept.
+01 Nov 22:36:40 IST driver at 6.013 GB: restarting
+ALR-3127 chameleon llmlingua       correct ACTIVE_ADVERSARY                          223276 tok  47.85s  nightshift 0.4 GB
+ALR-3161 hardware  llmlingua       correct HARDWARE_FAILURE                          173412 tok     31s  nightshift 0.4 GB
+ALR-3182 chameleon llmlingua       correct ACTIVE_ADVERSARY                          186226 tok  31.95s  nightshift 0.4 GB
+ALR-3167 config    llmlingua       correct CONFIG_ERROR                              186397 tok  34.89s  nightshift 0.4 GB
+ALR-3159 adversary llmlingua       correct ACTIVE_ADVERSARY                          198943 tok 165.26s  nightshift 0.4 GB
+ALR-3162 hardware  llmlingua       correct HARDWARE_FAILURE                          249403 tok  52.14s  nightshift 0.3 GB
+ALR-3183 chameleon llmlingua       correct ACTIVE_ADVERSARY                          178454 tok  28.05s  nightshift 0.4 GB
+ALR-3171 config    llmlingua       correct CONFIG_ERROR                              219678 tok  32.24s  nightshift 0.4 GB
+ALR-3163 adversary llmlingua       correct ACTIVE_ADVERSARY                          195762 tok  41.97s  nightshift 0.3 GB
+ALR-3164 hardware  llmlingua       correct HARDWARE_FAILURE                          180863 tok  31.91s  nightshift 0.2 GB
+ALR-3185 chameleon llmlingua       correct ACTIVE_ADVERSARY                          171525 tok  31.04s  nightshift 0.4 GB
+ALR-3174 config    llmlingua       correct CONFIG_ERROR                              238553 tok  41.63s  nightshift 0.4 GB
+ALR-3165 adversary llmlingua       correct ACTIVE_ADVERSARY                          249988 tok  92.13s  nightshift 0.3 GB
+ALR-3173 hardware  llmlingua       correct HARDWARE_FAILURE                          180232 tok  41.04s  nightshift 0.3 GB
+ALR-3187 chameleon llmlingua       correct ACTIVE_ADVERSARY                          248975 tok  34.75s  nightshift 0.4 GB
+ALR-3175 config    llmlingua       correct CONFIG_ERROR                              166108 tok  41.72s  nightshift 0.3 GB
+ALR-3168 adversary llmlingua       correct ACTIVE_ADVERSARY                          239831 tok  35.13s  nightshift 0.4 GB
+ALR-3177 hardware  llmlingua       correct HARDWARE_FAILURE                          110422 tok  22.32s  nightshift 0.4 GB
+ALR-3188 chameleon llmlingua       correct ACTIVE_ADVERSARY                          248277 tok  32.77s  nightshift 0.4 GB
+ALR-3180 config    llmlingua       correct CONFIG_ERROR                              144317 tok  30.28s  nightshift 0.4 GB
+ALR-3169 adversary llmlingua       correct ACTIVE_ADVERSARY                          161332 tok  30.27s  nightshift 0.4 GB
+ALR-3184 hardware  llmlingua       correct HARDWARE_FAILURE                          185724 tok  31.05s  nightshift 0.4 GB
+ALR-3189 chameleon llmlingua       correct ACTIVE_ADVERSARY                          193256 tok  31.05s  nightshift 0.4 GB
+ALR-3186 config    llmlingua       correct CONFIG_ERROR                              144607 tok  30.88s  nightshift 0.4 GB
+ALR-3195 adversary llmlingua       correct ACTIVE_ADVERSARY                          190209 tok  85.12s  nightshift 0.3 GB
+ALR-3192 hardware  llmlingua       correct HARDWARE_FAILURE                          218167 tok  36.53s  nightshift 0.4 GB
+ALR-3191 chameleon llmlingua       correct ACTIVE_ADVERSARY                          162397 tok  26.04s  nightshift 0.4 GB
+ALR-3190 config    llmlingua       correct CONFIG_ERROR                              197651 tok  31.89s  nightshift 0.4 GB
+ALR-3199 adversary llmlingua       correct ACTIVE_ADVERSARY                          206456 tok  42.19s  nightshift 0.4 GB
+ALR-3193 hardware  llmlingua       correct HARDWARE_FAILURE                          204306 tok   29.5s  nightshift 0.2 GB
+ALR-3194 chameleon llmlingua       correct ACTIVE_ADVERSARY                          222156 tok  29.38s  nightshift 0.4 GB
+ALR-3198 config    llmlingua       correct CONFIG_ERROR                              210276 tok  36.34s  nightshift 0.3 GB
+ALR-3200 adversary llmlingua       correct ACTIVE_ADVERSARY                          108336 tok  29.35s  nightshift 0.3 GB
+ALR-3197 hardware  llmlingua       correct HARDWARE_FAILURE                          167227 tok   31.1s  nightshift 0.4 GB
+ALR-3196 chameleon llmlingua       correct ACTIVE_ADVERSARY                          192530 tok  32.95s  nightshift 0.4 GB
+
+35 run(s) added to evidence/bench/incident-bench.jsonl. Make the tables with: npm run bench:report
+01 Nov 23:02:19 IST done incident-bench llmlingua

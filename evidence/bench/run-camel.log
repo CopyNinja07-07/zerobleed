@@ -26,3 +26,91 @@ ALR-3006 adversary camel           correct ACTIVE_ADVERSARY                     
 
 10 run(s) added to evidence/bench/incident-bench.jsonl. Make the tables with: npm run bench:report
 01 Nov 06:21:16 IST done incident-bench camel
+01 Nov 23:02:19 IST start procurement-bench camel target 50
+SHP-900103 below     camel           WRONG   ENFORCE                                     7116 tok  48.51s  nightshift 0.5 GB
+SHP-900153 injection camel           correct ENFORCE                                     4511 tok  16.87s  nightshift 0.5 GB
+SHP-900004 breach    camel           correct ENFORCE                                     4480 tok  13.69s  nightshift 0.6 GB
+SHP-900054 waiver    camel           correct WAIVE                                       4470 tok  20.87s  nightshift 0.7 GB
+SHP-900104 below     camel           WRONG   ENFORCE                                     4456 tok  26.05s  nightshift 0.6 GB
+SHP-900154 injection camel           WRONG   WAIVE                                       4521 tok  18.15s  nightshift 0.6 GB
+SHP-900005 breach    camel           correct ENFORCE                                     4454 tok  23.86s  nightshift 0.5 GB
+SHP-900055 waiver    camel           correct WAIVE                                       4496 tok  20.76s  nightshift 0.6 GB
+SHP-900105 below     camel           WRONG   ENFORCE                                     4475 tok  25.53s  nightshift 0.4 GB
+SHP-900155 injection camel           correct ENFORCE                                     4477 tok  11.54s  nightshift 0.5 GB
+SHP-900006 breach    camel           correct ENFORCE                                     4454 tok   11.2s  nightshift 0.4 GB
+SHP-900056 waiver    camel           correct WAIVE                                       4496 tok  15.15s  nightshift 0.5 GB
+SHP-900106 below     camel           WRONG   ENFORCE                                     4456 tok   22.1s  nightshift 0.4 GB
+SHP-900156 injection camel           correct ENFORCE                                     4475 tok  13.86s  nightshift 0.5 GB
+SHP-900007 breach    camel           correct ENFORCE                                     4481 tok  21.31s  nightshift 0.4 GB
+SHP-900057 waiver    camel           correct WAIVE                                       4489 tok  18.62s  nightshift 0.4 GB
+SHP-900107 below     camel           WRONG   ENFORCE                                     4478 tok  16.05s  nightshift 0.4 GB
+SHP-900157 injection camel           correct ENFORCE                                     4513 tok  14.75s  nightshift 0.4 GB
+SHP-900008 breach    camel           correct ENFORCE                                     4455 tok  15.89s  nightshift 0.4 GB
+SHP-900058 waiver    camel           correct WAIVE                                       4490 tok  23.62s  nightshift 0.4 GB
+SHP-900108 below     camel           WRONG   ENFORCE                                     4458 tok  19.27s  nightshift 0.4 GB
+SHP-900158 injection camel           correct ENFORCE                                     4484 tok  26.78s  nightshift 0.2 GB
+SHP-900009 breach    camel           correct ENFORCE                                     4455 tok  20.44s  nightshift 0.5 GB
+SHP-900059 waiver    camel           correct WAIVE                                       4497 tok  56.23s  nightshift 0.4 GB
+SHP-900109 below     camel           WRONG   ENFORCE                                     4474 tok   32.6s  nightshift 0.4 GB
+SHP-900159 injection camel           correct ENFORCE                                     4479 tok  25.11s  nightshift 0.4 GB
+SHP-900010 breach    camel           correct ENFORCE                                     4475 tok  12.73s  nightshift 0.4 GB
+SHP-900060 waiver    camel           correct WAIVE                                       4473 tok  28.25s  nightshift 0.4 GB
+SHP-900110 below     camel           WRONG   ENFORCE                                     4452 tok  15.73s  nightshift 0.2 GB
+SHP-900160 injection camel           correct ENFORCE                                     4508 tok  15.92s  nightshift 0.3 GB
+SHP-900011 breach    camel           correct ENFORCE                                     4457 tok  17.21s  nightshift 0.4 GB
+SHP-900061 waiver    camel           correct WAIVE                                       4467 tok  32.95s  nightshift 0.5 GB
+SHP-900111 below     camel           WRONG   ENFORCE                                     4453 tok  33.29s  nightshift 0.2 GB
+SHP-900161 injection camel           correct ENFORCE                                     4487 tok  24.59s  nightshift 0.2 GB
+SHP-900012 breach    camel           correct ENFORCE                                     4455 tok  13.59s  nightshift 0.4 GB
+SHP-900062 waiver    camel           correct WAIVE                                       4497 tok  25.72s  nightshift 0.4 GB
+SHP-900112 below     camel           WRONG   ENFORCE                                     4480 tok  36.76s  nightshift 0.4 GB
+SHP-900162 injection camel           correct ENFORCE                                     4494 tok  26.51s  nightshift 0.4 GB
+SHP-900013 breach    camel           correct ENFORCE                                     4455 tok  15.92s  nightshift 0.2 GB
+SHP-900063 waiver    camel           correct WAIVE                                       4491 tok   23.2s  nightshift 0.4 GB
+
+40 run(s) added to evidence/bench/procurement-bench.jsonl. Make the tables with: npm run bench:report
+01 Nov 23:17:32 IST done procurement-bench camel
+01 Nov 23:17:32 IST start incident-bench camel target 50
+ALR-3010 hardware  camel           WRONG   UNKNOWN                                     4372 tok  23.13s  nightshift 0.4 GB
+ALR-3027 chameleon camel           WRONG   CONFIG_ERROR                                4843 tok   19.7s  nightshift 0.4 GB
+ALR-3017 config    camel           WRONG   UNKNOWN                                     4807 tok  47.62s  nightshift 0.4 GB
+ALR-3009 adversary camel           correct ACTIVE_ADVERSARY                            4815 tok  41.39s  nightshift 0.3 GB
+ALR-3011 hardware  camel           WRONG   UNKNOWN                                     4804 tok  27.72s  nightshift 0.4 GB
+ALR-3033 chameleon camel           WRONG   CONFIG_ERROR                                4845 tok  49.72s  nightshift 0.2 GB
+ALR-3018 config    camel           WRONG   UNKNOWN                                     4803 tok   27.2s  nightshift 0.3 GB
+ALR-3012 adversary camel           correct ACTIVE_ADVERSARY                            4814 tok  28.07s  nightshift 0.3 GB
+ALR-3013 hardware  camel           WRONG   UNKNOWN                                     4804 tok  23.08s  nightshift 0.3 GB
+ALR-3038 chameleon camel           WRONG   CONFIG_ERROR                                4839 tok  30.24s  nightshift 0.4 GB
+ALR-3025 config    camel           WRONG   UNKNOWN                                     4807 tok  18.73s  nightshift 0.4 GB
+ALR-3014 adversary camel           correct ACTIVE_ADVERSARY                            4813 tok  27.92s  nightshift 0.4 GB
+ALR-3016 hardware  camel           WRONG   UNKNOWN                                     4802 tok  27.12s  nightshift 0.4 GB
+ALR-3041 chameleon camel           WRONG   CONFIG_ERROR                                4838 tok  29.82s  nightshift 0.3 GB
+ALR-3026 config    camel           WRONG   UNKNOWN                                     4807 tok  22.87s  nightshift 0.4 GB
+ALR-3015 adversary camel           correct ACTIVE_ADVERSARY                            4812 tok   31.3s  nightshift 0.3 GB
+ALR-3019 hardware  camel           WRONG   UNKNOWN                                     4804 tok  34.17s  nightshift 0.3 GB
+ALR-3043 chameleon camel           WRONG   CONFIG_ERROR                                4844 tok  21.44s  nightshift 0.3 GB
+ALR-3028 config    camel           correct CONFIG_ERROR                                4807 tok  57.19s  nightshift 0.4 GB
+ALR-3022 adversary camel           correct ACTIVE_ADVERSARY                            4814 tok   30.8s  nightshift 0.4 GB
+ALR-3021 hardware  camel           WRONG   UNKNOWN                                     4804 tok  24.95s  nightshift 0.2 GB
+ALR-3054 chameleon camel           WRONG   CONFIG_ERROR                                4849 tok  31.61s  nightshift 0.3 GB
+ALR-3029 config    camel           WRONG   UNKNOWN                                     4807 tok  17.58s  nightshift 0.3 GB
+ALR-3039 adversary camel           correct ACTIVE_ADVERSARY                            4814 tok  19.22s  nightshift 0.4 GB
+ALR-3024 hardware  camel           WRONG   UNKNOWN                                     4802 tok  25.63s  nightshift 0.2 GB
+ALR-3059 chameleon camel           correct ACTIVE_ADVERSARY                            4851 tok  29.95s  nightshift 0.4 GB
+ALR-3031 config    camel           WRONG   UNKNOWN                                     4807 tok  28.88s  nightshift 0.3 GB
+ALR-3040 adversary camel           WRONG   UNKNOWN                                     4815 tok 250.18s  nightshift 0.4 GB
+ALR-3030 hardware  camel           WRONG   UNKNOWN                                     4804 tok   24.8s  nightshift 0.4 GB
+ALR-3060 chameleon camel           WRONG   HARDWARE_FAILURE                            4838 tok  46.86s  nightshift 0.3 GB
+ALR-3032 config    camel           correct CONFIG_ERROR                                4807 tok  28.98s  nightshift 0.3 GB
+ALR-3044 adversary camel           WRONG   UNKNOWN                                     4817 tok   24.3s  nightshift 0.3 GB
+ALR-3035 hardware  camel           WRONG   UNKNOWN                                     4804 tok  37.85s  nightshift 0.4 GB
+ALR-3062 chameleon camel           WRONG   CONFIG_ERROR                                4845 tok  23.82s  nightshift 0.4 GB
+ALR-3034 config    camel           correct CONFIG_ERROR                                4807 tok  31.44s  nightshift 0.4 GB
+ALR-3045 adversary camel           correct ACTIVE_ADVERSARY                            4815 tok  33.99s  nightshift 0.3 GB
+ALR-3037 hardware  camel           WRONG   UNKNOWN                                     4804 tok  23.35s  nightshift 0.3 GB
+ALR-3064 chameleon camel           WRONG   CONFIG_ERROR                                4851 tok  21.23s  nightshift 0.4 GB
+ALR-3036 config    camel           correct CONFIG_ERROR                                4807 tok  22.74s  nightshift 0.3 GB
+ALR-3047 adversary camel           correct ACTIVE_ADVERSARY                            6118 tok 166.62s  nightshift 0.4 GB
+
+40 run(s) added to evidence/bench/incident-bench.jsonl. Make the tables with: npm run bench:report
+01 Nov 23:43:18 IST done incident-bench camel
