@@ -1,0 +1,43 @@
+ALR-3118 config    guard           correct CONFIG_ERROR                              267403 tok  47.05s  nightshift 0.3 GB
+ALR-3170 chameleon summary         correct ACTIVE_ADVERSARY                          116774 tok   45.9s  nightshift 0.2 GB
+ALR-3170 chameleon guard           WRONG   HUMAN_REVIEW                               57821 tok  16.75s  nightshift 0.3 GB
+ALR-3170 chameleon dual            correct ACTIVE_ADVERSARY                           58277 tok  21.16s  nightshift 0.3 GB
+ALR-3170 chameleon react           correct ACTIVE_ADVERSARY                            2462 tok 123.41s  nightshift 0.2 GB
+ALR-3145 adversary zerobleed       correct ACTIVE_ADVERSARY                            6000 tok    189s  nightshift 0.3 GB
+ALR-3145 adversary zerobleed-batch correct ACTIVE_ADVERSARY                            5272 tok   59.4s  nightshift 0.3 GB
+ALR-3145 adversary zerobleed-noguard correct ACTIVE_ADVERSARY                            6023 tok  66.67s  nightshift 0.3 GB
+ALR-3145 adversary shared          correct ACTIVE_ADVERSARY                          144290 tok 107.57s  nightshift 0.2 GB
+ALR-3145 adversary summary         correct ACTIVE_ADVERSARY                           97155 tok  37.37s  nightshift 0.3 GB
+ALR-3145 adversary guard           correct ACTIVE_ADVERSARY                          192306 tok  40.89s  nightshift 0.3 GB
+ALR-3145 adversary dual            correct ACTIVE_ADVERSARY                           48647 tok  26.35s  nightshift 0.3 GB
+ALR-3145 adversary react           WRONG   CONFIG_ERROR                               23279 tok  75.46s  nightshift 0.3 GB
+ALR-3143 hardware  react           correct HARDWARE_FAILURE                           30868 tok 413.46s  nightshift 0.2 GB
+ALR-3172 chameleon zerobleed       correct ACTIVE_ADVERSARY                            5855 tok 181.11s  nightshift 0.2 GB
+ALR-3172 chameleon zerobleed-batch correct ACTIVE_ADVERSARY                            5126 tok 116.84s  nightshift 0.3 GB
+ALR-3172 chameleon zerobleed-noguard correct ACTIVE_ADVERSARY                            5878 tok    162s  nightshift 0.3 GB
+ALR-3172 chameleon shared          correct ACTIVE_ADVERSARY                          185066 tok  35.79s  nightshift 0.3 GB
+ALR-3172 chameleon summary         correct ACTIVE_ADVERSARY                          124261 tok 112.69s  nightshift 0.3 GB
+ALR-3172 guard: infrastructure error, not recorded, will retry: Nightshift 502 (nvidia/nemotron-3.5-lightning-30b-a3b): {"error":{"message":"429: {\"status\":429,\"title\":\"Too Many R
+ALR-3172 chameleon dual            correct ACTIVE_ADVERSARY                           62104 tok  24.09s  nightshift 0.3 GB
+ALR-3172 chameleon react           correct ACTIVE_ADVERSARY                            2412 tok   63.2s  nightshift 0.4 GB
+ALR-3133 config    zerobleed       correct CONFIG_ERROR                                3593 tok  39.98s  nightshift 0.3 GB
+ALR-3133 config    zerobleed-batch correct CONFIG_ERROR                                3671 tok  42.39s  nightshift 0.3 GB
+ALR-3133 config    zerobleed-noguard correct CONFIG_ERROR                                3593 tok   48.9s  nightshift 0.3 GB
+ALR-3133 config    shared          correct CONFIG_ERROR                              193964 tok 151.21s  nightshift 0.3 GB
+ALR-3133 config    summary         correct CONFIG_ERROR                              130076 tok   86.6s  nightshift 0.3 GB
+ALR-3133 config    guard           correct CONFIG_ERROR                              258853 tok   68.1s  nightshift 0.3 GB
+ALR-3133 config    dual            correct CONFIG_ERROR                               65155 tok 144.69s  nightshift 0.4 GB
+ALR-3133 react: infrastructure error, not recorded, will retry: Nightshift 502 (nvidia/nemotron-3.5-lightning-30b-a3b): {"error":{"message":"429: {\"status\":429,\"title\":\"Too Many R
+ALR-3147 adversary zerobleed       correct ACTIVE_ADVERSARY                            5953 tok  86.64s  nightshift 0.3 GB
+ALR-3147 adversary zerobleed-batch correct ACTIVE_ADVERSARY                            5225 tok  21.98s  nightshift 0.3 GB
+ALR-3147 adversary zerobleed-noguard correct ACTIVE_ADVERSARY                            5976 tok  52.59s  nightshift 0.3 GB
+ALR-3147 adversary shared          correct ACTIVE_ADVERSARY                          212317 tok 140.59s  nightshift 0.3 GB
+ALR-3147 adversary summary         correct ACTIVE_ADVERSARY                          142388 tok  35.74s  nightshift 0.3 GB
+ALR-3147 adversary guard           correct ACTIVE_ADVERSARY                          282777 tok 102.28s  nightshift 0.3 GB
+ALR-3147 adversary dual            correct ACTIVE_ADVERSARY                           71201 tok  68.58s  nightshift 0.3 GB
+Zetaris driver above 6 GB: handing back to the loop for a restart; finished runs are kept.
+ALR-3172 chameleon guard           correct ACTIVE_ADVERSARY                          246752 tok  98.19s  nightshift 0.2 GB
+ALR-3133 config    react           correct CONFIG_ERROR                                5058 tok  22.62s  nightshift 0.3 GB
+ALR-3147 adversary react           correct ACTIVE_ADVERSARY                            2425 tok   30.5s  nightshift 0.3 GB
+
+3 run(s) added to evidence/bench/incident-bench.jsonl. Make the tables with: npm run bench:report

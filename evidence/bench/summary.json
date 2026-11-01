@@ -1,0 +1,866 @@
+{
+  "generated": "2026-11-01T08:55:33.242Z",
+  "kvMbPerToken": {
+    "small": 0.125,
+    "large": 0.3125
+  },
+  "poolGb": 40,
+  "prices": {
+    "fast": 0.1,
+    "deep": 1
+  },
+  "domains": {
+    "procurement-bench": {
+      "shared": {
+        "runs": 200,
+        "correct": 146,
+        "accuracy": 0.73,
+        "ci": [
+          0.664564384587978,
+          0.7867664526895944
+        ],
+        "perSplit": {
+          "breach": 0.86,
+          "waiver": 0.68,
+          "below": 0.82,
+          "injection": 0.56
+        },
+        "attacked": 50,
+        "asr": 0.44,
+        "flaggedHijacks": 0,
+        "dug": 0.29999999999999993,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 12613731,
+        "deepInputTokens": 2557863,
+        "meanTokens": 63068.655,
+        "peakInput": 18983,
+        "kvMbSmall": 2372.875,
+        "kvMbLarge": 5932.1875,
+        "maxConcurrentStreamsSmall": 17,
+        "p50": 14.114999999999998,
+        "p95": 81.92749999999998,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 3.5634498
+      },
+      "summary": {
+        "runs": 200,
+        "correct": 99,
+        "accuracy": 0.495,
+        "ci": [
+          0.4264572195415849,
+          0.5637312405175983
+        ],
+        "perSplit": {
+          "breach": 0.4,
+          "waiver": 0.5,
+          "below": 0.68,
+          "injection": 0.4
+        },
+        "attacked": 50,
+        "asr": 0.18,
+        "flaggedHijacks": 0,
+        "dug": 0,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 5545878,
+        "deepInputTokens": 118153,
+        "meanTokens": 27729.39,
+        "peakInput": 18729,
+        "kvMbSmall": 2341.125,
+        "kvMbLarge": 5852.8125,
+        "maxConcurrentStreamsSmall": 17,
+        "p50": 17.48,
+        "p95": 103.25099999999996,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 0.6609255
+      },
+      "guard": {
+        "runs": 200,
+        "correct": 156,
+        "accuracy": 0.78,
+        "ci": [
+          0.7176107720803744,
+          0.8318354646053661
+        ],
+        "perSplit": {
+          "breach": 0.96,
+          "waiver": 0.88,
+          "below": 0.88,
+          "injection": 0.4
+        },
+        "attacked": 50,
+        "asr": 0.5,
+        "flaggedHijacks": 0,
+        "dug": 0.5599999999999999,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 14888996,
+        "deepInputTokens": 2509909,
+        "meanTokens": 74444.98,
+        "peakInput": 19050,
+        "kvMbSmall": 2381.25,
+        "kvMbLarge": 5953.125,
+        "maxConcurrentStreamsSmall": 17,
+        "p50": 15.920000000000002,
+        "p95": 97.808,
+        "errors": 0,
+        "humanReview": 4,
+        "costUsd": 3.7478177
+      },
+      "dual": {
+        "runs": 200,
+        "correct": 178,
+        "accuracy": 0.89,
+        "ci": [
+          0.8390720169908702,
+          0.9262280983928396
+        ],
+        "perSplit": {
+          "breach": 0.98,
+          "waiver": 0.94,
+          "below": 1,
+          "injection": 0.64
+        },
+        "attacked": 50,
+        "asr": 0.32,
+        "flaggedHijacks": 0,
+        "dug": 0.33999999999999997,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 2593846,
+        "deepInputTokens": 86546,
+        "meanTokens": 12969.23,
+        "peakInput": 18753,
+        "kvMbSmall": 2344.125,
+        "kvMbLarge": 5860.3125,
+        "maxConcurrentStreamsSmall": 17,
+        "p50": 6.77,
+        "p95": 38.46999999999994,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 0.337276
+      },
+      "react": {
+        "runs": 200,
+        "correct": 151,
+        "accuracy": 0.755,
+        "ci": [
+          0.6909563161285153,
+          0.809432220853141
+        ],
+        "perSplit": {
+          "breach": 0.88,
+          "waiver": 1,
+          "below": 0.58,
+          "injection": 0.56
+        },
+        "attacked": 50,
+        "asr": 0.44,
+        "flaggedHijacks": 0,
+        "dug": 0.31999999999999995,
+        "pvr": 0.1564102564102564,
+        "modelRequests": 390,
+        "violations": 61,
+        "inputTokens": 4135694,
+        "deepInputTokens": 0,
+        "meanTokens": 20678.47,
+        "peakInput": 51336,
+        "kvMbSmall": 6417,
+        "kvMbLarge": 16042.5,
+        "maxConcurrentStreamsSmall": 6,
+        "p50": 12.31,
+        "p95": 75.41199999999978,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 0.41356940000000003
+      },
+      "llmlingua": {
+        "runs": 100,
+        "correct": 87,
+        "accuracy": 0.87,
+        "ci": [
+          0.7901947810519012,
+          0.9224290614158575
+        ],
+        "perSplit": {
+          "breach": 0.96,
+          "waiver": 0.76,
+          "below": 0.84,
+          "injection": 0.92
+        },
+        "attacked": 25,
+        "asr": 0.08,
+        "flaggedHijacks": 0,
+        "dug": 0.039999999999999925,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 5781138,
+        "deepInputTokens": 1173242,
+        "meanTokens": 57811.38,
+        "peakInput": 17273,
+        "kvMbSmall": 2159.125,
+        "kvMbLarge": 5397.8125,
+        "maxConcurrentStreamsSmall": 18,
+        "p50": 19.58,
+        "p95": 31.821999999999996,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 1.6340316000000001
+      },
+      "letta": {
+        "runs": 5,
+        "correct": 0,
+        "accuracy": 0,
+        "ci": [
+          0,
+          0.43449149475208104
+        ],
+        "perSplit": {
+          "breach": 0,
+          "waiver": 0,
+          "below": 0,
+          "injection": 0
+        },
+        "attacked": 1,
+        "asr": 0,
+        "flaggedHijacks": 0,
+        "dug": 0,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 5096570,
+        "deepInputTokens": 0,
+        "meanTokens": 1019314,
+        "peakInput": 137535,
+        "kvMbSmall": 17191.875,
+        "kvMbLarge": 42979.6875,
+        "maxConcurrentStreamsSmall": 2,
+        "p50": null,
+        "p95": null,
+        "errors": 5,
+        "humanReview": 0,
+        "costUsd": 0.509657
+      },
+      "camel": {
+        "runs": 10,
+        "correct": 5,
+        "accuracy": 0.5,
+        "ci": [
+          0.23658959361548731,
+          0.7634104063845126
+        ],
+        "perSplit": {
+          "breach": 1,
+          "waiver": 0,
+          "below": 0,
+          "injection": 1
+        },
+        "attacked": 2,
+        "asr": 0,
+        "flaggedHijacks": 0,
+        "dug": 0,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 42710,
+        "deepInputTokens": 34364,
+        "meanTokens": 4271,
+        "peakInput": 3377,
+        "kvMbSmall": 422.125,
+        "kvMbLarge": 1055.3125,
+        "maxConcurrentStreamsSmall": 97,
+        "p50": 10.559999999999999,
+        "p95": 46.79699999999994,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 0.0351986
+      },
+      "zerobleed-noguard": {
+        "runs": 200,
+        "correct": 189,
+        "accuracy": 0.945,
+        "ci": [
+          0.9042120755340645,
+          0.9690149791986299
+        ],
+        "perSplit": {
+          "breach": 0.96,
+          "waiver": 1,
+          "below": 0.96,
+          "injection": 0.86
+        },
+        "attacked": 50,
+        "asr": 0.12,
+        "flaggedHijacks": 0,
+        "dug": 0.09999999999999998,
+        "pvr": 0,
+        "modelRequests": 105,
+        "violations": 0,
+        "inputTokens": 862958,
+        "deepInputTokens": 312371,
+        "meanTokens": 4314.79,
+        "peakInput": 2012,
+        "kvMbSmall": 251.5,
+        "kvMbLarge": 628.75,
+        "maxConcurrentStreamsSmall": 162,
+        "p50": 15.95,
+        "p95": 108.4175,
+        "errors": 0,
+        "humanReview": 2,
+        "costUsd": 0.3674297
+      },
+      "zerobleed": {
+        "runs": 200,
+        "correct": 190,
+        "accuracy": 0.95,
+        "ci": [
+          0.9104209437021562,
+          0.9726176509713551
+        ],
+        "perSplit": {
+          "breach": 0.96,
+          "waiver": 1,
+          "below": 0.96,
+          "injection": 0.88
+        },
+        "attacked": 50,
+        "asr": 0.1,
+        "flaggedHijacks": 2,
+        "dug": 0.07999999999999996,
+        "pvr": 0,
+        "modelRequests": 170,
+        "violations": 0,
+        "inputTokens": 961880,
+        "deepInputTokens": 386874,
+        "meanTokens": 4809.4,
+        "peakInput": 1506,
+        "kvMbSmall": 188.25,
+        "kvMbLarge": 470.625,
+        "maxConcurrentStreamsSmall": 217,
+        "p50": 19.595,
+        "p95": 85.24799999999986,
+        "errors": 0,
+        "humanReview": 5,
+        "costUsd": 0.44437459999999995
+      },
+      "zerobleed-batch": {
+        "runs": 200,
+        "correct": 195,
+        "accuracy": 0.975,
+        "ci": [
+          0.9428208558483829,
+          0.9892754385292123
+        ],
+        "perSplit": {
+          "breach": 0.98,
+          "waiver": 1,
+          "below": 1,
+          "injection": 0.92
+        },
+        "attacked": 50,
+        "asr": 0.06,
+        "flaggedHijacks": 2,
+        "dug": 0.05999999999999994,
+        "pvr": 0,
+        "modelRequests": 16,
+        "violations": 0,
+        "inputTokens": 868626,
+        "deepInputTokens": 350449,
+        "meanTokens": 4343.13,
+        "peakInput": 1619,
+        "kvMbSmall": 202.375,
+        "kvMbLarge": 505.9375,
+        "maxConcurrentStreamsSmall": 202,
+        "p50": 17.244999999999997,
+        "p95": 97.41999999999999,
+        "errors": 0,
+        "humanReview": 4,
+        "costUsd": 0.40226670000000003
+      }
+    },
+    "incident-bench": {
+      "shared": {
+        "runs": 200,
+        "correct": 177,
+        "accuracy": 0.885,
+        "ci": [
+          0.8333517476611362,
+          0.9221368277817569
+        ],
+        "perSplit": {
+          "config": 0.82,
+          "adversary": 1,
+          "hardware": 0.88,
+          "chameleon": 0.84
+        },
+        "attacked": 50,
+        "asr": 0.16,
+        "flaggedHijacks": 0,
+        "dug": 0.16000000000000003,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 37716021,
+        "deepInputTokens": 12630579,
+        "meanTokens": 188580.105,
+        "peakInput": 94665,
+        "kvMbSmall": 11833.125,
+        "kvMbLarge": 29582.8125,
+        "maxConcurrentStreamsSmall": 3,
+        "p50": 28.27,
+        "p95": 87.532,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 15.139123199999998
+      },
+      "summary": {
+        "runs": 200,
+        "correct": 180,
+        "accuracy": 0.9,
+        "ci": [
+          0.8505931364369146,
+          0.9343300588284289
+        ],
+        "perSplit": {
+          "config": 0.9,
+          "adversary": 1,
+          "hardware": 0.76,
+          "chameleon": 0.94
+        },
+        "attacked": 50,
+        "asr": 0.06,
+        "flaggedHijacks": 0,
+        "dug": 0.06000000000000005,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 25359788,
+        "deepInputTokens": 173262,
+        "meanTokens": 126798.94,
+        "peakInput": 93273,
+        "kvMbSmall": 11659.125,
+        "kvMbLarge": 29147.8125,
+        "maxConcurrentStreamsSmall": 3,
+        "p50": 32.76,
+        "p95": 67.9589999999999,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 2.6919146
+      },
+      "guard": {
+        "runs": 200,
+        "correct": 166,
+        "accuracy": 0.83,
+        "ci": [
+          0.7718399896049648,
+          0.8757216464889435
+        ],
+        "perSplit": {
+          "config": 0.88,
+          "adversary": 1,
+          "hardware": 0.86,
+          "chameleon": 0.58
+        },
+        "attacked": 50,
+        "asr": 0.04,
+        "flaggedHijacks": 0,
+        "dug": 0.42000000000000004,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 46491728,
+        "deepInputTokens": 11360410,
+        "meanTokens": 232458.64,
+        "peakInput": 94774,
+        "kvMbSmall": 11846.75,
+        "kvMbLarge": 29616.875,
+        "maxConcurrentStreamsSmall": 3,
+        "p50": 32.67,
+        "p95": 99.19699999999996,
+        "errors": 0,
+        "humanReview": 19,
+        "costUsd": 14.8735418
+      },
+      "dual": {
+        "runs": 200,
+        "correct": 195,
+        "accuracy": 0.975,
+        "ci": [
+          0.9428208558483829,
+          0.9892754385292123
+        ],
+        "perSplit": {
+          "config": 1,
+          "hardware": 0.9,
+          "chameleon": 1,
+          "adversary": 1
+        },
+        "attacked": 50,
+        "asr": 0,
+        "flaggedHijacks": 0,
+        "dug": 0,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 12670002,
+        "deepInputTokens": 122747,
+        "meanTokens": 63350.01,
+        "peakInput": 93138,
+        "kvMbSmall": 11642.25,
+        "kvMbLarge": 29105.625,
+        "maxConcurrentStreamsSmall": 3,
+        "p50": 17.884999999999998,
+        "p95": 64.14500000000004,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 1.3774725
+      },
+      "react": {
+        "runs": 200,
+        "correct": 179,
+        "accuracy": 0.895,
+        "ci": [
+          0.8448186177864638,
+          0.9302930375380627
+        ],
+        "perSplit": {
+          "config": 1,
+          "adversary": 0.98,
+          "hardware": 0.98,
+          "chameleon": 0.62
+        },
+        "attacked": 50,
+        "asr": 0.36,
+        "flaggedHijacks": 0,
+        "dug": 0.36,
+        "pvr": 0.08153078202995008,
+        "modelRequests": 601,
+        "violations": 49,
+        "inputTokens": 2306292,
+        "deepInputTokens": 0,
+        "meanTokens": 11531.46,
+        "peakInput": 36920,
+        "kvMbSmall": 4615,
+        "kvMbLarge": 11537.5,
+        "maxConcurrentStreamsSmall": 8,
+        "p50": 20.69,
+        "p95": 112.86,
+        "errors": 1,
+        "humanReview": 0,
+        "costUsd": 0.2306292
+      },
+      "llmlingua": {
+        "runs": 100,
+        "correct": 94,
+        "accuracy": 0.94,
+        "ci": [
+          0.8752303146877748,
+          0.9722142547333433
+        ],
+        "perSplit": {
+          "config": 0.92,
+          "hardware": 0.88,
+          "chameleon": 0.96,
+          "adversary": 1
+        },
+        "attacked": 25,
+        "asr": 0.04,
+        "flaggedHijacks": 0,
+        "dug": 0.040000000000000036,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 19257352,
+        "deepInputTokens": 6449176,
+        "meanTokens": 192573.52,
+        "peakInput": 93781,
+        "kvMbSmall": 11722.625,
+        "kvMbLarge": 29306.5625,
+        "maxConcurrentStreamsSmall": 3,
+        "p50": 34.47,
+        "p95": 63.70699999999997,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 7.729993599999999
+      },
+      "letta": {
+        "runs": 5,
+        "correct": 0,
+        "accuracy": 0,
+        "ci": [
+          0,
+          0.43449149475208104
+        ],
+        "perSplit": {
+          "config": 0,
+          "adversary": 0,
+          "hardware": 0,
+          "chameleon": 0
+        },
+        "attacked": 1,
+        "asr": 0,
+        "flaggedHijacks": 0,
+        "dug": 0,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 4097257,
+        "deepInputTokens": 0,
+        "meanTokens": 819451.4,
+        "peakInput": 111882,
+        "kvMbSmall": 13985.25,
+        "kvMbLarge": 34963.125,
+        "maxConcurrentStreamsSmall": 2,
+        "p50": null,
+        "p95": null,
+        "errors": 5,
+        "humanReview": 0,
+        "costUsd": 0.4097257
+      },
+      "camel": {
+        "runs": 10,
+        "correct": 5,
+        "accuracy": 0.5,
+        "ci": [
+          0.23658959361548731,
+          0.7634104063845126
+        ],
+        "perSplit": {
+          "config": 0.3333333333333333,
+          "adversary": 1,
+          "hardware": 0.5,
+          "chameleon": 0
+        },
+        "attacked": 2,
+        "asr": 1,
+        "flaggedHijacks": 0,
+        "dug": 1,
+        "pvr": null,
+        "modelRequests": 0,
+        "violations": 0,
+        "inputTokens": 45640,
+        "deepInputTokens": 36025,
+        "meanTokens": 4564,
+        "peakInput": 3648,
+        "kvMbSmall": 456,
+        "kvMbLarge": 1140,
+        "maxConcurrentStreamsSmall": 89,
+        "p50": 21.04,
+        "p95": 110.40049999999991,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 0.0369865
+      },
+      "zerobleed-noguard": {
+        "runs": 200,
+        "correct": 196,
+        "accuracy": 0.98,
+        "ci": [
+          0.9497121344948062,
+          0.9921956998236058
+        ],
+        "perSplit": {
+          "config": 0.96,
+          "adversary": 1,
+          "hardware": 0.96,
+          "chameleon": 1
+        },
+        "attacked": 50,
+        "asr": 0,
+        "flaggedHijacks": 0,
+        "dug": 0,
+        "pvr": 0,
+        "modelRequests": 156,
+        "violations": 0,
+        "inputTokens": 982759,
+        "deepInputTokens": 483260,
+        "meanTokens": 4913.795,
+        "peakInput": 1766,
+        "kvMbSmall": 220.75,
+        "kvMbLarge": 551.875,
+        "maxConcurrentStreamsSmall": 185,
+        "p50": 31.049999999999997,
+        "p95": 120.35999999999999,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 0.5332099
+      },
+      "zerobleed": {
+        "runs": 200,
+        "correct": 199,
+        "accuracy": 0.995,
+        "ci": [
+          0.9722256001302286,
+          0.999116854010634
+        ],
+        "perSplit": {
+          "config": 1,
+          "adversary": 1,
+          "hardware": 0.98,
+          "chameleon": 1
+        },
+        "attacked": 50,
+        "asr": 0,
+        "flaggedHijacks": 0,
+        "dug": 0,
+        "pvr": 0,
+        "modelRequests": 149,
+        "violations": 0,
+        "inputTokens": 993038,
+        "deepInputTokens": 486666,
+        "meanTokens": 4965.19,
+        "peakInput": 1766,
+        "kvMbSmall": 220.75,
+        "kvMbLarge": 551.875,
+        "maxConcurrentStreamsSmall": 185,
+        "p50": 41.56,
+        "p95": 121.07500000000005,
+        "errors": 0,
+        "humanReview": 1,
+        "costUsd": 0.5373032
+      },
+      "zerobleed-batch": {
+        "runs": 200,
+        "correct": 200,
+        "accuracy": 1,
+        "ci": [
+          0.9811539940816791,
+          1
+        ],
+        "perSplit": {
+          "config": 1,
+          "adversary": 1,
+          "hardware": 1,
+          "chameleon": 1
+        },
+        "attacked": 50,
+        "asr": 0,
+        "flaggedHijacks": 0,
+        "dug": 0,
+        "pvr": 0,
+        "modelRequests": 76,
+        "violations": 0,
+        "inputTokens": 941517,
+        "deepInputTokens": 425027,
+        "meanTokens": 4707.585,
+        "peakInput": 1792,
+        "kvMbSmall": 224,
+        "kvMbLarge": 560,
+        "maxConcurrentStreamsSmall": 182,
+        "p50": 24.16,
+        "p95": 111.73399999999998,
+        "errors": 0,
+        "humanReview": 0,
+        "costUsd": 0.476676
+      }
+    },
+    "procurement-suite": {
+      "shared": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "summary": {
+        "runs": 30,
+        "correct": 11,
+        "hijacked": 5,
+        "complied": 0
+      },
+      "guard": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "dual": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "react": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "zerobleed-noguard": {
+        "runs": 30,
+        "correct": 29,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "zerobleed": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "zerobleed-batch": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      }
+    },
+    "incident-suite": {
+      "shared": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "summary": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "guard": {
+        "runs": 30,
+        "correct": 22,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "dual": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "react": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "zerobleed-noguard": {
+        "runs": 30,
+        "correct": 29,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "zerobleed": {
+        "runs": 30,
+        "correct": 28,
+        "hijacked": 0,
+        "complied": 0
+      },
+      "zerobleed-batch": {
+        "runs": 30,
+        "correct": 30,
+        "hijacked": 0,
+        "complied": 0
+      }
+    }
+  }
+}

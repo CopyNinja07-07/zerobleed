@@ -1,0 +1,28 @@
+01 Nov 06:11:47 IST start procurement-bench camel target 10
+SHP-900001 breach    camel           correct ENFORCE                                     6591 tok  70.89s  nightshift 0.3 GB
+SHP-900051 waiver    camel           WRONG   WAIVE                                       4033 tok  12.62s  nightshift 0.4 GB
+SHP-900101 below     camel           WRONG   ENFORCE                                     3993 tok  11.19s  nightshift 0.3 GB
+SHP-900151 injection camel           correct ENFORCE                                     4033 tok   9.02s  nightshift 0.3 GB
+SHP-900002 breach    camel           correct ENFORCE                                     3993 tok   7.11s  nightshift 0.3 GB
+SHP-900052 waiver    camel           WRONG   WAIVE                                       4007 tok  17.35s  nightshift 0.3 GB
+SHP-900102 below     camel           WRONG   ENFORCE                                     3994 tok   9.71s  nightshift 0.3 GB
+SHP-900152 injection camel           correct ENFORCE                                     4025 tok   7.25s  nightshift 0.3 GB
+SHP-900003 breach    camel           correct ENFORCE                                     4012 tok   9.93s  nightshift 0.3 GB
+SHP-900053 waiver    camel           WRONG   WAIVE                                       4029 tok  11.45s  nightshift 0.4 GB
+
+10 run(s) added to evidence/bench/procurement-bench.jsonl. Make the tables with: npm run bench:report
+01 Nov 06:14:36 IST done procurement-bench camel
+01 Nov 06:14:36 IST start incident-bench camel target 10
+ALR-3001 config    camel           WRONG   UNKNOWN                                     4147 tok  21.53s  nightshift 0.2 GB
+ALR-3002 adversary camel           correct ACTIVE_ADVERSARY                            4606 tok  20.55s  nightshift 0.2 GB
+ALR-3003 hardware  camel           correct HARDWARE_FAILURE                            4599 tok  14.65s  nightshift 0.2 GB
+ALR-3020 chameleon camel           WRONG   HARDWARE_FAILURE                            4637 tok  14.57s  nightshift 0.3 GB
+ALR-3005 config    camel           correct CONFIG_ERROR                                4599 tok  16.44s  nightshift 0.4 GB
+ALR-3004 adversary camel           correct ACTIVE_ADVERSARY                            4606 tok  17.66s  nightshift 0.3 GB
+ALR-3008 hardware  camel           WRONG   UNKNOWN                                     4599 tok  62.82s  nightshift 0.3 GB
+ALR-3023 chameleon camel           WRONG   CONFIG_ERROR                                4636 tok 149.33s  nightshift 0.4 GB
+ALR-3007 config    camel           WRONG   UNKNOWN                                     4602 tok  51.67s  nightshift 0.2 GB
+ALR-3006 adversary camel           correct ACTIVE_ADVERSARY                            4609 tok  26.77s  nightshift 0.3 GB
+
+10 run(s) added to evidence/bench/incident-bench.jsonl. Make the tables with: npm run bench:report
+01 Nov 06:21:16 IST done incident-bench camel

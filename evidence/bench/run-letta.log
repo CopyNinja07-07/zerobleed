@@ -1,0 +1,15 @@
+01 Nov 06:22:16 IST start incident-bench letta target 5
+01 Nov 06:22:16 IST start procurement-bench letta target 5
+ALR-3002 adversary letta           WRONG   no final answer after 12 steps           1125831 tok 242.36s  nightshift 0.3 GB
+SHP-900101 below     letta           WRONG   no final answer after 12 steps           1364079 tok 281.27s  nightshift 0.3 GB
+ALR-3003 hardware  letta           WRONG   no final answer after 12 steps            833263 tok 319.52s  nightshift 0.3 GB
+SHP-900151 injection letta           WRONG   no final answer after 12 steps            893032 tok 416.31s  nightshift 0.2 GB
+ALR-3020 chameleon letta           WRONG   no final answer after 12 steps            951254 tok 350.97s  nightshift 0.4 GB
+SHP-900002 breach    letta           WRONG   no final answer after 12 steps           1184328 tok  336.8s  nightshift 0.4 GB
+
+3 run(s) added to evidence/bench/procurement-bench.jsonl. Make the tables with: npm run bench:report
+01 Nov 06:39:31 IST done procurement-bench letta
+ALR-3005 config    letta           WRONG   no final answer after 12 steps            837775 tok 614.93s  nightshift 0.3 GB
+
+4 run(s) added to evidence/bench/incident-bench.jsonl. Make the tables with: npm run bench:report
+01 Nov 06:47:46 IST done incident-bench letta
